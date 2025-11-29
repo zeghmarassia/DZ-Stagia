@@ -1,0 +1,73 @@
+# ---------------------------------------
+# GLOBAL ENV FILES (NEVER COMMIT SECRETS)
+# ---------------------------------------
+.env
+*.env
+.env.*
+!env.example
+!.env.example
+
+# ---------------------------------------
+# PYTHON / FASTAPI
+# ---------------------------------------
+backend/__pycache__/
+backend/**/*.py[cod]
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.hypothesis/
+backend/*.egg-info/
+backend/.coverage
+backend/coverage.xml
+
+# Byte-compiled and optimized files
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# ---------------------------------------
+# NODE / REACT
+# ---------------------------------------
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+frontend/build/
+frontend/npm-debug.log
+frontend/yarn-debug.log
+frontend/yarn-error.log
+
+# ---------------------------------------
+# DOCKER
+# ---------------------------------------
+docker/*.pid
+*.pid
+*.log
+pgdata/
+dbdata/
+
+# ---------------------------------------
+# EDITORS / IDEs
+# ---------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---------------------------------------
+# SYSTEM FILES
+# ---------------------------------------
+.DS_Store
+Thumbs.db
+
+# ---------------------------------------
+# TEST ARTIFACTS
+# ---------------------------------------
+coverage/
+pytest-report/
+frontend/coverage/
