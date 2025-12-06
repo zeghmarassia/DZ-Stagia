@@ -1,0 +1,16 @@
+services:
+  # We name this service 'frontend'
+  frontend:
+    build:
+      context: ./frontend      # Points to the frontend folder
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app        # Syncs only the frontend folder to /app
+      - /app/node_modules      # Keeps container dependencies isolated
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    stdin_open: true           # Important for interactive mode
+    tty: true
