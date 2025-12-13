@@ -12,6 +12,14 @@ from app.utils.storage import (
     StorageService
 )
 
+from app.utils.security import (
+    verify_password,
+    get_password_hash,
+    create_access_token,
+    decode_access_token,
+    get_user
+)
+
 __all__ = [
     "upload_student_document",
     "upload_company_document",
@@ -23,5 +31,10 @@ __all__ = [
     "delete_student_profile",
     "delete_company_logo",
     "delete_admin_profile",
-    "StorageService"
+    "StorageService",
+    "verify_password",
+    "get_password_hash",
+    "create_access_token",
+    "decode_access_token",
+    "get_user"
 ]
