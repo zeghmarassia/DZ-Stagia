@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import CompanyCard from '../components/CompanyCard';
 import JobCard from '../components/JobCard';
 import FeatureCard from '../components/FeatureCard';
@@ -59,13 +60,18 @@ const Homepage = () => {
           </div>
 
           {/* Right Side: Auth Buttons */}
+          {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <button className="px-5 py-2.5 bg-[#5B8C9D] text-white text-sm font-bold rounded-lg hover:bg-[#4a7280] transition shadow-sm">
-              S'inscrire
-            </button>
-            <button className="text-sm font-bold text-slate-900 hover:text-blue-600 transition">
+            {/* Link to Signup */}
+            <Link to="/signup"> 
+              <button className="px-5 py-2.5 bg-[#5B8C9D] text-white text-sm font-bold rounded-lg hover:bg-[#4a7280] transition shadow-sm">
+                S'inscrire
+              </button>
+            </Link>
+            {/* Link to Login */}
+            <Link to="/login" className="text-sm font-bold text-slate-900 hover:text-blue-600 transition">
               Connexion
-            </button>
+            </Link>
           </div>
 
           {/* Mobile Menu Icon */}
