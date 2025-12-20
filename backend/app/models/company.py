@@ -14,7 +14,7 @@ class Company(Base):
     status = Column(String(20), default='pending', index=True)
     is_email_verified = Column(Boolean, default=False)
     
-    document_url = Column(String(500), nullable=False)
+    document_url = Column(String(500), nullable=True)
     
     description = Column(Text, nullable=True)
     sector = Column(String(100), nullable=True)

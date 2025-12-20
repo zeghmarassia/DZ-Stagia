@@ -48,5 +48,4 @@ Thumbs.db
 
 #testing files
 test.py
-supabase_test.py
 create_tables.py
