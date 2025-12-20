@@ -85,6 +85,25 @@ async def register_company(
     )
     return company
 
+@router.post("/verify-email")
+async def verify_email(
+    email: str = Form(...),
+    otp_code: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    """Verify email with OTP"""
+    if not AuthService.verify_otp(email, otp_code):
+        raise HTTPException(400, "Invalid or expired OTP")
+    
+    user_type, user = AuthService.detect_user_type(db, email)
+    
+    if not user:
+        raise HTTPException(404, "User not found")
+    
+    user.is_email_verified = True
+    db.commit()
+    
+    return {"message": "Email verified successfully"}
 
 @router.post("/forgot-password")
 def forgot_password(
@@ -117,7 +136,7 @@ def reset_password(
 @router.post("/logout")
 def logout(response: Response):
     """Logout and clear auth cookie"""
-    return AuthService.logout(response)  # ✅ FIXED: Just call service, don't duplicate
+    return AuthService.logout(response)  
 
 
 @router.get("/health")
@@ -131,6 +150,7 @@ def health_check():
             "admin_login": "/admin/login",
             "register_student": "/student/register",
             "register_company": "/company/register",
+            "verify_email": "/verify-email",
             "forgot_password": "/forgot-password",
             "reset_password": "/reset-password",
             "logout": "/logout"

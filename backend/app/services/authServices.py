@@ -186,9 +186,21 @@ class AuthService:
             db.add(new_student)
             db.commit()
             db.refresh(new_student)
+
+            # Generate OTP
             otp = AuthService.generate_otp()
             AuthService.store_otp(email, otp)
-            print(f"📧 (TESTING) Email verification OTP for {email}: {otp}")
+            
+            # send the email
+            try:
+                from app.services.emailService import EmailService
+                await EmailService.send_welcome_email(email, f"{first_name} {last_name}", "student")
+                await EmailService.send_otp_email(email, otp, "verification")
+                print(f"Email with OTP sent to {email}")
+            except Exception as email_error:
+                print(f"Email service failed: {email_error}")
+                print(f"Email verification OTP for {email}: {otp}")
+                
             return new_student
             
         except IntegrityError as e:
@@ -248,16 +260,28 @@ class AuthService:
             address=address,
             status='pending',
             is_email_verified=True,
-            document_url=document_url  # ✅ Already has value
+            document_url=document_url 
         )
         
         try:
             db.add(new_company)
             db.commit()
             db.refresh(new_company)
+            
+            # Generate OTP
             otp = AuthService.generate_otp()
             AuthService.store_otp(email, otp)
-            print(f"(TESTING) Email verification OTP for {email}: {otp}")
+            
+            # send email
+            try:
+                from app.services.emailService import EmailService
+                await EmailService.send_welcome_email(email, company_name, "company")
+                await EmailService.send_otp_email(email, otp, "verification")
+                print(f"Email with OTP sent to {email}")
+            except Exception as email_error:
+                # Fallback: Show OTP in console if email fails
+                print(f"Email service failed: {email_error}")
+                print(f"Email verification OTP for {email}: {otp}")
             return new_company
             
         except IntegrityError as e:
