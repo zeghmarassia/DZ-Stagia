@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException, status, UploadFile
+from fastapi import HTTPException, status, UploadFile, Response
 from typing import Optional, Tuple
 import random
 import string
@@ -65,7 +65,7 @@ class AuthService:
         return (None, None)
     
     @staticmethod
-    def login(db: Session, email: str, password: str) -> LoginResponse:
+    def login(db: Session, email: str, password: str, response: Optional[Response] = None) -> LoginResponse:
         """Login for all user types (student, company, admin)"""
         
         user_type, user = AuthService.detect_user_type(db, email)
@@ -82,7 +82,6 @@ class AuthService:
                 detail="Invalid email or password"
             )
         
-        # Validation for students and companies
         if user_type in ["student", "company"]:
             if not user.is_email_verified:
                 raise HTTPException(
@@ -96,7 +95,7 @@ class AuthService:
                     detail=f"Your account is {user.status}. Please wait for admin approval."
                 )
         
-        # Create token with consistent payload
+        # Create token with consistent payload (includes user_id)
         user_id_field = f"{user_type}_id"
         access_token = create_access_token(
             data={
@@ -105,7 +104,22 @@ class AuthService:
                 "user_id": getattr(user, user_id_field)
             }
         )
-        
+
+        if response is not None:
+            try:
+                response.set_cookie(
+                    key="auth_token",
+                    value=access_token,
+                    httponly=True,
+                    secure=False,
+                    samesite="lax",
+                    max_age=30 * 60,
+                    path="/",
+                )
+            except Exception:
+                # don't break login flow if cookie cannot be set
+                pass
+            
         # Format user data based on type
         if user_type == "student":
             user_data = StudentResponse.from_orm(user).dict()
@@ -144,7 +158,7 @@ class AuthService:
         # Hash password
         hashed_password = get_password_hash(password)
         
-        # ✅ UPLOAD DOCUMENT FIRST (before creating student)
+        # UPLOAD DOCUMENT FIRST (before creating student)
         try:
             # Generate temporary ID for file naming
             import time
@@ -215,7 +229,6 @@ class AuthService:
         # Hash password
         hashed_password = get_password_hash(password)
         
-        # ✅ UPLOAD DOCUMENT FIRST
         try:
             import time
             temp_id = int(time.time() * 1000)
@@ -299,10 +312,9 @@ class AuthService:
         otp = AuthService.generate_otp()
         AuthService.store_otp(email, otp)
         
-        # TODO: Send email with OTP
-        print(f"🔐 OTP for {email} ({user_type}): {otp}")
+        print(f"OTP for {email} ({user_type}): {otp}")
         
-        return otp  # Remove in production!
+        return otp 
     
     @staticmethod
     def reset_password(db: Session, email: str, otp: str, new_password: str) -> dict:
@@ -328,6 +340,14 @@ class AuthService:
         return {"message": "Password reset successfully"}
     
     @staticmethod
-    def logout() -> dict:
-        """Logout (with JWT, this is client-side token removal)"""
+    def logout(response: Response) -> dict:
+        try:
+            response.delete_cookie(
+                key="auth_token",
+                path="/"
+            )
+        except Exception as e:
+            # Cookie deletion failed, but still return success
+            print(f"Cookie deletion failed: {e}")
+        
         return {"message": "Logged out successfully"}

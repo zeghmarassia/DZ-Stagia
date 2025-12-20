@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Response
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -13,12 +13,32 @@ router = APIRouter(tags=["Authentication"])
 
 @router.post("/login")
 def login(
+    response: Response,
     email: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    result = AuthService.login(db, email, password)
+    """Login for students and companies"""
+    result = AuthService.login(db, email, password, response=response)
     return result
+
+
+@router.post("/admin/login")
+def admin_login(
+    response: Response, 
+    email: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    """Login specifically for admins"""
+    result = AuthService.login(db, email, password, response=response)
+    if result.get("user_type") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Admin credentials required on this endpoint"
+        )
+    return result
+
 
 @router.post("/student/register", response_model=StudentResponse, status_code=status.HTTP_201_CREATED)
 async def register_student(
@@ -30,6 +50,7 @@ async def register_student(
     document: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
+    """Register a new student account"""
     student = await AuthService.register_student(
         db=db,
         email=email,
@@ -41,6 +62,7 @@ async def register_student(
     )
     return student
 
+
 @router.post("/company/register", response_model=CompanyResponse, status_code=status.HTTP_201_CREATED)
 async def register_company(
     email: str = Form(...),
@@ -51,6 +73,7 @@ async def register_company(
     document: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
+    """Register a new company account"""
     company = await AuthService.register_company(
         db=db,
         email=email,
@@ -62,22 +85,26 @@ async def register_company(
     )
     return company
 
+
 @router.post("/forgot-password")
 def forgot_password(
     otp_request: OTPRequest,
     db: Session = Depends(get_db)
 ):
+    """Request password reset OTP"""
     otp = AuthService.request_password_reset(db, otp_request.email)
     return {
         "message": "OTP sent to your email",
-        "otp": otp
+        "otp": otp  # TODO: Remove in production!
     }
+
 
 @router.post("/reset-password")
 def reset_password(
     otp_verify: OTPVerify,
     db: Session = Depends(get_db)
 ):
+    """Reset password using OTP"""
     result = AuthService.reset_password(
         db=db,
         email=otp_verify.email,
@@ -86,17 +113,22 @@ def reset_password(
     )
     return result
 
+
 @router.post("/logout")
-def logout():
-    return AuthService.logout()
+def logout(response: Response):
+    """Logout and clear auth cookie"""
+    return AuthService.logout(response)  # ✅ FIXED: Just call service, don't duplicate
+
 
 @router.get("/health")
 def health_check():
+    """Health check endpoint"""
     return {
         "status": "healthy",
         "service": "authentication",
         "endpoints": {
             "login": "/login",
+            "admin_login": "/admin/login",
             "register_student": "/student/register",
             "register_company": "/company/register",
             "forgot_password": "/forgot-password",
