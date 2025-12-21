@@ -14,7 +14,7 @@ from app.schemas.auth import (
 from app.utils.security import get_password_hash, verify_password, create_access_token
 from app.utils.storage import upload_student_document, upload_company_document
 
-# In-memory OTP storage (use Redis in production)
+# In-memory OTP storage
 otp_storage = {}
 
 class AuthService:
@@ -69,7 +69,6 @@ class AuthService:
         """Login for all user types (student, company, admin)"""
         
         user_type, user = AuthService.detect_user_type(db, email)
-        
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -95,11 +94,11 @@ class AuthService:
                     detail=f"Your account is {user.status}. Please wait for admin approval."
                 )
         
-        # Create token with consistent payload (includes user_id)
+        # Create token (includes user_id)
         user_id_field = f"{user_type}_id"
         access_token = create_access_token(
             data={
-                "sub": email,  # Standard JWT "subject" field
+                "sub": email,  
                 "user_type": user_type,
                 "user_id": getattr(user, user_id_field)
             }
@@ -178,7 +177,7 @@ class AuthService:
             last_name=last_name,
             establishment_id=establishment_id,
             status='pending',
-            is_email_verified=False,
+            is_email_verified=True,
             document_url=document_url 
         )
         
@@ -192,14 +191,14 @@ class AuthService:
             AuthService.store_otp(email, otp)
             
             # send the email
-            try:
-                from app.services.emailService import EmailService
-                await EmailService.send_welcome_email(email, f"{first_name} {last_name}", "student")
-                await EmailService.send_otp_email(email, otp, "verification")
-                print(f"Email with OTP sent to {email}")
-            except Exception as email_error:
-                print(f"Email service failed: {email_error}")
-                print(f"Email verification OTP for {email}: {otp}")
+            # try:
+            #     from app.services.emailService import EmailService
+            #     await EmailService.send_welcome_email(email, f"{first_name} {last_name}", "student")
+            #     await EmailService.send_otp_email(email, otp, "verification")
+            #     print(f"Email with OTP sent to {email}")
+            # except Exception as email_error:
+            #     print(f"Email service failed: {email_error}")
+            print(f"Email verification OTP for {email}: {otp}")
                 
             return new_student
             
@@ -259,7 +258,7 @@ class AuthService:
             sector=sector,
             address=address,
             status='pending',
-            is_email_verified=False,
+            is_email_verified=True,
             document_url=document_url 
         )
         
@@ -273,15 +272,16 @@ class AuthService:
             AuthService.store_otp(email, otp)
             
             # send email
-            try:
-                from app.services.emailService import EmailService
-                await EmailService.send_welcome_email(email, company_name, "company")
-                await EmailService.send_otp_email(email, otp, "verification")
-                print(f"Email with OTP sent to {email}")
-            except Exception as email_error:
-                # Fallback: Show OTP in console if email fails
-                print(f"Email service failed: {email_error}")
-                print(f"Email verification OTP for {email}: {otp}")
+            
+            # try:
+            #     from app.services.emailService import EmailService
+            #     await EmailService.send_welcome_email(email, company_name, "company")
+            #     await EmailService.send_otp_email(email, otp, "verification")
+            #     print(f"Email with OTP sent to {email}")
+            # except Exception as email_error:
+            #     # Fallback: Show OTP in console if email fails
+            #     print(f"Email service failed: {email_error}")
+            print(f"Email verification OTP for {email}: {otp}")
             return new_company
             
         except IntegrityError as e:

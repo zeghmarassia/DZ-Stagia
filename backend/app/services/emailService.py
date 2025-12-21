@@ -11,12 +11,6 @@ class EmailService:
     async def send_email(to_email: str, subject: str, body: str, is_html: bool = True):
         """
         Send an email via SMTP
-        
-        Args:
-            to_email: Recipient email address
-            subject: Email subject
-            body: Email body (HTML or plain text)
-            is_html: Whether body is HTML (default: True)
         """
         try:
             # Create message
@@ -39,11 +33,11 @@ class EmailService:
                 start_tls=True
             )
             
-            print(f"✅ Email sent to {to_email}: {subject}")
+            print(f"Email sent to {to_email}: {subject}")
             return True
             
         except Exception as e:
-            print(f"❌ Email sending failed to {to_email}: {str(e)}")
+            print(f"Email sending failed to {to_email}: {str(e)}")
             return False
     
     @staticmethod
@@ -173,4 +167,63 @@ class EmailService:
         
         return await EmailService.send_email(email, subject, body)
     
+    @staticmethod
+    async def send_account_deletion_email(email: str, name: str, user_type: str):
+        """
+        Send account deletion notification email
+        """
+        subject = "Account Deletion Notice - DZ-Stagia"
+        body = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #dc2626;">Account Deletion Notice</h2>
+                <p>Dear {name},</p>
+                <p>We regret to inform you that your {user_type} account on DZ-Stagia has been deleted.</p>
+                <p><strong>Reason:</strong> Your account was found to be in violation of our Terms and Conditions.</p>
+                <p style="margin: 20px 0; padding: 15px; background-color: #fef2f2; border-left: 4px solid #dc2626; border-radius: 4px;">
+                    If you believe this action was taken in error, or if you have any questions, please contact our support team immediately.
+                </p>
+                <p style="margin-top: 20px;">
+                    <strong>Contact Us:</strong><br>
+                    Email: <a href="mailto:support@dzstagia.com">support@dzstagia.com</a><br>
+                    Or visit our contact page at <a href="https://dzstagia.com/contact">dzstagia.com/contact</a>
+                </p>
+                <p style="margin-top: 20px; color: #666;">
+                    Our support team will be happy to assist you and review your case if you believe this decision was incorrect.
+                </p>
+                <hr style="margin-top: 30px; border: none; border-top: 1px solid #e5e7eb;">
+                <p style="color: #6b7280; font-size: 12px;">DZ-Stagia Team</p>
+            </body>
+        </html>
+        """
+        
+        return await EmailService.send_email(email, subject, body)
+    
+    @staticmethod
+    async def send_offer_deletion_email(email: str, company_name: str, offer_title: str):
+        """
+        Notify a company that one of their offers was removed by admin.
+        """
+        subject = "Offer Removed - DZ-Stagia"
+        body = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #dc2626;">Offer Removed</h2>
+                <p>Dear {company_name},</p>
+                <p>We wanted to let you know that your offer titled <strong>"{offer_title}"</strong> has been removed by our moderation team.</p>
+                <p><strong>Reason:</strong> The offer was found to be in violation of our Terms and Conditions or platform policies.</p>
+                <p>If you believe this was done in error, please contact our support team and we'll review your case.</p>
+                <p style="margin-top: 20px;">
+                    <strong>Contact Us:</strong><br>
+                    Email: <a href="mailto:support@dzstagia.com">support@dzstagia.com</a><br>
+                    Or visit our contact page at <a href="https://dzstagia.com/contact">dzstagia.com/contact</a>
+                </p>
+                <hr style="margin-top: 30px; border: none; border-top: 1px solid #e5e7eb;">
+                <p style="color: #6b7280; font-size: 12px;">DZ-Stagia Team</p>
+            </body>
+        </html>
+        """
+
+        return await EmailService.send_email(email, subject, body)
+
     

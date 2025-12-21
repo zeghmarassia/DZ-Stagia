@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordBearer
 from app.config import settings
 
@@ -48,12 +48,32 @@ def decode_access_token(token: str) -> dict:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-async def get_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+async def get_user(request: Request) -> dict:
     """
-    Extract user info from JWT token - use with protected routes
+    Extract user info from JWT token from either:
+    1. Authorization: Bearer <token> header, or
+    2. auth_token cookie (httponly)
+    
     Returns: {"user_id": int, "email": str, "user_type": str}
     """
-    token = credentials.credentials
+    token = None
+    
+    # Try to get token from Authorization header first
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.replace("Bearer ", "")
+    
+    # Fallback to auth_token cookie if no bearer token
+    if not token:
+        token = request.cookies.get("auth_token")
+    
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
     payload = decode_access_token(token)
     
     # Extract from token payload (matches what create_access_token puts in)
