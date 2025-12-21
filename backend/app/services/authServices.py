@@ -178,7 +178,7 @@ class AuthService:
             last_name=last_name,
             establishment_id=establishment_id,
             status='pending',
-            is_email_verified=True,
+            is_email_verified=False,
             document_url=document_url 
         )
         
@@ -259,7 +259,7 @@ class AuthService:
             sector=sector,
             address=address,
             status='pending',
-            is_email_verified=True,
+            is_email_verified=False,
             document_url=document_url 
         )
         
