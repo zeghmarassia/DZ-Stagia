@@ -7,7 +7,7 @@ INSERT INTO establishment (name, abbreviation, type, address, created_at) VALUES
 ('École Supérieure de Commerce', 'ESC', 'École Supérieure', '11 Chemin Doudou Mokhtar, Alger', NOW())
 ON CONFLICT DO NOTHING;
 
--- Verify the import
+
 SELECT establishment_id, abbreviation, name, type 
 FROM establishment 
 ORDER BY establishment_id;
