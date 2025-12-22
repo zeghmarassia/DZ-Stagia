@@ -6,7 +6,7 @@ import random
 import string
 from datetime import datetime, timedelta
 
-from app.models import Student, Company, Admin
+from app.models import Student, Company, Admin, Establishment
 from app.schemas.auth import (
     StudentRegister, CompanyRegister, StudentResponse, CompanyResponse, AdminResponse,
     Token, OTPRequest, OTPVerify, LoginResponse
@@ -154,6 +154,15 @@ class AuthService:
                 detail=f"Email already registered as {user_type}"
             )
         
+        establishment = db.query(Establishment).filter(
+        Establishment.establishment_id == establishment_id
+        ).first()
+        
+        if not establishment:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid establishment ID: {establishment_id}"
+            )
         # Hash password
         hashed_password = get_password_hash(password)
         
