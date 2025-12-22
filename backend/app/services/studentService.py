@@ -9,9 +9,6 @@ from app.utils.storage import upload_student_profile
 
 
 class StudentService:
-    """Service for student operations: profile, offers, applications"""
-    
-    # ==================== HELPER ENDPOINTS (Dropdowns) ====================
     
     @staticmethod
     def get_all_domains(db: Session) -> List[Domain]:
@@ -30,16 +27,11 @@ class StudentService:
         """Get all available skills for dropdown selection"""
         return db.query(Skill).all()
     
-    # ==================== PROFILE MANAGEMENT ====================
     
     @staticmethod
     def get_profile(db: Session, student_id: int) -> Dict:
         """
-        Get complete student profile (LinkedIn style)
-        Returns everything in one response:
-        - Personal info
-        - Education history
-        - Skills
+        Get complete student profile info
         """
         student = db.query(Student).filter(Student.student_id == student_id).first()
         
@@ -49,33 +41,43 @@ class StudentService:
                 detail="Student not found"
             )
         
-        # Get education records
-        educations = db.query(Education).filter(
-            Education.student_id == student_id
-        ).order_by(Education.start_date.desc()).all()
+        educations = []
+        try:
+            educations = db.query(Education).filter(
+                Education.student_id == student_id
+            ).order_by(Education.start_date.desc()).all()
+        except Exception:
+            # If education table doesn't exist or query fails, return empty list
+            pass
         
-        # Get skills
-        student_skills = db.query(StudentSkill, Skill).join(
-            Skill, StudentSkill.skill_id == Skill.skill_id
-        ).filter(
-            StudentSkill.student_id == student_id
-        ).all()
-        
-        skills_list = [
-            {
-                "skill_id": skill.skill_id,
-                "name": skill.name,
-                "category": skill.category,
-                "proficiency_level": student_skill.proficiency_level
-            }
-            for student_skill, skill in student_skills
-        ]
-        
+        # Get skills - handle empty case
+        skills_list = []
+        try:
+            student_skills = db.query(StudentSkill, Skill).join(
+                Skill, StudentSkill.skill_id == Skill.skill_id
+            ).filter(
+                StudentSkill.student_id == student_id
+            ).all()
+            
+            skills_list = [
+                {
+                    "skill_id": skill.skill_id,
+                    "name": skill.name,
+                    "category": skill.category,
+                    "proficiency_level": student_skill.proficiency_level
+                }
+                for student_skill, skill in student_skills
+            ]
+        except Exception:
+            pass
+    
         return {
             "profile": student,
-            "educations": educations,
-            "skills": skills_list
+            "educations": educations or [],
+            "skills": skills_list or []    
         }
+        
+        
     
     @staticmethod
     def update_profile(
@@ -98,6 +100,17 @@ class StudentService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Student not found"
             )
+        
+        if speciality_id is not None:
+            speciality = db.query(Speciality).filter(
+                Speciality.speciality_id == speciality_id
+            ).first()
+            
+            if not speciality:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Invalid speciality ID: {speciality_id}"
+                )
         
         # Update fields if provided
         if first_name is not None:
@@ -127,7 +140,6 @@ class StudentService:
         student_id: int,
         file: UploadFile
     ) -> Student:
-        """Upload student profile picture"""
         student = db.query(Student).filter(Student.student_id == student_id).first()
         
         if not student:
@@ -160,7 +172,6 @@ class StudentService:
         db.refresh(student)
         return student
     
-    # ==================== EDUCATION MANAGEMENT ====================
     
     @staticmethod
     def add_education(
@@ -252,7 +263,6 @@ class StudentService:
         db.commit()
         return {"message": "Education deleted successfully"}
     
-    # ==================== SKILL MANAGEMENT ====================
     
     @staticmethod
     def add_skill(
@@ -321,7 +331,6 @@ class StudentService:
         db.commit()
         return {"message": "Skill removed successfully"}
     
-    # ==================== OFFER EXPLORATION ====================
     
     @staticmethod
     def get_all_offers(
@@ -415,7 +424,6 @@ class StudentService:
         
         return offer
     
-    # ==================== APPLICATION MANAGEMENT ====================
     
     @staticmethod
     def apply_to_offer(db: Session, student_id: int, offer_id: int) -> Application:
