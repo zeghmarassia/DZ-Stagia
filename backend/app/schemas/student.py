@@ -2,6 +2,9 @@ from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime, date
 
+from app.schemas.helper import EstablishmentResponse
+
+
 class StudentUpdateProfile(BaseModel):
     first_name: Optional[str] = Field(None, max_length=50)
     last_name: Optional[str] = Field(None, max_length=50)
@@ -10,10 +13,13 @@ class StudentUpdateProfile(BaseModel):
     portfolio_url: Optional[str] = None
     github_url: Optional[str] = None
     linkedin_url: Optional[str] = None
+    establishment_id: Optional[int] = None
     speciality_id: Optional[int] = None
+
 
 class CVVisibilityToggle(BaseModel):
     visibility: bool
+
 
 class AddEducationRequest(BaseModel):
     degree: str
@@ -23,6 +29,7 @@ class AddEducationRequest(BaseModel):
     end_date: Optional[date] = None
     is_current: bool = False
 
+
 class UpdateEducationRequest(BaseModel):
     degree: Optional[str] = None
     institution: Optional[str] = None
@@ -31,9 +38,34 @@ class UpdateEducationRequest(BaseModel):
     end_date: Optional[date] = None
     is_current: Optional[bool] = None
 
-class AddSkillRequest(BaseModel):
+
+class SkillInput(BaseModel):
     skill_id: int = Field(..., gt=0)
     proficiency_level: Optional[str] = None
+
+
+class AddSkillsRequest(BaseModel):
+    skills: List[SkillInput] = Field(..., min_items=1)
+
+
+class SkillError(BaseModel):
+    skill_id: int
+    error: str
+
+class SkillResponse(BaseModel):
+    skill_id: int
+    name: str
+    category: Optional[str]
+    proficiency_level: Optional[str]
+    
+    class Config:
+        from_attributes = True
+
+
+class AddSkillsResponse(BaseModel):
+    added: List[SkillResponse]
+    errors: Optional[List[SkillError]] = None
+
 
 class StudentResponse(BaseModel):
     student_id: int
@@ -59,6 +91,7 @@ class StudentResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class EducationResponse(BaseModel):
     education_id: int
     student_id: int
@@ -72,39 +105,20 @@ class EducationResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class SkillResponse(BaseModel):
     skill_id: int
     name: str
-    category: str
+    category: Optional[str]
     proficiency_level: Optional[str]
+
 
 class StudentProfileResponse(BaseModel):
     profile: StudentResponse
+    current_establishment: Optional[EstablishmentResponse]
     educations: List[EducationResponse] = []
     skills: List[SkillResponse] = []
 
-class DomainResponse(BaseModel):
-    domain_id: int
-    name: str
-    
-    class Config:
-        from_attributes = True
-
-class SpecialityResponse(BaseModel):
-    speciality_id: int
-    name: str
-    domain_id: int
-    
-    class Config:
-        from_attributes = True
-
-class SkillListResponse(BaseModel):
-    skill_id: int
-    name: str
-    category: str
-    
-    class Config:
-        from_attributes = True
 
 class OfferResponse(BaseModel):
     offer_id: int
@@ -120,6 +134,7 @@ class OfferResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class ApplicationResponse(BaseModel):
     application_id: int
     offer_id: int
@@ -129,6 +144,7 @@ class ApplicationResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
 
 class MessageResponse(BaseModel):
     message: str

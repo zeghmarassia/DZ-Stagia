@@ -4,35 +4,14 @@ from fastapi import HTTPException, status, UploadFile
 from typing import List, Dict, Optional
 from datetime import date
 
-from app.models import Student, Education, Skill, StudentSkill, Offer, Application, OfferEstablishment, Domain, Speciality
+from app.models import Student, Education, Skill, StudentSkill, Offer, Application, OfferEstablishment, Establishment, Speciality
 from app.utils.storage import upload_student_profile
 
 
 class StudentService:
-    
-    @staticmethod
-    def get_all_domains(db: Session) -> List[Domain]:
-        """Get all domains for dropdown selection"""
-        return db.query(Domain).all()
-    
-    @staticmethod
-    def get_specialities_by_domain(db: Session, domain_id: int) -> List[Speciality]:
-        """Get all specialities for a specific domain"""
-        return db.query(Speciality).filter(
-            Speciality.domain_id == domain_id
-        ).all()
-    
-    @staticmethod
-    def get_all_skills(db: Session) -> List[Skill]:
-        """Get all available skills for dropdown selection"""
-        return db.query(Skill).all()
-    
-    
+
     @staticmethod
     def get_profile(db: Session, student_id: int) -> Dict:
-        """
-        Get complete student profile info
-        """
         student = db.query(Student).filter(Student.student_id == student_id).first()
         
         if not student:
@@ -49,8 +28,16 @@ class StudentService:
         except Exception:
             # If education table doesn't exist or query fails, return empty list
             pass
+
+        establishment = []
+        try:
+            current_establishment = db.query(Establishment).filter(
+                Establishment.establishment_id == student.establishment_id
+            ).first()
+        except Exception:
+            pass
         
-        # Get skills - handle empty case
+        # handle empty case
         skills_list = []
         try:
             student_skills = db.query(StudentSkill, Skill).join(
@@ -73,6 +60,7 @@ class StudentService:
     
         return {
             "profile": student,
+            "current_establishment": current_establishment,
             "educations": educations or [],
             "skills": skills_list or []    
         }
@@ -112,7 +100,6 @@ class StudentService:
                     detail=f"Invalid speciality ID: {speciality_id}"
                 )
         
-        # Update fields if provided
         if first_name is not None:
             student.first_name = first_name
         if last_name is not None:
@@ -158,7 +145,6 @@ class StudentService:
     
     @staticmethod
     def toggle_cv_visibility(db: Session, student_id: int, visibility: bool) -> Student:
-        """Toggle CV visibility (public/private)"""
         student = db.query(Student).filter(Student.student_id == student_id).first()
         
         if not student:
@@ -212,7 +198,6 @@ class StudentService:
         end_date: Optional[date] = None,
         is_current: Optional[bool] = None
     ) -> Education:
-        """Update an education record"""
         education = db.query(Education).filter(
             and_(
                 Education.education_id == education_id,
@@ -268,48 +253,86 @@ class StudentService:
     def add_skill(
         db: Session,
         student_id: int,
-        skill_id: int,
-        proficiency_level: Optional[str] = None
+        skill_id: Optional[int] = None,
+        skill_ids: Optional[List[int]] = None,
+        proficiency_level: Optional[str] = None,
+        proficiency_levels: Optional[Dict[int, str]] = None
     ) -> Dict:
-        """Add skill to student profile"""
-        # Check if skill exists
-        skill = db.query(Skill).filter(Skill.skill_id == skill_id).first()
-        if not skill:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Skill not found"
-            )
         
-        # Check if already added
-        existing = db.query(StudentSkill).filter(
-            and_(
-                StudentSkill.student_id == student_id,
-                StudentSkill.skill_id == skill_id
-            )
-        ).first()
-        
-        if existing:
+        # Determine which mode: single or multiple
+        if skill_id is not None:
+            skills_to_add = [skill_id]
+            proficiency_map = {skill_id: proficiency_level} if proficiency_level else {}
+        elif skill_ids is not None and len(skill_ids) > 0:
+            skills_to_add = skill_ids
+            proficiency_map = proficiency_levels or {}
+        else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Skill already added"
+                detail="Must provide either skill_id or skill_ids"
             )
         
-        # Add skill
-        student_skill = StudentSkill(
-            student_id=student_id,
-            skill_id=skill_id,
-            proficiency_level=proficiency_level
-        )
+        added_skills = []
+        errors = []
         
-        db.add(student_skill)
-        db.commit()
+        for sid in skills_to_add:
+            try:
+                # Check if skill exists
+                skill = db.query(Skill).filter(Skill.skill_id == sid).first()
+                if not skill:
+                    errors.append({
+                        "skill_id": sid,
+                        "error": "Skill not found"
+                    })
+                    continue
+                
+                # Check if already added
+                existing = db.query(StudentSkill).filter(
+                    and_(
+                        StudentSkill.student_id == student_id,
+                        StudentSkill.skill_id == sid
+                    )
+                ).first()
+                
+                if existing:
+                    errors.append({
+                        "skill_id": sid,
+                        "error": "Skill already added"
+                    })
+                    continue
+                
+                # Add skill
+                prof_level = proficiency_map.get(sid)
+                student_skill = StudentSkill(
+                    student_id=student_id,
+                    skill_id=sid,
+                    proficiency_level=prof_level
+                )
+                
+                db.add(student_skill)
+                
+                added_skills.append({
+                    "skill_id": skill.skill_id,
+                    "name": skill.name,
+                    "category": skill.category,
+                    "proficiency_level": prof_level
+                })
+                
+            except Exception as e:
+                errors.append({
+                    "skill_id": sid,
+                    "error": str(e)
+                })
         
-        return {
-            "skill_id": skill.skill_id,
-            "name": skill.name,
-            "category": skill.category,
-            "proficiency_level": proficiency_level
-        }
+        # Commit all successful additions
+        if added_skills:
+            db.commit()
+        
+        result = {"added": added_skills}
+        if errors:
+            result["errors"] = errors
+        
+        return result
     
     @staticmethod
     def remove_skill(db: Session, student_id: int, skill_id: int) -> Dict[str, str]:
@@ -343,8 +366,6 @@ class StudentService:
         Get offers visible to student:
         1. Offers with visibility=True (public to all)
         2. Offers with visibility=False BUT targeted to student's establishment
-        
-        All offers must be active (is_active=True)
         """
         # Get student's establishment
         student = db.query(Student).filter(Student.student_id == student_id).first()

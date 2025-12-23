@@ -112,7 +112,7 @@ class AuthService:
                     httponly=True,
                     secure=False,
                     samesite="lax",
-                    max_age=30 * 60,
+                    max_age=1440 * 60,
                     path="/",
                 )
             except Exception:
