@@ -18,7 +18,7 @@ class Student(Base):
     document_url = Column(String(500), nullable=True)
     
     phone = Column(String(20), nullable=True)
-    cv_url = Column(String(500), nullable=True)
+    cv_url = Column[str](String(500), nullable=True)
     cv_visibility = Column(Boolean, default=False)
     
     bio = Column(Text, nullable=True)
