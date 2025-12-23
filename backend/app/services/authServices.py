@@ -6,7 +6,7 @@ import random
 import string
 from datetime import datetime, timedelta
 
-from app.models import Student, Company, Admin, Establishment
+from app.models import Student, Company, Admin, Establishment, OTP
 from app.schemas.auth import (
     StudentRegister, CompanyRegister, StudentResponse, CompanyResponse, AdminResponse,
     Token, OTPRequest, OTPVerify, LoginResponse
@@ -14,8 +14,6 @@ from app.schemas.auth import (
 from app.utils.security import get_password_hash, verify_password, create_access_token
 from app.utils.storage import upload_student_document, upload_company_document
 
-# In-memory OTP storage
-otp_storage = {}
 
 class AuthService:
     
@@ -24,28 +22,47 @@ class AuthService:
         return ''.join(random.choices(string.digits, k=6))
     
     @staticmethod
-    def store_otp(email: str, otp: str, expires_minutes: int = 10):
+    def store_otp(db: Session, email: str, otp: str, user_type: str, purpose: str, expires_minutes: int = 10):
+        # Invalidate previous unused OTPs for this purpose
+        db.query(OTP).filter(
+            OTP.email == email,
+            OTP.user_type == user_type,
+            OTP.purpose == purpose,
+            OTP.is_used == False
+        ).update({"is_used": True})
+        db.commit()
+        
+        # Create new OTP
         expiry = datetime.utcnow() + timedelta(minutes=expires_minutes)
-        otp_storage[email] = {
-            "code": otp,
-            "expires_at": expiry
-        }
+        new_otp = OTP(
+            email=email,
+            otp_code=otp,
+            user_type=user_type,
+            purpose=purpose,
+            expires_at=expiry
+        )
+        db.add(new_otp)
+        db.commit()
     
     @staticmethod
-    def verify_otp(email: str, otp: str) -> bool:
-        stored = otp_storage.get(email)
-        if not stored:
+    def verify_otp(db: Session, email: str, otp: str, user_type: str, purpose: str) -> bool:
+        stored_otp = db.query(OTP).filter(
+            OTP.email == email,
+            OTP.otp_code == otp,
+            OTP.user_type == user_type,
+            OTP.purpose == purpose,
+            OTP.is_used == False,
+            OTP.expires_at > datetime.utcnow()
+        ).first()
+        
+        if not stored_otp:
             return False
         
-        if datetime.utcnow() > stored["expires_at"]:
-            del otp_storage[email]
-            return False
-        
-        if stored["code"] == otp:
-            del otp_storage[email]
-            return True
-        
-        return False
+        # can choose to mark as used while keeping in the db or delete the OTP
+        #stored_otp.is_used = True
+        db.delete(stored_otp)
+        db.commit()
+        return True
 
     @staticmethod
     def detect_user_type(db: Session, email: str) -> Tuple[Optional[str], Optional[any]]:
@@ -186,7 +203,7 @@ class AuthService:
             last_name=last_name,
             establishment_id=establishment_id,
             status='pending',
-            is_email_verified=True,
+            is_email_verified=False,
             document_url=document_url 
         )
         
@@ -197,20 +214,19 @@ class AuthService:
 
             # Generate OTP
             otp = AuthService.generate_otp()
-            AuthService.store_otp(email, otp)
+            AuthService.store_otp(db, email, otp, "student", "verification")
+            print(f"Email verification OTP for {email}: {otp}")
             
             # send the email
-            # try:
-            #     from app.services.emailService import EmailService
-            #     await EmailService.send_welcome_email(email, f"{first_name} {last_name}", "student")
-            #     await EmailService.send_otp_email(email, otp, "verification")
-            #     print(f"Email with OTP sent to {email}")
-            # except Exception as email_error:
-            #     print(f"Email service failed: {email_error}")
-            print(f"Email verification OTP for {email}: {otp}")
+            try:
+                from app.services.emailService import EmailService
+                #await EmailService.send_welcome_email(email, f"{first_name} {last_name}", "student")
+                await EmailService.send_otp_email(email, otp, "verification")
+                print(f"Email with OTP sent to {email}")
+            except Exception as email_error:
+                print(f"Email service failed: {email_error}")
                 
             return new_student
-            
         except IntegrityError as e:
             db.rollback()
             # Document is already uploaded but student failed
@@ -236,7 +252,6 @@ class AuthService:
         address: str,
         document: UploadFile
     ) -> Company:
-        """Register a new company with document upload"""
         
         # Check if email exists
         user_type, _ = AuthService.detect_user_type(db, email)
@@ -267,7 +282,7 @@ class AuthService:
             sector=sector,
             address=address,
             status='pending',
-            is_email_verified=True,
+            is_email_verified=False,
             document_url=document_url 
         )
         
@@ -278,19 +293,19 @@ class AuthService:
             
             # Generate OTP
             otp = AuthService.generate_otp()
-            AuthService.store_otp(email, otp)
-            
-            # send email
-            
-            # try:
-            #     from app.services.emailService import EmailService
-            #     await EmailService.send_welcome_email(email, company_name, "company")
-            #     await EmailService.send_otp_email(email, otp, "verification")
-            #     print(f"Email with OTP sent to {email}")
-            # except Exception as email_error:
-            #     # Fallback: Show OTP in console if email fails
-            #     print(f"Email service failed: {email_error}")
+            AuthService.store_otp(db, email, otp, "company", "verification")
             print(f"Email verification OTP for {email}: {otp}")
+            
+            
+            try:
+                from app.services.emailService import EmailService
+                #await EmailService.send_welcome_email(email, company_name, "company")
+                await EmailService.send_otp_email(email, otp, "verification")
+                print(f"Email with OTP sent to {email}")
+            except Exception as email_error:
+                # Fallback: Show OTP in console if email fails
+                print(f"Email service failed: {email_error}")
+            
             return new_company
             
         except IntegrityError as e:
@@ -309,13 +324,6 @@ class AuthService:
         
     @staticmethod
     def verify_email(db: Session, email: str, otp: str) -> dict:
-        """Verify email with OTP"""
-        
-        if not AuthService.verify_otp(email, otp):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid or expired OTP"
-            )
         
         user_type, user = AuthService.detect_user_type(db, email)
         
@@ -324,7 +332,16 @@ class AuthService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found"
             )
-        
+        if user.is_email_verified:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already verified"
+            )
+        if not AuthService.verify_otp(db, email, otp, user_type, "verification"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired OTP"
+            )
         user.is_email_verified = True
         db.commit()
         
@@ -353,13 +370,19 @@ class AuthService:
     def reset_password(db: Session, email: str, otp: str, new_password: str) -> dict:
         """Reset password with OTP"""
         
-        if not AuthService.verify_otp(email, otp):
+        user_type, user = AuthService.detect_user_type(db, email)
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        if not AuthService.verify_otp(db, email, otp, user_type, "password_reset"):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid or expired OTP"
             )
-        
-        user_type, user = AuthService.detect_user_type(db, email)
         
         if not user:
             raise HTTPException(

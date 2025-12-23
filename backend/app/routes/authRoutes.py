@@ -86,24 +86,13 @@ async def register_company(
     return company
 
 @router.post("/verify-email")
-async def verify_email(
+def verify_email(
     email: str = Form(...),
     otp_code: str = Form(...),
     db: Session = Depends(get_db)
 ):
     """Verify email with OTP"""
-    if not AuthService.verify_otp(email, otp_code):
-        raise HTTPException(400, "Invalid or expired OTP")
-    
-    user_type, user = AuthService.detect_user_type(db, email)
-    
-    if not user:
-        raise HTTPException(404, "User not found")
-    
-    user.is_email_verified = True
-    db.commit()
-    
-    return {"message": "Email verified successfully"}
+    return AuthService.verify_email(db, email, otp_code)
 
 @router.post("/forgot-password")
 def forgot_password(
