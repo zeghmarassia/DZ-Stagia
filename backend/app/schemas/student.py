@@ -151,5 +151,10 @@ class ApplicationResponse(BaseModel):
         from_attributes = True
 
 
+class ApplicationsListResponse(BaseModel):
+    applications: List[ApplicationResponse]
+    total: int
+
+
 class MessageResponse(BaseModel):
     message: str

@@ -38,6 +38,7 @@ from .student import (
     OfferResponse,
     OffersListResponse,
     ApplicationResponse,
+    ApplicationsListResponse,
     MessageResponse,
 )
 
@@ -82,6 +83,7 @@ __all__ = [
     "OfferResponse",
     "OffersListResponse",
     "ApplicationResponse",
+    "ApplicationsListResponse",
     "MessageResponse",
     "EstablishmentResponse",
     "DomainResponse",

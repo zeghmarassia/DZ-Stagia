@@ -537,11 +537,22 @@ class StudentService:
         return application
     
     @staticmethod
-    def get_my_applications(db: Session, student_id: int) -> List[Application]:
+    def get_my_applications(db: Session, student_id: int, skip: int = 0, limit: int = 100) -> Dict:
         """Get all applications submitted by student"""
-        return db.query(Application).filter(
+        query = db.query(Application).filter(
             Application.student_id == student_id
-        ).all()
+        )
+        
+        # Get total count before pagination
+        total = query.count()
+        
+        # Get paginated results
+        applications = query.offset(skip).limit(limit).all()
+        
+        return {
+            "applications": applications,
+            "total": total
+        }
     
     @staticmethod
     def withdraw_application(db: Session, student_id: int, application_id: int) -> Dict[str, str]:

@@ -7,7 +7,8 @@ from app.schemas.student import (
     StudentUpdateProfile, StudentProfileResponse, StudentResponse, 
     EducationResponse, CVVisibilityToggle, AddEducationRequest, 
     UpdateEducationRequest, AddSkillsRequest, OfferResponse, 
-    ApplicationResponse, MessageResponse, AddSkillsResponse, OffersListResponse
+    ApplicationResponse, MessageResponse, AddSkillsResponse, OffersListResponse,
+    ApplicationsListResponse
 )
 from app.schemas.helper import (
     DomainResponse, SpecialityResponse, SkillListResponse
@@ -172,7 +173,7 @@ def apply_to_offer(
 
 
 # Application endpoints
-@router.get("/applications", response_model=List[ApplicationResponse])
+@router.get("/applications", response_model=ApplicationsListResponse)
 def get_my_applications(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
