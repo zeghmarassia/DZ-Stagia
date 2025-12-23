@@ -3,7 +3,7 @@ from sqlalchemy import and_
 from fastapi import HTTPException, status, UploadFile
 from typing import List, Dict, Optional
 from datetime import date
-
+from sqlalchemy import or_
 from app.models import Student, Education, Skill, StudentSkill, Offer, Application, OfferEstablishment, Establishment, Speciality
 from app.utils.storage import upload_student_profile
 
@@ -361,11 +361,10 @@ class StudentService:
         student_id: int,
         skip: int = 0,
         limit: int = 100
-    ) -> List[Offer]:
+    ) -> Dict:
         """
-        Get offers visible to student:
-        1. Offers with visibility=True (public to all)
-        2. Offers with visibility=False BUT targeted to student's establishment
+        Get all offers that are visible to the student
+        whether public or targeted
         """
         # Get student's establishment
         student = db.query(Student).filter(Student.student_id == student_id).first()
@@ -375,11 +374,16 @@ class StudentService:
                 detail="Student not found"
             )
         
-        from sqlalchemy import or_
         
-        # Get all active offers
-        # Then filter by visibility logic
-        query = db.query(Offer).filter(Offer.is_active == True)
+        # Get all active offers & filtering by visibility and expiration
+        today = date.today()
+        query = db.query(Offer).filter(
+            Offer.is_active == True,
+            or_(
+                Offer.expiration_date.is_(None),  # No expiration date
+                Offer.expiration_date >= today  # Not expired
+            )
+        )
         
         # If visibility=True: show to everyone
         # If visibility=False: only show if offer is targeted to student's establishment
@@ -390,7 +394,7 @@ class StudentService:
         ).subquery()
         
         # Apply visibility filter
-        query = query.filter(
+        filtered_query = query.filter(
             or_(
                 Offer.visibility == True,  # Public offers
                 and_(
@@ -400,11 +404,23 @@ class StudentService:
             )
         )
         
-        return query.offset(skip).limit(limit).all()
+        # Get total count before pagination
+        total = filtered_query.count()
+        
+        # Get paginated results
+        offers = filtered_query.offset(skip).limit(limit).all()
+        
+        return {
+            "offers": offers,
+            "total": total
+        }
     
     @staticmethod
     def get_offer_details(db: Session, student_id: int, offer_id: int) -> Offer:
-        """Get single offer details (if student has access to it)"""
+        """
+        Get single offer details (if student has access to it)
+        Allows viewing expired offers - they just won't appear in the offer list
+        """
         student = db.query(Student).filter(Student.student_id == student_id).first()
         if not student:
             raise HTTPException(
@@ -422,11 +438,12 @@ class StudentService:
             )
         ).first() is not None
         
-        # Get offer with visibility check
+        # Get offer with visibility check + NO expiration check here
+        #if std applied to an offer thats expired, he can still view it
         offer = db.query(Offer).filter(
             and_(
                 Offer.offer_id == offer_id,
-                Offer.is_active == True,
+                Offer.is_active == True,  # Still check if active
                 or_(
                     Offer.visibility == True,  # Public
                     and_(
@@ -467,11 +484,16 @@ class StudentService:
             )
         ).first() is not None
         
-        # Check if offer exists and student has access to it
+        # Check if offer exists and student has access to it (not expired)
+        today = date.today()
         offer = db.query(Offer).filter(
             and_(
                 Offer.offer_id == offer_id,
                 Offer.is_active == True,
+                or_(
+                    Offer.expiration_date.is_(None),  # No expiration date
+                    Offer.expiration_date >= today  # Not expired
+                ),
                 or_(
                     Offer.visibility == True,
                     and_(

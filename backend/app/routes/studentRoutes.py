@@ -7,7 +7,7 @@ from app.schemas.student import (
     StudentUpdateProfile, StudentProfileResponse, StudentResponse, 
     EducationResponse, CVVisibilityToggle, AddEducationRequest, 
     UpdateEducationRequest, AddSkillsRequest, OfferResponse, 
-    ApplicationResponse, MessageResponse, AddSkillsResponse
+    ApplicationResponse, MessageResponse, AddSkillsResponse, OffersListResponse
 )
 from app.schemas.helper import (
     DomainResponse, SpecialityResponse, SkillListResponse
@@ -138,7 +138,7 @@ def remove_skill(
 
 
 # Offer endpoints
-@router.get("/offers", response_model=List[OfferResponse])
+@router.get("/offers", response_model=OffersListResponse)
 def get_all_offers(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),

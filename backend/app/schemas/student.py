@@ -135,6 +135,11 @@ class OfferResponse(BaseModel):
         from_attributes = True
 
 
+class OffersListResponse(BaseModel):
+    offers: List[OfferResponse]
+    total: int
+
+
 class ApplicationResponse(BaseModel):
     application_id: int
     offer_id: int
