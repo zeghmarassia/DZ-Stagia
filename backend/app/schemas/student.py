@@ -66,6 +66,36 @@ class AddSkillsResponse(BaseModel):
     added: List[SkillResponse]
     errors: Optional[List[SkillError]] = None
 
+class AddExperienceRequest(BaseModel):
+    title: str
+    company: str
+    description: Optional[str] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    is_current: bool = False
+
+
+class UpdateExperienceRequest(BaseModel):
+    title: Optional[str] = None
+    company: Optional[str] = None
+    description: Optional[str] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    is_current: Optional[bool] = None
+
+
+class ExperienceResponse(BaseModel):
+    experience_id: int
+    student_id: int
+    title: str
+    company: str
+    description: Optional[str]
+    start_date: Optional[date]
+    end_date: Optional[date]
+    is_current: bool
+    
+    class Config:
+        from_attributes = True
 
 class StudentResponse(BaseModel):
     student_id: int
@@ -106,17 +136,12 @@ class EducationResponse(BaseModel):
         from_attributes = True
 
 
-class SkillResponse(BaseModel):
-    skill_id: int
-    name: str
-    category: Optional[str]
-    proficiency_level: Optional[str]
-
 
 class StudentProfileResponse(BaseModel):
     profile: StudentResponse
     current_establishment: Optional[EstablishmentResponse]
     educations: List[EducationResponse] = []
+    experiences: List[ExperienceResponse] = []
     skills: List[SkillResponse] = []
 
 

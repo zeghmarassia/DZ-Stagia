@@ -32,6 +32,9 @@ from .student import (
     AddSkillsRequest,
     SkillError,
     AddSkillsResponse,
+    AddExperienceRequest,
+    UpdateExperienceRequest,
+    ExperienceResponse,
     EducationResponse,
     SkillResponse,
     StudentProfileResponse,
@@ -50,6 +53,7 @@ from .helper import (
 )
 
 __all__ = [
+    # Auth schemas
     "Token",
     "TokenData",
     "LoginRequest",
@@ -62,6 +66,8 @@ __all__ = [
     "OTPRequest",
     "OTPVerify",
     "OTPVerifyWithEmail",
+    
+    # Admin schemas
     "StudentListResponse",
     "CompanyListResponse",
     "OfferListResponse",
@@ -69,6 +75,8 @@ __all__ = [
     "OfferStats",
     "StatisticsResponse",
     "AdminListResponse",
+    
+    # Student schemas
     "StudentUpdateProfile",
     "CVVisibilityToggle",
     "AddEducationRequest",
@@ -77,6 +85,9 @@ __all__ = [
     "AddSkillsRequest",
     "SkillError",
     "AddSkillsResponse",
+    "AddExperienceRequest",      
+    "UpdateExperienceRequest",   
+    "ExperienceResponse",        
     "EducationResponse",
     "SkillResponse",
     "StudentProfileResponse",
@@ -85,6 +96,8 @@ __all__ = [
     "ApplicationResponse",
     "ApplicationsListResponse",
     "MessageResponse",
+    
+    # Helper schemas
     "EstablishmentResponse",
     "DomainResponse",
     "SpecialityResponse",

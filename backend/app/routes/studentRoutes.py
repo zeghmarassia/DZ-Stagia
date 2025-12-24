@@ -6,7 +6,8 @@ from app.database import get_db
 from app.schemas.student import (
     StudentUpdateProfile, StudentProfileResponse, StudentResponse, 
     EducationResponse, CVVisibilityToggle, AddEducationRequest, 
-    UpdateEducationRequest, AddSkillsRequest, OfferResponse, 
+    UpdateEducationRequest, AddExperienceRequest, 
+    UpdateExperienceRequest, ExperienceResponse,AddSkillsRequest, OfferResponse, 
     ApplicationResponse, MessageResponse, AddSkillsResponse, OffersListResponse,
     ApplicationsListResponse
 )
@@ -105,6 +106,49 @@ def delete_education(
     db: Session = Depends(get_db)
 ):
     return StudentService.delete_education(db, current_student["user_id"], education_id)
+
+#Experience endpoints
+@router.post("/experience", response_model=ExperienceResponse)
+def add_experience(
+    experience_data: AddExperienceRequest,
+    current_student: dict = Depends(get_current_student),
+    db: Session = Depends(get_db)
+):
+    """Add work experience to profile"""
+    student_id = current_student["user_id"]
+    return StudentService.add_experience(
+        db=db,
+        student_id=student_id,
+        **experience_data.dict()
+    )
+
+
+@router.put("/experience/{experience_id}", response_model=ExperienceResponse)
+def update_experience(
+    experience_id: int,
+    experience_data: UpdateExperienceRequest,
+    current_student: dict = Depends(get_current_student),
+    db: Session = Depends(get_db)
+):
+    """Update an experience record"""
+    student_id = current_student["user_id"]
+    return StudentService.update_experience(
+        db=db,
+        student_id=student_id,
+        experience_id=experience_id,
+        **experience_data.dict(exclude_unset=True)
+    )
+
+
+@router.delete("/experience/{experience_id}", response_model=MessageResponse)
+def delete_experience(
+    experience_id: int,
+    current_student: dict = Depends(get_current_student),
+    db: Session = Depends(get_db)
+):
+    """Delete an experience record"""
+    student_id = current_student["user_id"]
+    return StudentService.delete_experience(db, student_id, experience_id)
 
 
 # Skill endpoints

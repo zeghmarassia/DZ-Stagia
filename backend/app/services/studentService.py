@@ -4,7 +4,7 @@ from fastapi import HTTPException, status, UploadFile
 from typing import List, Dict, Optional
 from datetime import date
 from sqlalchemy import or_
-from app.models import Student, Education, Skill, StudentSkill, Offer, Application, OfferEstablishment, Establishment, Speciality
+from app.models import Student, Education, Skill, StudentSkill, Offer, Application, OfferEstablishment, Establishment, Speciality, Experience
 from app.utils.storage import upload_student_profile
 
 
@@ -354,6 +354,96 @@ class StudentService:
         db.commit()
         return {"message": "Skill removed successfully"}
     
+
+    @staticmethod
+    def add_experience(
+        db: Session,
+        student_id: int,
+        title: str,
+        company: str,
+        description: Optional[str] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        is_current: bool = False
+    ) -> Experience:
+        """Add work experience to student profile"""
+        new_experience = Experience(
+            student_id=student_id,
+            title=title,
+            company=company,
+            description=description,
+            start_date=start_date,
+            end_date=end_date,
+            is_current=is_current
+        )
+        
+        db.add(new_experience)
+        db.commit()
+        db.refresh(new_experience)
+        return new_experience
+    
+    @staticmethod
+    def update_experience(
+        db: Session,
+        student_id: int,
+        experience_id: int,
+        title: Optional[str] = None,
+        company: Optional[str] = None,
+        description: Optional[str] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        is_current: Optional[bool] = None
+    ) -> Experience:
+        """Update an experience record"""
+        experience = db.query(Experience).filter(
+            and_(
+                Experience.experience_id == experience_id,
+                Experience.student_id == student_id
+            )
+        ).first()
+        
+        if not experience:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Experience record not found or does not belong to this student"
+            )
+        
+        if title is not None:
+            experience.title = title
+        if company is not None:
+            experience.company = company
+        if description is not None:
+            experience.description = description
+        if start_date is not None:
+            experience.start_date = start_date
+        if end_date is not None:
+            experience.end_date = end_date
+        if is_current is not None:
+            experience.is_current = is_current
+        
+        db.commit()
+        db.refresh(experience)
+        return experience
+    
+    @staticmethod
+    def delete_experience(db: Session, student_id: int, experience_id: int) -> Dict[str, str]:
+        """Delete an experience record"""
+        experience = db.query(Experience).filter(
+            and_(
+                Experience.experience_id == experience_id,
+                Experience.student_id == student_id
+            )
+        ).first()
+        
+        if not experience:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Experience record not found"
+            )
+        
+        db.delete(experience)
+        db.commit()
+        return {"message": "Experience deleted successfully"}
     
     @staticmethod
     def get_all_offers(
