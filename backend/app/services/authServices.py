@@ -348,8 +348,7 @@ class AuthService:
         return {"message": "Email verified successfully"}
     
     @staticmethod
-    def request_password_reset(db: Session, email: str) -> str:
-        """Send OTP for password reset"""
+    async def request_password_reset(db: Session, email: str) -> str:
         
         user_type, user = AuthService.detect_user_type(db, email)
         
@@ -360,15 +359,23 @@ class AuthService:
             )
         
         otp = AuthService.generate_otp()
-        AuthService.store_otp(email, otp)
+        AuthService.store_otp(db, email, otp, user_type, "password_reset")
         
         print(f"OTP for {email} ({user_type}): {otp}")
+        
+        # Send email with OTP
+        try:
+            from app.services.emailService import EmailService
+            await EmailService.send_otp_email(email, otp, "password_reset")
+            print(f"Password reset OTP email sent to {email}")
+        except Exception as email_error:
+            print(f"Email service failed: {email_error}")
+            # Don't fail the request if email fails, OTP is still generated
         
         return otp 
     
     @staticmethod
     def reset_password(db: Session, email: str, otp: str, new_password: str) -> dict:
-        """Reset password with OTP"""
         
         user_type, user = AuthService.detect_user_type(db, email)
         
@@ -384,16 +391,59 @@ class AuthService:
                 detail="Invalid or expired OTP"
             )
         
+        user.password = get_password_hash(new_password)
+        db.commit()
+        
+        return {"message": "Password reset successfully"}
+    
+    @staticmethod
+    def change_password(
+        db: Session,
+        user_id: int,
+        user_type: str,
+        current_password: str,
+        new_password: str
+    ) -> dict:
+        """for logged-in users"""
+        
+        # Get user based on type
+        if user_type == "student":
+            user = db.query(Student).filter(Student.student_id == user_id).first()
+        elif user_type == "company":
+            user = db.query(Company).filter(Company.company_id == user_id).first()
+        elif user_type == "admin":
+            user = db.query(Admin).filter(Admin.admin_id == user_id).first()
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid user type"
+            )
+        
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found"
             )
         
+        # Verify current password
+        if not verify_password(current_password, user.password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Current password is incorrect"
+            )
+        
+        # Check if new password is different
+        if verify_password(new_password, user.password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="New password must be different from current password"
+            )
+        
+        # Update password
         user.password = get_password_hash(new_password)
         db.commit()
         
-        return {"message": "Password reset successfully"}
+        return {"message": "Password changed successfully"}
     
     @staticmethod
     def logout(response: Response) -> dict:

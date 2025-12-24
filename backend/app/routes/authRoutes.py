@@ -5,9 +5,11 @@ from app.database import get_db
 from app.schemas.auth import (
     LoginRequest,
     StudentResponse, CompanyResponse,
-    OTPRequest, OTPVerify
+    OTPRequest, OTPVerify, ChangePasswordRequest, MessageResponse,
+    ForgotPasswordResponse
 )
 from app.services import AuthService
+from app.utils.security import get_user
 
 router = APIRouter(tags=["Authentication"])
 
@@ -94,20 +96,20 @@ def verify_email(
     """Verify email with OTP"""
     return AuthService.verify_email(db, email, otp_code)
 
-@router.post("/forgot-password")
-def forgot_password(
+@router.post("/forgot-password", response_model=ForgotPasswordResponse)
+async def forgot_password(
     otp_request: OTPRequest,
     db: Session = Depends(get_db)
 ):
     """Request password reset OTP"""
-    otp = AuthService.request_password_reset(db, otp_request.email)
+    otp = await AuthService.request_password_reset(db, otp_request.email)
     return {
         "message": "OTP sent to your email",
-        "otp": otp  # TODO: Remove in production!
+        "otp": otp
     }
 
 
-@router.post("/reset-password")
+@router.post("/reset-password", response_model=MessageResponse)
 def reset_password(
     otp_verify: OTPVerify,
     db: Session = Depends(get_db)
@@ -116,10 +118,26 @@ def reset_password(
     result = AuthService.reset_password(
         db=db,
         email=otp_verify.email,
-        otp_code=otp_verify.otp_code,
+        otp=otp_verify.otp_code,
         new_password=otp_verify.new_password
     )
     return result
+
+
+@router.post("/change-password", response_model=MessageResponse)
+def change_password(
+    password_data: ChangePasswordRequest,
+    current_user: dict = Depends(get_user),
+    db: Session = Depends(get_db)
+):
+    """Change password for logged-in users"""
+    return AuthService.change_password(
+        db=db,
+        user_id=current_user["user_id"],
+        user_type=current_user["user_type"],
+        current_password=password_data.current_password,
+        new_password=password_data.new_password
+    )
 
 
 @router.post("/logout")
@@ -142,6 +160,7 @@ def health_check():
             "verify_email": "/verify-email",
             "forgot_password": "/forgot-password",
             "reset_password": "/reset-password",
+            "change_password": "/change-password",
             "logout": "/logout"
         }
     }
