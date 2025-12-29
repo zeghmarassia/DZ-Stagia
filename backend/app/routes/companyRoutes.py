@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -123,4 +123,26 @@ def health_check():
             "delete_logo": "DELETE /company/logo",
             "public_profile": "GET /company/{company_id}/public"
         }
+    }
+@router.get("/all", response_model=dict)
+def get_all_companies_list(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    order_by: str = Query("popular", description="Sort by: popular, recent, name"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all companies (public endpoint)
+    order_by: 'popular' (by number of offers), 'recent' (newest), 'name' (alphabetical)
+    """
+    from app.services.companyService import CompanyService
+    
+    companies, total = CompanyService.get_all_companies(db, page, page_size, order_by)
+    
+    return {
+        "companies": companies,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": (total + page_size - 1) // page_size
     }

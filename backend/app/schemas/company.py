@@ -71,3 +71,16 @@ class FileUploadResponse(BaseModel):
 class MessageResponse(BaseModel):
     """Generic message response"""
     message: str
+
+class CompanyPublicResponse(BaseModel):
+    company_id: int
+    name: str
+    logo: Optional[str]
+    description: Optional[str]
+    sector: Optional[str]
+    location: Optional[str]
+    website: Optional[str]
+    offers_count: int = 0 
+    
+    class Config:
+        from_attributes = True

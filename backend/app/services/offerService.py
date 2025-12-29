@@ -346,3 +346,44 @@ class OfferService:
             total_applications=sum(o.applications_count for o in offers),
             offers_by_type=offers_by_type
         )
+@staticmethod
+def get_all_offers(
+    db: Session,
+    page: int = 1,
+    page_size: int = 10,
+    include_inactive: bool = False,
+    include_expired: bool = False
+) -> tuple[List[Offer], int]:
+    """
+    Get all offers with optional filters
+    """
+    from datetime import date
+    
+    query = db.query(Offer).options(
+        joinedload(Offer.company),
+        joinedload(Offer.required_skills),
+        joinedload(Offer.required_specialities)
+    )
+    
+    # Filter active offers only
+    if not include_inactive:
+        query = query.filter(Offer.is_active == True, Offer.visibility == True)
+    
+    # Filter expired offers
+    if not include_expired:
+        query = query.filter(
+            or_(
+                Offer.expiration_date == None,
+                Offer.expiration_date >= date.today()
+            )
+        )
+    
+    # Get total count
+    total = query.count()
+    
+    # Apply pagination and order by newest first
+    offers = query.order_by(Offer.created_at.desc()).offset(
+        (page - 1) * page_size
+    ).limit(page_size).all()
+    
+    return offers, total

@@ -235,3 +235,29 @@ def list_public_offers(
         "page_size": page_size,
         "total_pages": (total + page_size - 1) // page_size
     }
+@router.get("/all", response_model=dict)
+def get_all_offers_list(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    include_inactive: bool = Query(False, description="Include inactive offers"),
+    include_expired: bool = Query(False, description="Include expired offers"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all offers (public endpoint)
+    """
+    offers, total = OfferService.get_all_offers(
+        db, 
+        page, 
+        page_size, 
+        include_inactive, 
+        include_expired
+    )
+    
+    return {
+        "offers": offers,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": (total + page_size - 1) // page_size
+    }

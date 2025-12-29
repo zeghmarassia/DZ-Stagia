@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status, UploadFile
 from typing import Optional
+from typing import List
+
 
 from app.models.company import Company
 from app.utils.storage import upload_company_logo, delete_company_logo
@@ -176,3 +178,42 @@ class CompanyService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to delete logo: {str(e)}"
             )
+@staticmethod
+def get_all_companies(
+    db: Session,
+    page: int = 1,
+    page_size: int = 10,
+    order_by: str = "popular"  # "popular", "recent", "name"
+) -> tuple[List[Company], int]:
+    """
+    order_by: 'populaنr' =by offers count, 'recent' =newest first=, 'name'= alphabeticalت
+    """
+    from sqlalchemy import func
+    from app.models.offer import Offer
+    
+    query = db.query(Company)
+    
+    if order_by == "popular":
+        # Order by number of active offers (most popular first)
+        query = query.outerjoin(Offer).group_by(Company.company_id).order_by(
+            func.count(Offer.offer_id).desc()
+        )
+    elif order_by == "recent":
+        # Order by newest companies first
+        query = query.order_by(Company.created_at.desc())
+    elif order_by == "name":
+        # Order alphabetically by name
+        query = query.order_by(Company.name.asc())
+    else:
+        # Default: most popular
+        query = query.outerjoin(Offer).group_by(Company.company_id).order_by(
+            func.count(Offer.offer_id).desc()
+        )
+    
+    # Get total count
+    total = query.count()
+    
+    # Apply pagination
+    companies = query.offset((page - 1) * page_size).limit(page_size).all()
+    
+    return companies, total
