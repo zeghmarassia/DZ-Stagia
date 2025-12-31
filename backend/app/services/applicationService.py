@@ -12,6 +12,8 @@ from app.schemas.application import (
     ApplicationStatusUpdate, 
     ApplicationStatistics
 )
+from app.services.notificationService import NotificationService
+
 
 
 class ApplicationService:
@@ -86,6 +88,14 @@ class ApplicationService:
         db.commit()
         db.refresh(new_application)
         
+        NotificationService.notify_new_application(
+            db=db,
+            company_id=offer.company_id,
+            student_name=f"{student.first_name} {student.last_name}",
+            offer_title=offer.title,
+            offer_id=offer.offer_id,
+            application_id=new_application.application_id
+        )
         return new_application
     
     
@@ -186,13 +196,23 @@ class ApplicationService:
                 detail=f"Cannot change status from '{application.status}' to '{status_data.status}'"
             )
         
+        old_status = application.status
+
         # Update status
         application.status = status_data.status
-        
+
         db.commit()
         db.refresh(application)
         
-        # TODO: Send notification to student about status change
+        NotificationService.notify_application_status_changed(
+            db=db,
+            student_id=application.student_id,
+            offer_title=application.offer.title,
+            old_status=old_status,
+            new_status=application.status,
+            company_name=application.offer.company.name,
+            application_id=application.application_id
+        )
         
         return application
     

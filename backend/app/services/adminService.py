@@ -3,9 +3,12 @@ from sqlalchemy import func
 from fastapi import HTTPException, status
 from typing import List, Dict, Any
 
+
 from app.models import Student, Company, Offer, Admin
 from app.services.emailService import EmailService
 from app.utils.storage import delete_student_document, delete_company_document
+from app.services.notificationService import NotificationService
+
 
 
 class AdminService:
@@ -48,7 +51,12 @@ class AdminService:
             approved=True,
             name=f"{student.first_name} {student.last_name}"
         )
-        
+        NotificationService.notify_account_approved(
+            db=db,
+            user_type='student',
+            user_id=student.student_id,
+            user_email=student.email
+        )
         return student
     
     @staticmethod
@@ -89,6 +97,13 @@ class AdminService:
         db.commit()
         
         return {"message": f"Student {email_copy} rejected and deleted"}
+        NotificationService.notify_account_rejected(
+            db=db,
+            user_type='student',
+            user_id=student.student_id,
+            user_email=student.email,
+            reason=reason
+        )
     
     @staticmethod
     async def approve_company(db: Session, company_id: int) -> Company:
@@ -115,6 +130,12 @@ class AdminService:
             user_type="company",
             approved=True,
             name=company.company_name
+        )
+        NotificationService.notify_account_approved(
+            db=db,
+            user_type='company',
+            user_id=company.company_id,
+            user_email=company.email
         )
         
         return company
@@ -158,6 +179,15 @@ class AdminService:
         db.commit()
 
         return {"message": f"Company {email_copy} rejected and deleted"}
+        NotificationService.notify_account_rejected(
+            db=db,
+            user_type='company',
+            user_id=company.company_id,
+            user_email=company.email,
+            reason=reason
+        )
+        return company
+
     
     @staticmethod
     def get_approved_students(db: Session, skip: int = 0, limit: int = 100) -> List[Student]:
@@ -216,6 +246,7 @@ class AdminService:
         db.commit()
         
         return {"message": f"Student {email_copy} deleted successfully"}
+    
     
     @staticmethod
     async def delete_company(db: Session, company_id: int) -> Dict[str, str]:

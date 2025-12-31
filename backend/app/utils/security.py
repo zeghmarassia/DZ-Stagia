@@ -191,3 +191,34 @@ def get_current_student(
         raise credentials_exception
     
     return student
+def get_current_user_info(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+) -> tuple:
+    """
+    Get current user type and ID from JWT token
+    Returns: (user_type, user_id)
+    """
+    from jose import jwt, JWTError
+    from app.config import settings
+    
+    token = credentials.credentials
+    
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        user_type: str = payload.get("type")  # 'student' or 'company'
+        user_id: int = payload.get("sub")
+        
+        if user_id is None or user_type is None:
+            raise credentials_exception
+        
+        return user_type, user_id
+            
+    except JWTError:
+        raise credentials_exception

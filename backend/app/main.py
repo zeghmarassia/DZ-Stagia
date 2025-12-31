@@ -18,6 +18,8 @@ app = FastAPI(
 # Import existant
 from app.routes import authRoutes, adminRoutes, studentRoutes
 from app.routes import companyRoutes 
+from app.routes import notificationRoutes
+
 
 # Dans l'application FastAPI
 app.include_router(authRoutes.router, prefix="/auth")
@@ -26,6 +28,9 @@ app.include_router(studentRoutes.router, prefix="/student")
 app.include_router(companyRoutes.router)
 app.include_router(offerRoutes.router, prefix="/api/v1")  
 app.include_router(applicationRoutes.router, prefix="/api/v1")
+app.include_router(notificationRoutes.router, prefix="/api/v1")
+
+
 
 
 
