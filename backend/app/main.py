@@ -5,6 +5,7 @@ from app.routes import auth_router, admin_router, establishment_router, student_
 from app.routes import offerRoutes
 from app.database import engine, Base
 from typing import Optional
+from app.routes import applicationRoutes
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -24,6 +25,7 @@ app.include_router(adminRoutes.router, prefix="/admin")
 app.include_router(studentRoutes.router, prefix="/student")
 app.include_router(companyRoutes.router)
 app.include_router(offerRoutes.router, prefix="/api/v1")  
+app.include_router(applicationRoutes.router, prefix="/api/v1")
 
 
 
