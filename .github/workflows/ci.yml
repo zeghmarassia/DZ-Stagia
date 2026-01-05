@@ -1,0 +1,50 @@
+name: DZ-Stagiaire CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+      - name: Run Black (Linting)
+        run: |
+          cd backend
+          black . --check
+      - name: Run Tests
+        run: |
+          cd backend
+          pytest
+
+  frontend-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Run Linting
+        run: |
+          cd frontend
+          npm run lint
+      - name: Run Tests
+        run: |
+          cd frontend
+          npm test -- --watchAll=false
