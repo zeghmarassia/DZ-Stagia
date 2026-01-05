@@ -1,93 +1,131 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next'; // 1. Import Hook
 import { Mail, Lock, Upload, User, Building, Briefcase, GraduationCap, X } from 'lucide-react';
+import LanguageSwitcher from '../components/LanguageSwitcher'; // 2. Import Switcher
 
 const SignupPage = ({ type }) => {
+  const { t } = useTranslation(); // 3. Initialize Translation
   const isStudent = type === 'student';
 
   return (
     <div className="min-h-screen bg-white font-sans overflow-hidden">
+      
+      {/* MAIN CONTAINER */}
       <div className={`w-full min-h-screen flex flex-col md:flex-row transition-all duration-500 ease-in-out ${isStudent ? '' : 'md:flex-row-reverse'}`}>
         
         {/* --- FORM SECTION --- */}
         <div className="w-full md:w-1/2 flex flex-col h-screen overflow-y-auto">
-          <div className="p-8 md:p-12 w-full max-w-2xl mx-auto">
-            <Link to="/" className="text-2xl font-black text-slate-900 tracking-wide uppercase mb-8 block hover:text-blue-600 transition">
-              LOGO
-            </Link>
+          <div className="p-8 md:p-12 w-full max-w-2xl mx-auto relative">
+            
+            {/* Header: Logo & Switcher */}
+            <div className="flex justify-between items-center mb-8">
+                <Link to="/" className="text-2xl font-black text-slate-900 tracking-wide uppercase hover:text-blue-600 transition">
+                  LOGO
+                </Link>
+                
+                {/* Replaced Static Flag with LanguageSwitcher */}
+                <div>
+                   <LanguageSwitcher />
+                </div>
+            </div>
 
-            {/* UPDATED LINKS IN TABS */}
+            {/* TOGGLE TABS */}
             <div className="flex border-b border-gray-200 mb-8">
               <Link 
-                to="/student/signup" 
-                className={`flex-1 pb-3 text-center font-bold text-sm transition-all duration-300 relative ${isStudent ? 'text-[#5B8C9D]' : 'text-gray-400 hover:text-gray-600'}`}
+                to="/student/signup"
+                className={`flex-1 pb-3 text-center font-bold text-sm transition-all duration-300 relative
+                  ${isStudent ? 'text-[#5B8C9D]' : 'text-gray-400 hover:text-gray-600'}
+                `}
               >
-                Étudiant
+                {t('auth.student', 'Étudiant')}
                 {isStudent && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#5B8C9D]" />}
               </Link>
               
               <Link 
-                to="/company/signup" 
-                className={`flex-1 pb-3 text-center font-bold text-sm transition-all duration-300 relative ${!isStudent ? 'text-teal-700' : 'text-gray-400 hover:text-gray-600'}`}
+                to="/company/signup"
+                className={`flex-1 pb-3 text-center font-bold text-sm transition-all duration-300 relative
+                  ${!isStudent ? 'text-[#6EB486]' : 'text-gray-400 hover:text-gray-600'}
+                `}
               >
-                Entreprise
-                {!isStudent && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-teal-700" />}
+                {t('auth.company', 'Entreprise')}
+                {!isStudent && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#6EB486]" />}
               </Link>
             </div>
 
+            {/* CONTENT AREA */}
             <div key={type} className="animate-fadeInSlideUp">
               {isStudent ? <StudentForm /> : <CompanyForm />}
             </div>
+
           </div>
         </div>
 
-        {/* --- IMAGE SECTION --- */}
-        <div className={`hidden md:flex w-1/2 items-center justify-center p-12 text-white text-center flex-col transition-colors duration-700 ${isStudent ? 'bg-gradient-to-br from-[#5B8C9D] to-teal-600' : 'bg-gradient-to-br from-[#1F4E64] to-[#2B6A85]'}`}>
+        {/* --- IMAGE / BANNER SECTION --- */}
+        <div 
+          className={`hidden md:flex w-1/2 items-center justify-center p-12 text-white text-center flex-col transition-colors duration-700
+            ${isStudent 
+              ? 'bg-gradient-to-br from-[#5B8C9D] to-teal-600' 
+              : 'bg-gradient-to-br from-[#1F4E64] to-[#2B6A85]'
+            }`}
+        >
+           {/* Animated Content Wrapper */}
            <div key={type} className="animate-fadeInScale">
              <h2 className="text-3xl font-bold mb-8 leading-tight max-w-md mx-auto">
-               {isStudent ? "Créez votre profil, postulez aux offres en un clic." : "Publiez vos offres, trouvez les meilleurs talents."}
+               {isStudent 
+                  ? t('hero.student_desc', "Créez votre profil, postulez aux offres en un clic, et suivez vos candidatures en temps réel.")
+                  : t('hero.company_desc', "Publiez vos offres, gérez vos candidatures et trouvez les meilleurs talents.")
+               }
              </h2>
+             
              <div className="w-full max-w-md mx-auto">
-               <img src={isStudent ? "/students1 1.png" : "/company 1.png"} alt="Illustration" className="w-full object-contain drop-shadow-2xl" />
+               <img 
+                  src={isStudent ? "/students1 1.png" : "/company 1.png"} 
+                  alt="Illustration" 
+                  className="w-full object-contain drop-shadow-2xl" 
+               />
              </div>
            </div>
         </div>
+
       </div>
-      
+
+      {/* Internal CSS for Animations */}
       <style>{`
-        @keyframes fadeInSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .animate-fadeInSlideUp { animation: fadeInSlideUp 0.5s ease-out forwards; }
-        .animate-fadeInScale { animation: fadeInScale 0.6s ease-out forwards; }
+        @keyframes fadeInSlideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInScale {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fadeInSlideUp {
+          animation: fadeInSlideUp 0.5s ease-out forwards;
+        }
+        .animate-fadeInScale {
+          animation: fadeInScale 0.6s ease-out forwards;
+        }
       `}</style>
     </div>
   );
 };
 
-/* --- FUNCTIONAL STUDENT FORM --- */
+/* --- STUDENT FORM SUB-COMPONENT --- */
 const StudentForm = () => {
-  // 1. STATE MANAGEMENT
+  const { t } = useTranslation(); // Initialize Hook
   const [formData, setFormData] = useState({
-    university: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    file: null // To store the uploaded file object
+    university: '', firstName: '', lastName: '', email: '', password: '', file: null
   });
 
-  // Reference to the hidden file input
   const fileInputRef = useRef(null);
 
-  // 2. HANDLERS
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileClick = () => {
-    fileInputRef.current.click(); // Trigger the hidden input
-  };
+  const handleFileClick = () => fileInputRef.current.click();
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -96,7 +134,7 @@ const StudentForm = () => {
   };
 
   const handleRemoveFile = (e) => {
-    e.stopPropagation(); // Prevent opening the dialog again
+    e.stopPropagation();
     setFormData(prev => ({ ...prev, file: null }));
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -104,14 +142,13 @@ const StudentForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Submitting Student Form:", formData);
-    // Add your API call here
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* University */}
+      {/* University Select */}
       <div>
-        <label className="block text-sm font-bold text-slate-900 mb-2">Université / Établissement</label>
+        <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.university_label', 'Université / Établissement')}</label>
         <div className="relative">
           <select 
             name="university"
@@ -119,7 +156,7 @@ const StudentForm = () => {
             onChange={handleChange}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D] appearance-none bg-white text-gray-600"
           >
-            <option value="">Choisissez votre établissement</option>
+            <option value="">{t('auth.university_placeholder', 'Choisissez votre établissement')}</option>
             <option value="USTHB">USTHB</option>
             <option value="ESI">ESI</option>
             <option value="MDI">MDI</option>
@@ -131,30 +168,16 @@ const StudentForm = () => {
       {/* Name Row */}
       <div className="flex gap-4">
         <div className="flex-1">
-          <label className="block text-sm font-bold text-slate-900 mb-2">Prénom</label>
+          <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.firstname', 'Prénom')}</label>
           <div className="relative">
-            <input 
-              name="firstName"
-              type="text" 
-              placeholder="John" 
-              value={formData.firstName}
-              onChange={handleChange}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D]" 
-            />
+            <input name="firstName" type="text" placeholder="John" value={formData.firstName} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D]" />
             <User className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
           </div>
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-bold text-slate-900 mb-2">Nom</label>
+          <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.lastname', 'Nom')}</label>
           <div className="relative">
-            <input 
-              name="lastName"
-              type="text" 
-              placeholder="Doe" 
-              value={formData.lastName}
-              onChange={handleChange}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D]" 
-            />
+            <input name="lastName" type="text" placeholder="Doe" value={formData.lastName} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D]" />
             <User className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
           </div>
         </div>
@@ -162,108 +185,59 @@ const StudentForm = () => {
 
       {/* Email */}
       <div>
-        <label className="block text-sm font-bold text-slate-900 mb-2">Adresse email</label>
+        <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.email', 'Adresse email')}</label>
         <div className="relative">
-          <input 
-            name="email"
-            type="email" 
-            placeholder="e.g.name@email.com" 
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D]" 
-          />
+          <input name="email" type="email" placeholder="e.g.name@email.com" value={formData.email} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D]" />
           <Mail className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
         </div>
       </div>
 
       {/* Password */}
       <div>
-        <label className="block text-sm font-bold text-slate-900 mb-2">Mot de passe</label>
+        <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.password', 'Mot de passe')}</label>
         <div className="relative">
-          <input 
-            name="password"
-            type="password" 
-            placeholder="Créez un mot de passe" 
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D]" 
-          />
+          <input name="password" type="password" placeholder={t('auth.password_placeholder', 'Créez un mot de passe')} value={formData.password} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D]" />
           <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
         </div>
       </div>
 
-      {/* --- FILE UPLOAD SECTION --- */}
+      {/* File Upload */}
       <div>
-        <label className="block text-sm font-bold text-slate-900 mb-2">Vérifiez votre identité</label>
-        
-        {/* Hidden Input */}
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          onChange={handleFileChange} 
-          className="hidden" 
-          accept=".pdf,.jpg,.png"
-        />
-
-        {/* Custom Styled Clickable Area */}
-        <div 
-          onClick={handleFileClick}
-          className={`border rounded-lg p-4 flex items-center cursor-pointer transition border-dashed
-            ${formData.file ? 'bg-blue-50 border-[#5B8C9D]' : 'border-gray-300 hover:bg-gray-50'}
-          `}
-        >
+        <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.upload_label', 'Vérifiez votre identité')}</label>
+        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".pdf,.jpg,.png" />
+        <div onClick={handleFileClick} className={`border rounded-lg p-4 flex items-center cursor-pointer transition border-dashed ${formData.file ? 'bg-blue-50 border-[#5B8C9D]' : 'border-gray-300 hover:bg-gray-50'}`}>
           {formData.file ? (
-             // Shown when file IS selected
              <>
-               <div className="bg-[#5B8C9D] text-white p-2 rounded mr-3">
-                 <Upload className="w-5 h-5" />
-               </div>
+               <div className="bg-[#5B8C9D] text-white p-2 rounded mr-3"><Upload className="w-5 h-5" /></div>
                <div className="flex-1 overflow-hidden">
                  <div className="text-sm font-bold text-slate-900 truncate">{formData.file.name}</div>
-                 <div className="text-xs text-slate-500">{(formData.file.size / 1024).toFixed(0)} KB</div>
                </div>
-               <button onClick={handleRemoveFile} className="p-1 hover:bg-red-100 rounded-full text-red-500">
-                 <X className="w-5 h-5" />
-               </button>
+               <button onClick={handleRemoveFile} className="p-1 hover:bg-red-100 rounded-full text-red-500"><X className="w-5 h-5" /></button>
              </>
           ) : (
-             // Shown when NO file is selected
              <>
                <Upload className="w-6 h-6 text-gray-400 mr-3" />
                <div>
-                   <div className="text-sm font-bold text-slate-600">Déposer un document</div>
-                   <div className="text-xs text-slate-400">Carte d'étudiant, certificat, etc.</div>
+                   <div className="text-sm font-bold text-slate-600">{t('auth.upload_text', 'Déposer un document')}</div>
+                   <div className="text-xs text-slate-400">{t('auth.upload_subtext_student', "Carte d'étudiant, certificat de scolarité, etc.")}</div>
                </div>
              </>
           )}
         </div>
       </div>
 
-      <button type="submit" className="w-full bg-[#5B8C9D] text-white font-bold py-3.5 rounded-lg hover:bg-[#4a7280] transition mt-6 shadow-md">
-        CONTINUER
-      </button>
-
-      {/* Footer Links */}
-      <div className="flex items-center my-4">
-          <div className="flex-grow border-t border-gray-300"></div>
-          <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-bold uppercase">OU</span>
-          <div className="flex-grow border-t border-gray-300"></div>
-      </div>
-      <button type="button" className="w-full bg-gray-100 text-slate-700 font-bold py-3.5 rounded-lg hover:bg-gray-200 transition text-sm">
-        Continuer avec votre email universitaire
+      <button type="submit" className="w-full bg-[#5B8C9D] text-white font-bold py-3.5 rounded-lg hover:bg-[#4a7280] transition mt-6 shadow-md uppercase">
+        {t('auth.continue_btn', 'CONTINUER')}
       </button>
     </form>
   );
 };
 
-/* --- FUNCTIONAL COMPANY FORM --- */
+/* --- COMPANY FORM SUB-COMPONENT --- */
 const CompanyForm = () => {
+  const { t } = useTranslation(); // Initialize Hook
   const [formData, setFormData] = useState({
-    companyName: '',
-    sector: '',
-    email: '',
-    password: '',
-    file: null
+    companyName: '', sector: '', email: '', password: '', file: null
   });
 
   const fileInputRef = useRef(null);
@@ -294,19 +268,19 @@ const CompanyForm = () => {
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Company Name */}
       <div>
-        <label className="block text-sm font-bold text-slate-900 mb-2">Nom de l'entreprise</label>
+        <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.company_name', "Nom de l'entreprise")}</label>
         <div className="relative">
-          <input name="companyName" value={formData.companyName} onChange={handleChange} type="text" placeholder="Entrez le nom" className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-700" />
+          <input name="companyName" value={formData.companyName} onChange={handleChange} type="text" placeholder={t('auth.company_name', "Nom de l'entreprise")} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#6EB486]" />
           <Building className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
         </div>
       </div>
 
       {/* Sector */}
       <div>
-        <label className="block text-sm font-bold text-slate-900 mb-2">Secteur d'activité</label>
+        <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.sector', "Secteur d'activité")}</label>
         <div className="relative">
-          <select name="sector" value={formData.sector} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-700 appearance-none bg-white text-gray-600">
-            <option value="">Choisissez votre secteur</option>
+          <select name="sector" value={formData.sector} onChange={handleChange} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#6EB486] appearance-none bg-white text-gray-600">
+            <option value="">{t('auth.sector_placeholder', "Choisissez votre secteur d'activité")}</option>
             <option value="IT">Technologie / IT</option>
             <option value="Finance">Finance</option>
           </select>
@@ -316,31 +290,30 @@ const CompanyForm = () => {
 
       {/* Email */}
       <div>
-        <label className="block text-sm font-bold text-slate-900 mb-2">Adresse email</label>
+        <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.email', 'Adresse email')}</label>
         <div className="relative">
-          <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder="e.g.name@email.com" className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-700" />
+          <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder="e.g.name@email.com" className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#6EB486]" />
           <Mail className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
         </div>
       </div>
 
       {/* Password */}
       <div>
-        <label className="block text-sm font-bold text-slate-900 mb-2">Mot de passe</label>
+        <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.password', 'Mot de passe')}</label>
         <div className="relative">
-          <input name="password" value={formData.password} onChange={handleChange} type="password" placeholder="Mot de passe" className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-teal-700" />
+          <input name="password" value={formData.password} onChange={handleChange} type="password" placeholder={t('auth.password_placeholder', 'Créez un mot de passe')} className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#6EB486]" />
           <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
         </div>
       </div>
 
-      {/* --- FILE UPLOAD SECTION (Company) --- */}
+      {/* File Upload */}
       <div>
-        <label className="block text-sm font-bold text-slate-900 mb-2">Vérifiez votre identité</label>
+        <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.upload_label', 'Vérifiez votre identité')}</label>
         <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".pdf,.jpg,.png" />
-        
-        <div onClick={handleFileClick} className={`border rounded-lg p-4 flex items-center cursor-pointer transition border-dashed ${formData.file ? 'bg-teal-50 border-teal-700' : 'border-gray-300 hover:bg-gray-50'}`}>
+        <div onClick={handleFileClick} className={`border rounded-lg p-4 flex items-center cursor-pointer transition border-dashed ${formData.file ? 'bg-green-50 border-[#6EB486]' : 'border-gray-300 hover:bg-gray-50'}`}>
           {formData.file ? (
              <>
-               <div className="bg-teal-700 text-white p-2 rounded mr-3"><Upload className="w-5 h-5" /></div>
+               <div className="bg-[#6EB486] text-white p-2 rounded mr-3"><Upload className="w-5 h-5" /></div>
                <div className="flex-1 overflow-hidden">
                  <div className="text-sm font-bold text-slate-900 truncate">{formData.file.name}</div>
                </div>
@@ -350,26 +323,16 @@ const CompanyForm = () => {
              <>
                <Upload className="w-6 h-6 text-gray-400 mr-3" />
                <div>
-                   <div className="text-sm font-bold text-slate-600">Déposer un document</div>
-                   <div className="text-xs text-slate-400">Registre de commerce, NIF, etc.</div>
+                   <div className="text-sm font-bold text-slate-600">{t('auth.upload_text', 'Déposer un document')}</div>
+                   <div className="text-xs text-slate-400">{t('auth.upload_subtext_company', "Document réglementaire, registre de commerce, etc.")}</div>
                </div>
              </>
           )}
         </div>
       </div>
 
-      <button type="submit" className="w-full bg-teal-700 text-white font-bold py-3.5 rounded-lg hover:bg-teal-800 transition mt-6 shadow-md">
-        CONTINUER
-      </button>
-
-      {/* Footer Links */}
-      <div className="flex items-center my-4">
-          <div className="flex-grow border-t border-gray-300"></div>
-          <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-bold uppercase">OU</span>
-          <div className="flex-grow border-t border-gray-300"></div>
-      </div>
-      <button type="button" className="w-full bg-gray-100 text-slate-700 font-bold py-3.5 rounded-lg hover:bg-gray-200 transition text-sm">
-        Continuer avec votre email professionnel
+      <button type="submit" className="w-full bg-[#6EB486] text-white font-bold py-3.5 rounded-lg hover:bg-[#5da076] transition mt-6 shadow-md uppercase">
+        {t('auth.continue_btn', 'CONTINUER')}
       </button>
     </form>
   );
