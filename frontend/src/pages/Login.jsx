@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'; 
 import { Mail, Lock } from 'lucide-react';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -15,6 +15,8 @@ const Login = () => {
     if (error) setError(false);
   };
 
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
@@ -22,7 +24,9 @@ const Login = () => {
         return;
     }
     console.log("Login Data Submitted:", formData);
-    // navigate('/dashboard'); 
+    // if student navigate to student dashboard
+    // if company navigate to company dashboard
+    navigate('/company/dashboard'); 
   };
 
   return (
