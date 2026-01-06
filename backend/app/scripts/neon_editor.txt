@@ -1,0 +1,13 @@
+-- Insert 5 key Algerian Écoles Supérieures for DZ-Stagia testing
+INSERT INTO establishment (name, abbreviation, type, address, created_at) VALUES
+('École Nationale Supérieure d''Informatique', 'ESI', 'École Supérieure', 'BP 68M, Oued Smar, Alger', NOW()),
+('École Nationale Polytechnique', 'ENP', 'École Supérieure', '10 Avenue Pasteur, El Harrach, Alger', NOW()),
+('École Supérieure en Technologie Industrielle de Béjaïa', 'ESTIN', 'École Supérieure', 'Amizour, Béjaïa', NOW()),
+('École Supérieure d''Informatique de Sidi Bel Abbès', 'ESI SBA', 'École Supérieure', 'Sidi Bel Abbès', NOW()),
+('École Supérieure de Commerce', 'ESC', 'École Supérieure', '11 Chemin Doudou Mokhtar, Alger', NOW())
+ON CONFLICT DO NOTHING;
+
+-- Verify the import
+SELECT establishment_id, abbreviation, name, type 
+FROM establishment 
+ORDER BY establishment_id;

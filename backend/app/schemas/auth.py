@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from datetime import datetime
 from typing import Optional
 
@@ -85,6 +85,18 @@ class OTPVerify(BaseModel):
     """Verify OTP and reset password"""
     otp_code: str
     new_password: str
+
+class ChangePassword(BaseModel):
+    """Change password when logged in"""
+    old_password: str
+    new_password: str
+    confirm_password: str 
+    
+    @validator('confirm_password')
+    def passwords_match(cls, v, values):
+        if 'new_password' in values and v != values['new_password']:
+            raise ValueError('Passwords do not match')
+        return v
     
 class OTPVerifyWithEmail(BaseModel):
     """Alternative: Include email if frontend doesn't store it"""
