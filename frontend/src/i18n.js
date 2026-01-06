@@ -81,6 +81,117 @@ contact: {
   info_address: "Address",
   info_phone: "Phone",
   success_msg: "Message sent successfully!"
+},
+  company_dashboard: {
+  welcome: "Hello, Recruiter!",
+  subtitle: "Manage your job offers and track candidates.",
+  btn_create: "Post New Offer",
+  stat_active: "Active Jobs",
+  stat_candidates: "New Candidates",
+  stat_views: "Total Views",
+  recent_jobs: "Recent Job Postings",
+  col_title: "Job Title",
+  col_applicants: "Applicants",
+  col_date: "Posted Date",
+  col_status: "Status",
+  status_active: "Active",
+  status_closed: "Closed",
+  menu_dashboard: "Dashboard",
+  menu_offers: "My Offers",
+  menu_candidates: "Candidates",
+  menu_profile: "Company Profile"
+},
+      company_nav: {
+        dashboard: "Tableau de Bord",
+        offers: "Mes offres",
+        applications: "Candidatures",
+        search: "Rechercher",
+        logout: "Déconnexion"
+      },
+      company_hero: {
+        greeting: "Bonjour, {{name}} !",
+        subtitle: "Gérez vos offres de stage et d'emploi et suivez les candidatures."
+      },
+      stats: {
+        active_offers: "Offres actives",
+        apps_received: "Candidatures reçues",
+        archived_offers: "Offres archivés",
+        btn_view: "VOIR MES OFFRES",
+        btn_manage: "GÉRER LES CANDIDATURES",
+        btn_history: "HISTORIQUE"
+      },
+      table: {
+        title: "Offres récemment publiées",
+        search_placeholder: "Rechercher ...",
+        headers: {
+          title: "TITRE DE L'OFFRE",
+          type: "TYPE",
+          status: "STATUT",
+          candidates: "CANDIDATURES"
+        },
+        badges: {
+          first_job: "Premier Emploi",
+          pfe: "Projet de Fin d'Etudes",
+          internship: "Stage",
+          active: "Active",
+          archived: "Archivée"
+        },
+        published_on: "Publiée le {{date}}",
+        candidates_count: "{{count}} Candidats",
+        load_more: "Afficher Plus"
+      },
+      offers: {
+  title: "My Offers",
+  subtitle: "Manage and track the status of all your job, internship, and PFE offers.",
+  tabs: {
+    all: "All Offers",
+    active: "Active",
+    archived: "Archived"
+  },
+  btn_publish: "Publish New Offer",
+  sort: {
+    label: "Sort by:",
+    recent: "Most Recent"
+  },
+  search_placeholder: "Search ...",
+  table: {
+    headers: {
+      title: "OFFER TITLE",
+      type: "TYPE",
+      visibility: "VISIBILITY",
+      status: "STATUS",
+      candidates: "CANDIDATES"
+    },
+    visibility: {
+      public: "Public",
+      targeted: "Targeted"
+    }
+  },
+  pagination: {
+    prev: "Previous",
+    next: "Next"
+  }
+},
+applications: {
+  breadcrumb: "My Offers / Applications",
+  modify_offer: "Edit Offer",
+  published_on: "Published on {{date}}",
+  stats: {
+    all: "All",
+    received: "Received",
+    under_review: "Under Review",
+    shortlisted: "Interview Scheduled",
+    accepted: "Accepted",
+    refused: "Refused"
+  },
+  table: {
+    headers: {
+      name: "CANDIDATE NAME",
+      university: "UNIVERSITY / SCHOOL",
+      field: "FIELD OF STUDY",
+      status: "STATUS"
+    }
+  }
 }
     }
   },
@@ -162,6 +273,117 @@ contact: {
   info_address: "Adresse",
   info_phone: "Téléphone",
   success_msg: "Message envoyé avec succès !"
+},
+  company_dashboard: {
+  welcome: "Bonjour, Recruteur !",
+  subtitle: "Gérez vos offres d'emploi et suivez les candidats.",
+  btn_create: "Poster une offre",
+  stat_active: "Offres Actives",
+  stat_candidates: "Nouveaux Candidats",
+  stat_views: "Vues Totales",
+  recent_jobs: "Offres Récentes",
+  col_title: "Titre du poste",
+  col_applicants: "Candidats",
+  col_date: "Date de publication",
+  col_status: "Statut",
+  status_active: "Active",
+  status_closed: "Clôturée",
+  menu_dashboard: "Tableau de bord",
+  menu_offers: "Mes Offres",
+  menu_candidates: "Candidats",
+  menu_profile: "Profil Entreprise"
+},
+      company_nav: {
+        dashboard: "Dashboard",
+        offers: "My Offers",
+        applications: "Applications",
+        search: "Search",
+        logout: "Logout"
+      },
+      company_hero: {
+        greeting: "Hello, {{name}} !",
+        subtitle: "Manage your internship and job offers and track applications."
+      },
+      stats: {
+        active_offers: "Active Offers",
+        apps_received: "Applications Received",
+        archived_offers: "Archived Offers",
+        btn_view: "VIEW MY OFFRES",
+        btn_manage: "MANAGE APPLICATIONS",
+        btn_history: "HISTORY"
+      },
+      table: {
+        title: "Recently Published Offers",
+        search_placeholder: "Search ...",
+        headers: {
+          title: "OFFER TITLE",
+          type: "TYPE",
+          status: "STATUS",
+          candidates: "CANDIDATES"
+        },
+        badges: {
+          first_job: "First Job",
+          pfe: "Graduation Project",
+          internship: "Internship",
+          active: "Active",
+          archived: "Archived"
+        },
+        published_on: "Published on {{date}}",
+        candidates_count: "{{count}} Candidates",
+        load_more: "Load More"
+      },
+      offers: {
+  title: "Mes offres",
+  subtitle: "Gérez et suivez le statut de toutes vos offres d'emploi, de stage et de PFE.",
+  tabs: {
+    all: "Toutes les offres",
+    active: "Actives",
+    archived: "Archivées"
+  },
+  btn_publish: "Publier une nouvelle offre",
+  sort: {
+    label: "Trier par :",
+    recent: "Les plus récents"
+  },
+  search_placeholder: "Rechercher ...",
+  table: {
+    headers: {
+      title: "TITRE DE L'OFFRE",
+      type: "TYPE",
+      visibility: "VISIBILITÉ",
+      status: "STATUT",
+      candidates: "CANDIDATURES"
+    },
+    visibility: {
+      public: "Publique",
+      targeted: "Ciblée"
+    }
+  },
+  pagination: {
+    prev: "Précédent",
+    next: "Suivant"
+  }
+},
+applications: {
+  breadcrumb: "Mes offres / Candidatures",
+  modify_offer: "Modifier l'offre",
+  published_on: "Publiée le {{date}}",
+  stats: {
+    all: "Tous",
+    received: "Reçue",
+    under_review: "En cours d'étude",
+    shortlisted: "Entretien planifié",
+    accepted: "Accepté",
+    refused: "Refusé"
+  },
+  table: {
+    headers: {
+      name: "NOM DU CANDIDAT",
+      university: "UNIVERSITÉ / ÉCOLE",
+      field: "FILIÈRE",
+      status: "STATUT"
+    }
+  }
 }
     }
   },
@@ -243,9 +465,124 @@ contact: {
   info_address: "العنوان",
   info_phone: "الهاتف",
   success_msg: "تم إرسال الرسالة بنجاح!"
-}
+},
+  company_dashboard: {
+  welcome: "مرحباً أيها المجند!",
+  subtitle: "إدارة عروض العمل الخاصة بك ومتابعة المرشحين.",
+  btn_create: "نشر عرض جديد",
+  stat_active: "وظائف نشطة",
+  stat_candidates: "مرشحين جدد",
+  stat_views: "إجمالي المشاهدات",
+  recent_jobs: "وظائف حديثة",
+  col_title: "المسمى الوظيفي",
+  col_applicants: "المتقدمين",
+  col_date: "تاريخ النشر",
+  col_status: "الحالة",
+  status_active: "نشط",
+  status_closed: "مغلق",
+  menu_dashboard: "لوحة التحكم",
+  menu_offers: "عروضي",
+  menu_candidates: "المرشحين",
+  menu_profile: "ملف الشركة"
+},
+      company_nav: {
+        dashboard: "لوحة القيادة",
+        offers: "عروضي",
+        applications: "الطلبات",
+        search: "بحث",
+        logout: "خروج"
+      },
+      company_hero: {
+        greeting: "مرحباً، {{name}} !",
+        subtitle: "إدارة عروض التدريب والتوظيف الخاصة بك ومتابعة الطلبات."
+      },
+      stats: {
+        active_offers: "العروض النشطة",
+        apps_received: "الطلبات المستلمة",
+        archived_offers: "العروض المؤرشفة",
+        btn_view: "عرض عروضي",
+        btn_manage: "إدارة الطلبات",
+        btn_history: "السجل"
+      },
+      table: {
+        title: "العروض المنشورة مؤخراً",
+        search_placeholder: "بحث ...",
+        headers: {
+          title: "عنوان العرض",
+          type: "النوع",
+          status: "الحالة",
+          candidates: "المرشحين"
+        },
+        badges: {
+          first_job: "وظيفة أولى",
+          pfe: "مشروع تخرج",
+          internship: "تدريب",
+          active: "نشط",
+          archived: "مؤرشف"
+        },
+        published_on: "نشر في {{date}}",
+        candidates_count: "{{count}} مرشح",
+        load_more: "عرض المزيد"
+    },
+    offers: {
+  title: "عروضي",
+  subtitle: "إدارة ومتابعة حالة جميع عروض العمل والتدريب ومشاريع التخرج.",
+  tabs: {
+    all: "كل العروض",
+    active: "النشطة",
+    archived: "المؤرشفة"
+  },
+  btn_publish: "نشر عرض جديد",
+  sort: {
+    label: "فرز حسب:",
+    recent: "الأحدث"
+  },
+  search_placeholder: "بحث ...",
+  table: {
+    headers: {
+      title: "عنوان العرض",
+      type: "النوع",
+      visibility: "الظهور",
+      status: "الحالة",
+      candidates: "المرشحين"
+    },
+    visibility: {
+      public: "عام",
+      targeted: "مستهدف"
     }
+  },
+  pagination: {
+    prev: "السابق",
+    next: "التالي"
   }
+},
+applications: {
+  breadcrumb: "عروضي / Candidatures",
+  modify_offer: "تعديل العرض",
+  published_on: "نُشر في {{date}}",
+  stats: {
+    all: "الكل",
+    received: "تم استلامها",
+    under_review: "قيد الدراسة",
+    shortlisted: "مقابلة مجدولة",
+    accepted: "تم القبول",
+    refused: "تم الرفض"
+  },
+  table: {
+    headers: {
+      name: "اسم المترشح",
+      university: "الجامعة / المدرسة",
+      field: "التخصص",
+      status: "الحالة"
+    }
+  },
+  pagination: {
+    prev: "السابق",
+    next: "التالي"
+  }
+}
+  }
+}
 };
 
 i18n

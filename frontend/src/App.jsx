@@ -7,6 +7,9 @@ import './i18n';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import VerifyOtp from './pages/VerifyOtp';
+import CompanyDashboard from './pages/CompanyDashboard';
+import CompanyOffers from './pages/CompanyOffers';
+import CompanyApplications from './pages/CompanyApplications';
 
 function App() {
   return (
@@ -20,6 +23,10 @@ function App() {
         
         {/* Redirect generic /signup to the student route by default */}
         <Route path="/signup" element={<Navigate to="/student/signup" replace />} />
+
+        <Route path="/company/dashboard" element={<CompanyDashboard />} />
+        <Route path="/company/offers" element={<CompanyOffers />} />
+        <Route path="/company/applications" element={<CompanyApplications />} />
         
         {/* UPDATED ROUTES to match Backend */}
         <Route path="/student/signup" element={<SignupPage type="student" />} />
