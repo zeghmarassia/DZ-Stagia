@@ -9,4 +9,3 @@ class Speciality(Base):
     name = Column(String(100), nullable=False)
     domain_id = Column(Integer, ForeignKey('domain.domain_id', ondelete='CASCADE'), nullable=False)
     offers = relationship("Offer", secondary="offer_speciality", back_populates="required_specialities")
-    applications = relationship("Application", back_populates="student", cascade="all, delete-orphan")

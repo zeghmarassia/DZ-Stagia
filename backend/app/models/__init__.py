@@ -1,5 +1,8 @@
 from app.database import Base
 
+# Import junction tables first to register them in metadata before models that use them
+from app.models.offer_speciality import offer_speciality
+
 from app.models.domain import Domain
 from app.models.speciality import Speciality
 from app.models.establishment import Establishment

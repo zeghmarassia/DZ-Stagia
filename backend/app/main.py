@@ -24,7 +24,7 @@ from app.routes import notificationRoutes
 # Dans l'application FastAPI
 app.include_router(authRoutes.router, prefix="/auth")
 app.include_router(adminRoutes.router, prefix="/admin")
-app.include_router(studentRoutes.router, prefix="/student")
+app.include_router(studentRoutes.router)  # Router already has /student prefix
 app.include_router(companyRoutes.router)
 app.include_router(offerRoutes.router, prefix="/api/v1")  
 app.include_router(applicationRoutes.router, prefix="/api/v1")
