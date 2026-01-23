@@ -129,11 +129,11 @@ async def get_current_admin(current_user: dict = Depends(get_user)) -> dict:
     return current_user
 
 
-def get_current_company(
+def get_current_company_obj(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ) -> Company:
-    """Get the currently authenticated company from JWT token"""
+    """Get the currently authenticated company object from JWT token (legacy function)"""
     token = credentials.credentials
     
     credentials_exception = HTTPException(
@@ -161,11 +161,11 @@ def get_current_company(
     return company
 
 
-def get_current_student(
+def get_current_student_obj(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ) -> Student:
-    """Get the currently authenticated student from JWT token"""
+    """Get the currently authenticated student object from JWT token (legacy function)"""
     token = credentials.credentials
     
     credentials_exception = HTTPException(
