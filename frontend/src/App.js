@@ -13,7 +13,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import UserValidation from './pages/Admin/UserValidation';
 import Etudiants from './pages/Admin/Etudiants'; 
 import Enterprise from './pages/Admin/Enterprise'; 
-import Offers from './pages/Admin/Offers'; // Import the new Offers page
+import AdminOffers from './pages/Admin/AdminOffers'; // Import the new Offers page
 
 function App() {
   const [isVerified, setIsVerified] = useState(false);
@@ -44,7 +44,7 @@ function App() {
           <Route path="/admin/users" element={<UserValidation />} />
           <Route path="/admin/students" element={<Etudiants />} /> 
           <Route path="/admin/companies" element={<Enterprise />} />
-          <Route path="/admin/offers" element={<Offers />} /> {/* Admin Offers route added */}
+          <Route path="/admin/offers" element={<AdminOffers />} /> {/* Admin Offers route added */}
         </Routes>
       </div>
     </Router>
