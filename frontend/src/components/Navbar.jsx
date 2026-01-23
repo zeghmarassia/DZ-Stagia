@@ -14,7 +14,7 @@ const Navbar = () => {
           <div className="flex items-center gap-8 md:gap-12">
             <Link to="/" className="text-2xl font-black text-slate-900 tracking-wide uppercase">LOGO</Link>
             <div className="hidden md:flex space-x-6 lg:space-x-8 text-sm font-bold text-slate-900">
-              <Link to="/" className="hover:text-blue-600 transition">{t('nav.offers')}</Link>
+              <Link to="/offers" className="hover:text-blue-600 transition">{t('nav.offers')}</Link>
               <Link to="/" className="hover:text-blue-600 transition">{t('nav.companies')}</Link>
               <Link to="/about" className="hover:text-blue-600 transition">{t('nav.about')}</Link>
             </div>

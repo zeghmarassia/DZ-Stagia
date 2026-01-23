@@ -1,7 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Edit3, Search, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import { API_URL } from '../config/api';
 import CompanyNavbar from '../components/CompanyNavbar';
+
+// Status Badge Component
+const Badge = ({ status }) => {
+  const statusMap = {
+    pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'En attente' },
+    accepted: { bg: 'bg-green-100', text: 'text-green-700', label: 'Accepté' },
+    rejected: { bg: 'bg-red-100', text: 'text-red-700', label: 'Rejeté' }
+  };
+  
+  const config = statusMap[status] || statusMap.pending;
+  
+  return (
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      {config.label}
+    </span>
+  );
+};
 
 const StatusPill = ({ label, count, active, onClick }) => (
   <button
@@ -19,28 +38,49 @@ const StatusPill = ({ label, count, active, onClick }) => (
 const CompanyApplications = () => {
   const { t, i18n } = useTranslation();
   const [filter, setFilter] = useState('all');
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     document.body.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   }, [i18n.language]);
 
-  const candidates = [
-    { id: 1, name: "Amine Benali", email: "amine.benali@usthb.dz", school: "USTHB", location: "Bab Ezzouar", field: "Informatique (Master 2)", subField: "Génie Logiciel", status: "received", avatar: "https://i.pravatar.cc/150?u=amine" },
-    { id: 2, name: "Sarah Kaci", email: "s_kaci@esi.dz", school: "ESI Alger", location: "Oued Smar", field: "Ingénieur d'État", subField: "Systèmes d'Information", status: "under_review", avatar: "https://i.pravatar.cc/150?u=sarah" },
-    { id: 3, name: "Yasmine Belkacem", email: "yasmine.bel@enp.edu.dz", school: "ENP Oran", location: "Oran", field: "Génie Électrique", subField: "Automatisme", status: "shortlisted", interviewDate: "15 Oct à 10:00", avatar: "https://i.pravatar.cc/150?u=yasmine" },
-    { id: 4, name: "Karim Ouali", email: "k.ouali@ummto.dz", school: "UMMTO", location: "Tizi Ouzou", field: "Informatique", subField: "Réseaux et Sécurité", status: "accepted", avatar: "https://i.pravatar.cc/150?u=karim" },
-    { id: 5, name: "Mohamed Derkaoui", email: "m.derkaoui@univ-constantine2.dz", school: "Univ. Constantine 2", location: "Constantine", field: "Informatique", subField: "Développement Web", status: "refused", avatar: "https://i.pravatar.cc/150?u=mohamed" },
-  ];
+  // Fetch all applications from backend
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        
+        const response = await axios.get(`${API_URL}/applications/company/all?page=${currentPage}&page_size=10`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
-  const getStatusStyle = (status) => {
-    const styles = {
-      received: "bg-blue-100 text-blue-700",
-      under_review: "bg-amber-100 text-amber-700",
-      shortlisted: "bg-purple-100 text-purple-700",
-      accepted: "bg-emerald-100 text-emerald-700",
-      refused: "bg-red-100 text-red-700",
+        setApplications(response.data.applications || []);
+      } catch (err) {
+        setError('Erreur lors du chargement des candidatures');
+        console.error('Applications fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
     };
-    return styles[status] || "bg-slate-100 text-slate-700";
+
+    fetchApplications();
+  }, [currentPage]);
+
+  const filteredApplications = filter === 'all' 
+    ? applications 
+    : applications.filter(app => app.status === filter);
+
+  const statusCounts = {
+    all: applications.length,
+    pending: applications.filter(a => a.status === 'pending').length,
+    accepted: applications.filter(a => a.status === 'accepted').length,
+    rejected: applications.filter(a => a.status === 'rejected').length
   };
 
   return (
@@ -52,29 +92,43 @@ const CompanyApplications = () => {
         <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
           <span className="hover:text-emerald-600 cursor-pointer">Mes offres</span>
           <ChevronRight size={14} className="rtl:rotate-180" />
-          <span className="text-emerald-600 font-medium">Candidatures</span>
+          <span className="text-emerald-600 font-medium">Toutes les candidatures</span>
         </nav>
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Ingénieur DevOps Junior</h1>
-            <p className="text-slate-500 text-sm">Publiée le 25 décembre 2025</p>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Toutes les candidatures</h1>
+            <p className="text-slate-500 text-sm">Gérez toutes vos candidatures reçues</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors">
-            <Edit3 size={16} />
-            {t('applications.modify_offer')}
-          </button>
         </div>
 
         {/* Filters Bar */}
         <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-6">
           <div className="flex items-center gap-3 overflow-x-auto w-full pb-2 lg:pb-0 scrollbar-hide">
-            <StatusPill label={t('applications.stats.all')} count={86} active={filter === 'all'} onClick={() => setFilter('all')} />
-            <StatusPill label={t('applications.stats.received')} count={42} active={filter === 'received'} onClick={() => setFilter('received')} />
-            <StatusPill label={t('applications.stats.under_review')} count={15} active={filter === 'under_review'} onClick={() => setFilter('under_review')} />
-            <StatusPill label={t('applications.stats.shortlisted')} count={5} active={filter === 'shortlisted'} onClick={() => setFilter('shortlisted')} />
-            <StatusPill label={t('applications.stats.accepted')} count={1} active={filter === 'accepted'} onClick={() => setFilter('accepted')} />
-            <StatusPill label={t('applications.stats.refused')} count={3} active={filter === 'refused'} onClick={() => setFilter('refused')} />
+            <StatusPill 
+              label="Tous" 
+              count={statusCounts.all} 
+              active={filter === 'all'} 
+              onClick={() => setFilter('all')} 
+            />
+            <StatusPill 
+              label="En attente" 
+              count={statusCounts.pending} 
+              active={filter === 'pending'} 
+              onClick={() => setFilter('pending')} 
+            />
+            <StatusPill 
+              label="Acceptés" 
+              count={statusCounts.accepted} 
+              active={filter === 'accepted'} 
+              onClick={() => setFilter('accepted')} 
+            />
+            <StatusPill 
+              label="Rejetés" 
+              count={statusCounts.rejected} 
+              active={filter === 'rejected'} 
+              onClick={() => setFilter('rejected')} 
+            />
           </div>
 
           <div className="relative w-full lg:w-72">
@@ -93,58 +147,83 @@ const CompanyApplications = () => {
             <table className="w-full text-left rtl:text-right">
               <thead className="bg-slate-50 border-b border-slate-100">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">{t('applications.table.headers.name')}</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">{t('applications.table.headers.university')}</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">{t('applications.table.headers.field')}</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">{t('applications.table.headers.status')}</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Candidat</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Offre</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Date</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase">Statut</th>
                   <th className="px-6 py-4"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {candidates.map((candidate) => (
-                  <tr key={candidate.id} className="hover:bg-slate-50 transition-colors group cursor-pointer">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <img src={candidate.avatar} alt="" className="w-10 h-10 rounded-full border border-slate-100" />
-                        <div>
-                          <p className="font-bold text-slate-800 text-sm">{candidate.name}</p>
-                          <p className="text-xs text-slate-400">{candidate.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-semibold text-slate-700">{candidate.school}</p>
-                      <p className="text-xs text-slate-400">{candidate.location}</p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-semibold text-slate-700">{candidate.field}</p>
-                      <p className="text-xs text-slate-400">{candidate.subField}</p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col items-start gap-1">
-                        <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase ${getStatusStyle(candidate.status)}`}>
-                          {t(`applications.stats.${candidate.status}`)}
-                        </span>
-                        {candidate.interviewDate && (
-                          <span className="text-[10px] text-purple-600 font-bold">{candidate.interviewDate}</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-right rtl:text-left">
-                      <ChevronRight size={20} className="text-slate-300 group-hover:text-emerald-500 transition-colors rtl:rotate-180" />
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                      Chargement...
                     </td>
                   </tr>
-                ))}
+                ) : error ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-8 text-center text-red-500">
+                      {error}
+                    </td>
+                  </tr>
+                ) : filteredApplications.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-8 text-center text-slate-500">
+                      Aucune candidature trouvée
+                    </td>
+                  </tr>
+                ) : (
+                  filteredApplications.map((app) => (
+                    <tr key={app.id} className="hover:bg-slate-50 transition-colors group cursor-pointer">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <img 
+                            src={`https://ui-avatars.com/api/?name=${app.student?.first_name || ''}+${app.student?.last_name || ''}&background=random&color=fff`}
+                            alt="" 
+                            className="w-10 h-10 rounded-full border border-slate-100" 
+                          />
+                          <div>
+                            <p className="font-bold text-slate-800 text-sm">{app.student?.first_name} {app.student?.last_name}</p>
+                            <p className="text-xs text-slate-400">{app.student?.email}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-sm font-semibold text-slate-700">{app.offer?.title}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-sm text-slate-600">{new Date(app.application_date).toLocaleDateString('fr-FR')}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge status={app.status} />
+                      </td>
+                      <td className="px-6 py-4 text-right rtl:text-left">
+                        <ChevronRight size={20} className="text-slate-300 group-hover:text-emerald-500 transition-colors rtl:rotate-180" />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
 
           {/* Pagination */}
           <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between">
-            <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-100 transition-colors">
+            <button 
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-100 transition-colors disabled:opacity-50"
+            >
               Précédent
             </button>
-            <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-100 transition-colors">
+            <span className="px-4 py-2 text-sm font-medium text-slate-600">
+              Page {currentPage}
+            </span>
+            <button 
+              onClick={() => setCurrentPage(currentPage + 1)}
+              className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-100 transition-colors"
+            >
               Suivant
             </button>
           </div>

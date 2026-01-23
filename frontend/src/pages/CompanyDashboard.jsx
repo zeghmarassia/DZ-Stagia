@@ -10,7 +10,8 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-// Import the i18n config
+import axios from 'axios';
+import { API_URL } from '../config/api';
 import '../i18n';
 import CompanyNavbar from '../components/CompanyNavbar';
 
@@ -73,61 +74,64 @@ const AvatarGroup = ({ count, images }) => (
 const Dashboard = () => {
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState('fr');
+  const [statistics, setStatistics] = useState({
+    totalOffers: 0,
+    totalApplications: 0,
+    totalCandidates: 0
+  });
+  const [recentApplications, setRecentApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   // Handle RTL for Arabic
   useEffect(() => {
     document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, [lang]);
 
+  // Fetch dashboard data on mount
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        const headers = {
+          Authorization: `Bearer ${token}`
+        };
+
+        // Fetch offers statistics
+        const offersStatsResponse = await axios.get(`${API_URL}/offers/my-offers/statistics`, { headers });
+        
+        // Fetch applications statistics
+        const appStatsResponse = await axios.get(`${API_URL}/applications/company/statistics`, { headers });
+        
+        // Fetch all applications (recent ones)
+        const appResponse = await axios.get(`${API_URL}/applications/company/all`, {
+          headers,
+          params: { page: 1, page_size: 5 }
+        });
+
+        setStatistics({
+          totalOffers: offersStatsResponse.data.total_offers || 0,
+          totalApplications: appStatsResponse.data.total_applications || 0,
+          totalCandidates: appStatsResponse.data.total_candidates || 0
+        });
+
+        setRecentApplications(appResponse.data.applications || []);
+      } catch (err) {
+        setError('Failed to load dashboard data');
+        console.error('Dashboard fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
   const changeLanguage = (l) => {
     setLang(l);
     i18n.changeLanguage(l);
   };
-
-  // Mock Data
-  const offers = [
-    {
-      id: 1,
-      title: "Ingénieur DevOps Junior",
-      date: "25 décembre 2025",
-      typeKey: "first_job",
-      typeColor: "yellow",
-      status: "active",
-      candidatesCount: 42,
-      avatars: ["https://i.pravatar.cc/150?u=1", "https://i.pravatar.cc/150?u=2"]
-    },
-    {
-      id: 2,
-      title: "Assistant Ressources Humaines",
-      date: "5 novembre 2025",
-      typeKey: "pfe",
-      typeColor: "blue",
-      status: "active",
-      candidatesCount: 7,
-      avatars: ["https://i.pravatar.cc/150?u=3", "https://i.pravatar.cc/150?u=4"]
-    },
-    {
-      id: 3,
-      title: "Développeur Full Stack React/Node",
-      date: "10 octobre 2025",
-      typeKey: "internship",
-      typeColor: "cyan",
-      status: "active",
-      candidatesCount: 15,
-      avatars: ["https://i.pravatar.cc/150?u=5", "https://i.pravatar.cc/150?u=6", "https://i.pravatar.cc/150?u=7"]
-    },
-    {
-      id: 4,
-      title: "Designer UI/UX",
-      date: "4 avril 2025",
-      typeKey: "internship",
-      typeColor: "cyan",
-      status: "archived",
-      candidatesCount: 0, // Should show text "60 Candidats" instead of avatar group in design, handled in render
-      totalCandidates: 60,
-      avatars: []
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
@@ -153,21 +157,21 @@ const Dashboard = () => {
             icon={Briefcase} 
             iconColor="bg-slate-700" 
             title={t('stats.active_offers')} 
-            count="20" 
+            count={loading ? '...' : statistics.totalOffers} 
             buttonText={t('stats.btn_view')} 
           />
           <StatCard 
             icon={Users} 
             iconColor="bg-emerald-500" 
             title={t('stats.apps_received')} 
-            count="148" 
+            count={loading ? '...' : statistics.totalApplications}
             buttonText={t('stats.btn_manage')} 
           />
           <StatCard 
             icon={Archive} 
             iconColor="bg-blue-400" 
-            title={t('stats.archived_offers')} 
-            count="20" 
+            title={t('stats.candidates')} 
+            count={loading ? '...' : statistics.totalCandidates}
             buttonText={t('stats.btn_history')} 
           />
         </div>
@@ -177,12 +181,12 @@ const Dashboard = () => {
           
           {/* Table Header / Controls */}
           <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h2 className="text-lg font-bold text-slate-800">{t('table.title')}</h2>
+            <h2 className="text-lg font-bold text-slate-800">{t('table.title') || 'Candidatures Récentes'}</h2>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 rtl:right-3 rtl:left-auto" />
               <input 
                 type="text" 
-                placeholder={t('table.search_placeholder')}
+                placeholder={t('table.search_placeholder') || 'Rechercher...'}
                 className="pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full md:w-64 rtl:pl-4 rtl:pr-10"
               />
             </div>
@@ -193,50 +197,53 @@ const Dashboard = () => {
             <table className="w-full text-left rtl:text-right">
               <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
                 <tr>
-                  <th className="px-6 py-4">{t('table.headers.title')}</th>
-                  <th className="px-6 py-4 text-center">{t('table.headers.type')}</th>
-                  <th className="px-6 py-4 text-center">{t('table.headers.status')}</th>
-                  <th className="px-6 py-4">{t('table.headers.candidates')}</th>
+                  <th className="px-6 py-4">Candidat</th>
+                  <th className="px-6 py-4">Offre</th>
+                  <th className="px-6 py-4">Statut</th>
+                  <th className="px-6 py-4">Date de Candidature</th>
                   <th className="px-6 py-4"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {offers.map((offer) => (
-                  <tr key={offer.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4">
-                      <p className="font-bold text-slate-800 text-sm">{offer.title}</p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        {t('table.published_on', { date: offer.date })}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <Badge type={offer.typeColor} text={t(`table.badges.${offer.typeKey}`)} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <Badge 
-                        type={offer.status === 'active' ? 'emerald' : 'gray'} 
-                        text={t(`table.badges.${offer.status}`)} 
-                      />
-                    </td>
-                    <td className="px-6 py-4">
-                      {offer.status === 'active' ? (
-                        <div className="flex items-center gap-2">
-                          <AvatarGroup count={offer.candidatesCount} images={offer.avatars} />
-                          {lang !== 'ar' && <span className="text-xs font-semibold text-slate-500">+{offer.candidatesCount}</span>}
-                        </div>
-                      ) : (
-                        <span className="text-xs font-bold text-slate-500">
-                          {t('table.candidates_count', { count: offer.totalCandidates })}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right rtl:text-left">
-                      <button className="text-slate-400 hover:text-emerald-600 transition-colors">
-                        <MoreVertical className="w-5 h-5" />
-                      </button>
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-4 text-center text-slate-500">
+                      Chargement...
                     </td>
                   </tr>
-                ))}
+                ) : recentApplications.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-4 text-center text-slate-500">
+                      Aucune candidature
+                    </td>
+                  </tr>
+                ) : (
+                  recentApplications.map((app) => (
+                    <tr key={app.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <p className="font-bold text-slate-800 text-sm">{app.student?.first_name} {app.student?.last_name}</p>
+                        <p className="text-xs text-slate-400 mt-1">{app.student?.email}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="font-semibold text-slate-800 text-sm">{app.offer?.title}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge 
+                          type={app.status === 'accepted' ? 'green' : app.status === 'rejected' ? 'gray' : 'blue'}
+                          text={app.status}
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        {new Date(app.created_at).toLocaleDateString('fr-FR')}
+                      </td>
+                      <td className="px-6 py-4 text-right rtl:text-left">
+                        <button className="text-slate-400 hover:text-emerald-600 transition-colors">
+                          <MoreVertical className="w-5 h-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -1,30 +1,70 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Lock, Eye, EyeOff } from 'lucide-react';
+import axios from 'axios';
+import { API_URL } from '../config/api';
 
 const ResetPassword = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   const [formData, setFormData] = useState({ password: '', confirmPassword: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
+    
     if (formData.password !== formData.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas.");
+      setError(t('auth.password_mismatch') || "Les mots de passe ne correspondent pas.");
       return;
     }
-    // Simulate API Call
-    console.log("Password reset successfully");
-    navigate('/login');
+
+    if (formData.password.length < 8) {
+      setError(t('auth.password_min_length') || "Le mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const email = searchParams.get('email');
+      const otp = searchParams.get('otp');
+
+      if (!email || !otp) {
+        setError(t('auth.invalid_reset_link') || "Lien de réinitialisation invalide.");
+        return;
+      }
+
+      const response = await axios.post(`${API_URL}/auth/reset-password`, {
+        email: email,
+        otp_code: otp,
+        new_password: formData.password
+      });
+
+      setSuccess(t('auth.reset_success') || "Mot de passe réinitialisé avec succès!");
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } catch (err) {
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError(err.response?.data?.message || t('auth.reset_error') || "Erreur lors de la réinitialisation du mot de passe.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,6 +89,12 @@ const ResetPassword = () => {
             {error && (
               <div className="bg-red-50 border-l-4 border-red-400 p-4 text-sm text-red-700">
                 {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="bg-green-50 border-l-4 border-green-400 p-4 text-sm text-green-700">
+                {success}
               </div>
             )}
 
@@ -103,9 +149,10 @@ const ResetPassword = () => {
 
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-[#5B8C9D] hover:bg-[#4a7280] transition"
+              disabled={loading}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-[#5B8C9D] hover:bg-[#4a7280] transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t('auth.reset_btn')}
+              {loading ? (t('auth.loading') || 'Chargement...') : (t('auth.reset_btn') || 'Réinitialiser')}
             </button>
           </form>
         </div>

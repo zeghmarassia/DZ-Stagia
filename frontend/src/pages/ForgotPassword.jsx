@@ -2,18 +2,39 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Mail, ArrowLeft } from 'lucide-react';
+import axios from 'axios';
+import { API_URL } from '../config/api';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const ForgotPassword = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Reset link sent to:", email);
-    // Redirect to CheckEmail page
-    navigate('/verify-otp', { state: { email: email } });
+    setError('');
+
+    if (!email) {
+      setError(t('auth.email_required', 'Veuillez entrer une adresse email'));
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await axios.post(`${API_URL}/auth/forgot-password`, {
+        email: email
+      });
+
+      navigate('/verify-otp', { state: { email: email } });
+    } catch (err) {
+      setError(err.response?.data?.detail || t('auth.forgot_error', 'Erreur lors de l\'envoi du code.'));
+      console.error('Forgot password error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,6 +62,11 @@ const ForgotPassword = () => {
         </div>
 
         <form className="space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="text-red-500 text-sm font-bold text-left animate-pulse bg-red-50 p-3 rounded">
+              {error}
+            </div>
+          )}
           {/* Email Input */}
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2">
@@ -55,7 +81,10 @@ const ForgotPassword = () => {
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D] transition"
                 placeholder="e.g. name@company.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError('');
+                }}
               />
               <Mail className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
             </div>
@@ -64,9 +93,10 @@ const ForgotPassword = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-[#5B8C9D] hover:bg-[#4a7280] text-white font-bold py-3.5 rounded-lg transition shadow-sm uppercase tracking-wide"
+            disabled={loading}
+            className="w-full bg-[#5B8C9D] hover:bg-[#4a7280] text-white font-bold py-3.5 rounded-lg transition shadow-sm uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {t('auth.send_link', 'Envoyer le lien')}
+            {loading ? (t('auth.loading', 'Chargement...')) : (t('auth.send_link', 'Envoyer le lien'))}
           </button>
         </form>
 

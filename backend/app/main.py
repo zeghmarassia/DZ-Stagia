@@ -1,11 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from app.routes import auth_router, admin_router, establishment_router, student_router
-from app.routes import offerRoutes
 from app.database import engine, Base
-from typing import Optional
-from app.routes import applicationRoutes
+from app.routes import authRoutes, adminRoutes, studentRoutes, companyRoutes
+from app.routes import offerRoutes, applicationRoutes, notificationRoutes
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -15,13 +13,8 @@ app = FastAPI(
     description="Backend API for Stagia platform",
     version="1.0.0"
 )
-# Import existant
-from app.routes import authRoutes, adminRoutes, studentRoutes
-from app.routes import companyRoutes 
-from app.routes import notificationRoutes
 
-
-# Dans l'application FastAPI
+# Register all routers with appropriate prefixes
 app.include_router(authRoutes.router, prefix="/auth")
 app.include_router(adminRoutes.router, prefix="/admin")
 app.include_router(studentRoutes.router)  # Router already has /student prefix
@@ -71,12 +64,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Include routers
-app.include_router(auth_router)
-app.include_router(admin_router)
-app.include_router(establishment_router)
-app.include_router(student_router)
 
 @app.get("/")
 def root():

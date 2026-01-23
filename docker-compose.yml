@@ -1,26 +1,9 @@
 services:
   # --------------------
-  # 1. DATABASE SERVICE (PostgreSQL)
-  # --------------------
-  db:
-    image: postgres:16-alpine  # Lightweight official PostgreSQL image
-    restart: always
-    environment:
-      # These variables are required for PostgreSQL initialization
-      POSTGRES_USER: dz_user
-      POSTGRES_PASSWORD: dz_password
-      POSTGRES_DB: dz_stagiaire_db
-    ports:
-      # Expose port 5432 on host for optional direct access (e.g., with DBeaver)
-      - "5432:5432"
-    volumes:
-      # Persistent volume to store database data
-      - postgres_data:/var/lib/postgresql/data
-
-  # --------------------
-  # 2. BACKEND SERVICE (FastAPI)
+  # BACKEND SERVICE (FastAPI)
   # --------------------
   backend:
+    image: dz-stagia-backend
     build:
       context: ./backend      # Assumes Dockerfile is in ./backend/
       dockerfile: Dockerfile
@@ -31,13 +14,16 @@ services:
     ports:
       - "8000:8000"
     environment:
-      # The backend connects to the DB using the 'db' service name
-      DATABASE_URL: postgresql://dz_user:dz_password@db:5432/dz_stagiaire_db
-    depends_on:
-      - db                     # Ensure the database is running before starting the backend
+      # The backend connects to the cloud database using the connection string
+      DATABASE_URL: ${DATABASE_URL:-postgresql://user:password@cloud-host:5432/dz_stagiaire_db}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your_secret_key_here}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-your_email@gmail.com}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-your_app_password}
 
   # --------------------
-  # 3. FRONTEND SERVICE (React)
+  # FRONTEND SERVICE (React)
   # --------------------
   frontend:
     build:
@@ -55,10 +41,3 @@ services:
     tty: true
     depends_on:
       - backend
-
-# --------------------
-# NAMED VOLUMES
-# --------------------
-volumes:
-  # This named volume will hold your PostgreSQL data persistently
-  postgres_data:

@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'; // 1. Import Hook
 import { Mail, Lock, Upload, User, Building, Briefcase, GraduationCap, X } from 'lucide-react';
+import axios from 'axios';
+import { API_URL } from '../config/api';
 import LanguageSwitcher from '../components/LanguageSwitcher'; // 2. Import Switcher
 
 const SignupPage = ({ type }) => {
@@ -114,15 +116,19 @@ const SignupPage = ({ type }) => {
 /* --- STUDENT FORM SUB-COMPONENT --- */
 const StudentForm = () => {
   const { t } = useTranslation(); // Initialize Hook
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     university: '', firstName: '', lastName: '', email: '', password: '', file: null
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleFileClick = () => fileInputRef.current.click();
@@ -130,6 +136,7 @@ const StudentForm = () => {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setFormData(prev => ({ ...prev, file: e.target.files[0] }));
+      setError('');
     }
   };
 
@@ -139,13 +146,49 @@ const StudentForm = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting Student Form:", formData);
+    
+    // Validation
+    if (!formData.university || !formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.file) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const formDataBody = new FormData();
+      formDataBody.append('email', formData.email);
+      formDataBody.append('password', formData.password);
+      formDataBody.append('first_name', formData.firstName);
+      formDataBody.append('last_name', formData.lastName);
+      formDataBody.append('establishment_id', formData.university);
+      formDataBody.append('document', formData.file);
+
+      const response = await axios.post(`${API_URL}/auth/student/register`, formDataBody, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Navigate to Email verification page
+      navigate('/verify-email', { state: { email: formData.email, userType: 'student' } });
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Registration failed. Please try again.');
+      console.error('Signup error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="text-red-500 text-sm font-bold text-left animate-pulse bg-red-50 p-3 rounded">
+          {error}
+        </div>
+      )}
+
       {/* University Select */}
       <div>
         <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.university_label', 'Université / Établissement')}</label>
@@ -157,9 +200,9 @@ const StudentForm = () => {
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D] appearance-none bg-white text-gray-600"
           >
             <option value="">{t('auth.university_placeholder', 'Choisissez votre établissement')}</option>
-            <option value="USTHB">USTHB</option>
-            <option value="ESI">ESI</option>
-            <option value="MDI">MDI</option>
+            <option value="1">USTHB</option>
+            <option value="2">ESI</option>
+            <option value="3">MDI</option>
           </select>
           <GraduationCap className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
         </div>
@@ -226,8 +269,8 @@ const StudentForm = () => {
         </div>
       </div>
 
-      <button type="submit" className="w-full bg-[#5B8C9D] text-white font-bold py-3.5 rounded-lg hover:bg-[#4a7280] transition mt-6 shadow-md uppercase">
-        {t('auth.continue_btn', 'CONTINUER')}
+      <button type="submit" disabled={loading} className="w-full bg-[#5B8C9D] text-white font-bold py-3.5 rounded-lg hover:bg-[#4a7280] transition mt-6 shadow-md uppercase disabled:opacity-50 disabled:cursor-not-allowed">
+        {loading ? t('auth.loading', 'Inscription en cours...') : t('auth.continue_btn', 'CONTINUER')}
       </button>
     </form>
   );
@@ -235,22 +278,29 @@ const StudentForm = () => {
 
 /* --- COMPANY FORM SUB-COMPONENT --- */
 const CompanyForm = () => {
-  const { t } = useTranslation(); // Initialize Hook
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    companyName: '', sector: '', email: '', password: '', file: null
+    companyName: '', sector: '', email: '', password: '', address: '', file: null
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleFileClick = () => fileInputRef.current.click();
 
   const handleFileChange = (e) => {
-    if (e.target.files[0]) setFormData(prev => ({ ...prev, file: e.target.files[0] }));
+    if (e.target.files[0]) {
+      setFormData(prev => ({ ...prev, file: e.target.files[0] }));
+      setError('');
+    }
   };
 
   const handleRemoveFile = (e) => {
@@ -259,13 +309,49 @@ const CompanyForm = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting Company Form:", formData);
+    
+    // Validation
+    if (!formData.companyName || !formData.sector || !formData.email || !formData.password || !formData.address || !formData.file) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const formDataBody = new FormData();
+      formDataBody.append('email', formData.email);
+      formDataBody.append('password', formData.password);
+      formDataBody.append('company_name', formData.companyName);
+      formDataBody.append('sector', formData.sector);
+      formDataBody.append('address', formData.address);
+      formDataBody.append('document', formData.file);
+
+      const response = await axios.post(`${API_URL}/auth/company/register`, formDataBody, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Navigate to Email verification page
+      navigate('/verify-email', { state: { email: formData.email, userType: 'company' } });
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Registration failed. Please try again.');
+      console.error('Signup error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="text-red-500 text-sm font-bold text-left animate-pulse bg-red-50 p-3 rounded">
+          {error}
+        </div>
+      )}
+
       {/* Company Name */}
       <div>
         <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.company_name', "Nom de l'entreprise")}</label>
@@ -285,6 +371,15 @@ const CompanyForm = () => {
             <option value="Finance">Finance</option>
           </select>
           <Briefcase className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
+        </div>
+      </div>
+
+      {/* Address */}
+      <div>
+        <label className="block text-sm font-bold text-slate-900 mb-2">{t('auth.address', 'Adresse')}</label>
+        <div className="relative">
+          <input name="address" value={formData.address} onChange={handleChange} type="text" placeholder="123 Rue de la Paix" className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#6EB486]" />
+          <Building className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
         </div>
       </div>
 
@@ -331,8 +426,8 @@ const CompanyForm = () => {
         </div>
       </div>
 
-      <button type="submit" className="w-full bg-[#6EB486] text-white font-bold py-3.5 rounded-lg hover:bg-[#5da076] transition mt-6 shadow-md uppercase">
-        {t('auth.continue_btn', 'CONTINUER')}
+      <button type="submit" disabled={loading} className="w-full bg-[#6EB486] text-white font-bold py-3.5 rounded-lg hover:bg-[#5da076] transition mt-6 shadow-md uppercase disabled:opacity-50 disabled:cursor-not-allowed">
+        {loading ? t('auth.loading', 'Inscription en cours...') : t('auth.continue_btn', 'CONTINUER')}
       </button>
     </form>
   );

@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
+import axios from 'axios';
+import { API_URL } from '../config/api';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const VerifyOtp = () => {
@@ -63,19 +65,27 @@ const VerifyOtp = () => {
     inputRefs.current[5].focus();
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     if (isResendDisabled) return;
-    console.log("Resending to:", email);
-    setTimer(30);
-    setIsResendDisabled(true);
+    try {
+      await axios.post(`${API_URL}/auth/forgot-password`, { email });
+      setTimer(30);
+      setIsResendDisabled(true);
+    } catch (err) {
+      console.error('Resend error:', err);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const code = otp.join('');
     if (code.length < 6) return;
-    console.log("Verifying:", code);
-    navigate('/reset-password');
+
+    try {
+      navigate(`/reset-password?email=${encodeURIComponent(email)}&otp=${code}`);
+    } catch (err) {
+      console.error('Verification error:', err);
+    }
   };
 
   return (

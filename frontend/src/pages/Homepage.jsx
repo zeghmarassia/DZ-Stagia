@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'; // Import translation hook
 import LanguageSwitcher from '../components/LanguageSwitcher'; // Import switcher
 import CompanyCard from '../components/CompanyCard';
 import JobCard from '../components/JobCard';
 import FeatureCard from '../components/FeatureCard';
+import axios from 'axios';
+import { API_URL } from '../config/api';
 
 import { 
   Search, MapPin, Briefcase, GraduationCap, Building2, Handshake,
@@ -15,6 +17,34 @@ import {
 const Homepage = () => {
   const { t } = useTranslation(); // Initialize translations
   const [isSearchOpen, setIsSearchOpen] = useState(false); // State for search bar toggle
+  const [offers, setOffers] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch recent offers and companies on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch recent offers
+        const offersResponse = await axios.get(`${API_URL}/api/v1/offers`, {
+          params: { limit: 4 }
+        });
+        setOffers(offersResponse.data.offers || []);
+
+        // Fetch companies
+        const companiesResponse = await axios.get(`${API_URL}/company/all`, {
+          params: { page_size: 6 }
+        });
+        setCompanies(companiesResponse.data.companies || []);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="min-h-screen font-sans text-slate-800 bg-gray-50">
@@ -32,7 +62,7 @@ const Homepage = () => {
 
             {/* Nav Links (Desktop) */}
             <div className="hidden md:flex space-x-6 lg:space-x-8 text-sm font-bold text-slate-900">
-              <a href="#" className="hover:text-blue-600 transition">{t('nav.offers')}</a>
+              <Link to="/offers" className="hover:text-blue-600 transition">{t('nav.offers')}</Link>
               <a href="#" className="hover:text-blue-600 transition">{t('nav.companies')}</a>
               <a href="#" className="hover:text-blue-600 transition">{t('nav.about')}</a>
             </div>
@@ -154,12 +184,20 @@ const Homepage = () => {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <CompanyCard name="SONATRACH" location="Boumerdès" logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Sonatrach.svg/1200px-Sonatrach.svg.png" isFeatured={true} />
-          <CompanyCard name="MOBILIS" location="Béjaia" logo="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Mobilis_Bonne_Ann%C3%A9e_2018.png/800px-Mobilis_Bonne_Ann%C3%A9e_2018.png" />
-          <CompanyCard name="Algérie Télécom" location="Alger" logo="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Alg%C3%A9rie_T%C3%A9l%C3%A9com.svg/2560px-Alg%C3%A9rie_T%C3%A9l%C3%A9com.svg.png" isActive={true} />
-          <CompanyCard name="Cévital" location="Alger" logo="https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Cevital_logo.svg/1200px-Cevital_logo.svg.png" isFeatured={true} />
-          <CompanyCard name="YASSIR" location="Alger" logo="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Yassir_logo.svg/2560px-Yassir_logo.svg.png" />
-          <CompanyCard name="Djezzy" location="Oran" logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Djezzy_Logo.svg/1200px-Djezzy_Logo.svg.png" />
+          {loading ? (
+            <p className="col-span-full text-center text-slate-500">Chargement des entreprises...</p>
+          ) : companies.length > 0 ? (
+            companies.map((company) => (
+              <CompanyCard 
+                key={company.id}
+                name={company.company_name} 
+                location={company.address} 
+                logo={company.logo_url || 'https://via.placeholder.com/150'}
+              />
+            ))
+          ) : (
+            <p className="col-span-full text-center text-slate-500">Aucune entreprise disponible</p>
+          )}
         </div>
       </section>
 
@@ -172,10 +210,25 @@ const Homepage = () => {
           </div>
 
           <div className="space-y-4">
-            <JobCard title="Développeur Full Stack" company="Digital Solutions" location="Constantine" duration="2 mois" type="Stage" badgeColor="bg-emerald-100 text-emerald-600" logo={<Code2 size={28} className="text-indigo-600" />} logoBg="bg-indigo-100" />
-            <JobCard title="Junior Data Analyst" company="Danone Algérie" location="Akbou, Béjaia" duration="CDI" type="Emploi" badgeColor="bg-amber-100 text-amber-600" logo={<BarChart3 size={28} className="text-emerald-600" />} logoBg="bg-emerald-100" />
-            <JobCard title="Marketing Digital" company="Cévital" location="Alger" duration="6 mois" type="PFE" badgeColor="bg-blue-100 text-blue-600" logo={<TrendingUp size={28} className="text-amber-700" />} logoBg="bg-amber-100" />
-            <JobCard title="Développeur d'applications mobiles" company="InnovEra" location="Bordj Bou Arréridj" duration="30 jours" type="Stage" badgeColor="bg-emerald-100 text-emerald-600" logo={<Smartphone size={28} className="text-blue-600" />} logoBg="bg-blue-100" />
+            {loading ? (
+              <p className="text-center text-slate-500 py-8">Chargement des offres...</p>
+            ) : offers.length > 0 ? (
+              offers.map((offer) => (
+                <JobCard 
+                  key={offer.id}
+                  title={offer.title}
+                  company={offer.company?.company_name || 'Entreprise'}
+                  location={offer.location}
+                  duration={offer.duration}
+                  type={offer.offer_type}
+                  badgeColor="bg-emerald-100 text-emerald-600"
+                  logo={<Briefcase size={28} className="text-blue-600" />}
+                  logoBg="bg-blue-100"
+                />
+              ))
+            ) : (
+              <p className="text-center text-slate-500 py-8">Aucune offre disponible</p>
+            )}
           </div>
 
           <div className="mt-10 text-center">

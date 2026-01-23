@@ -2,31 +2,82 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'; 
 import { Mail, Lock } from 'lucide-react';
+import axios from 'axios';
+import { API_URL } from '../config/api';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const Login = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    if (error) setError(false);
+    if (error) setError('');
   };
 
-  const navigate = useNavigate();
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
-        setError(true);
-        return;
+      setError(t('auth.error_required_fields', 'Veuillez remplir tous les champs'));
+      return;
     }
-    console.log("Login Data Submitted:", formData);
-    // if student navigate to student dashboard
-    // if company navigate to company dashboard
-    navigate('/company/dashboard'); 
+
+    setLoading(true);
+    try {
+      const formDataBody = new FormData();
+      formDataBody.append('email', formData.email);
+      formDataBody.append('password', formData.password);
+
+      const response = await axios.post(`${API_URL}/auth/login`, formDataBody, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      });
+
+      console.log('Login response:', response.data);
+
+      // Check user_type and navigate accordingly
+      if (response.data.user_type === 'student') {
+        navigate('/student/dashboard');
+      } else if (response.data.user_type === 'company') {
+        navigate('/company/dashboard');
+      } else if (response.data.user_type === 'admin') {
+        navigate('/admin/dashboard');
+      }
+
+      // Store auth data including token
+      localStorage.setItem('user', JSON.stringify(response.data));
+      localStorage.setItem('token', response.data.access_token);
+    } catch (err) {
+      console.error('Login error:', err);
+      console.error('Error response:', err.response?.data);
+      
+      let errorMessage = t('auth.error_login', 'Identifiants incorrects');
+      
+      if (err.response?.data?.detail) {
+        errorMessage = err.response.data.detail;
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      }
+      
+      // More user-friendly messages
+      if (errorMessage.includes('verify your email')) {
+        errorMessage = 'Veuillez vérifier votre email d\'abord';
+      } else if (errorMessage.includes('wait for admin approval')) {
+        errorMessage = 'Votre compte est en attente d\'approbation de l\'administrateur';
+      } else if (errorMessage.includes('pending')) {
+        errorMessage = 'Votre compte est en attente d\'approbation';
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,9 +104,9 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {error && (
-            <div className="text-red-500 text-sm font-bold text-left animate-pulse">
-              {t('auth.error_credentials', 'Identifiants incorrects.')}
+        {error && (
+            <div className="text-red-500 text-sm font-bold text-left animate-pulse bg-red-50 p-3 rounded">
+              {error}
             </div>
           )}
 
