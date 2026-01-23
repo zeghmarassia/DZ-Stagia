@@ -14,6 +14,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# CORS Configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Register all routers with appropriate prefixes
 app.include_router(authRoutes.router, prefix="/auth")
 app.include_router(adminRoutes.router, prefix="/admin")
@@ -22,11 +31,6 @@ app.include_router(companyRoutes.router)
 app.include_router(offerRoutes.router, prefix="/api/v1")  
 app.include_router(applicationRoutes.router, prefix="/api/v1")
 app.include_router(notificationRoutes.router, prefix="/api/v1")
-
-
-
-
-
 
 
 # Custom OpenAPI schema to add JWT authentication in docs
@@ -56,14 +60,7 @@ def custom_openapi():
 
 app.openapi = custom_openapi
 
-# CORS Configuration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"], 
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
 
 @app.get("/")
 def root():

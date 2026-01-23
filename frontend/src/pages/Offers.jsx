@@ -19,7 +19,7 @@ const Offers = () => {
     const fetchOffers = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${API_URL}/offers/all`, {
+        const response = await axios.get(`${API_URL}/offers/my-offers`, {
           params: {
             page: currentPage,
             page_size: pageSize,

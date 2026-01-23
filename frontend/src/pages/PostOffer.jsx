@@ -1,9 +1,30 @@
 import React, { useState } from 'react';
-import { ChevronDown, MapPin } from 'lucide-react'; // Added MapPin
+import { 
+  ChevronDown, 
+  MapPin, 
+  Calendar, 
+  DollarSign, 
+  Briefcase, 
+  Clock 
+} from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api';
 import CompanyNavbar from '../components/CompanyNavbar';
+
+// Standard list of Wilayas (You can expand this to all 58)
+const WILAYAS = [
+  { id: 16, name: "Alger" },
+  { id: 31, name: "Oran" },
+  { id: 25, name: "Constantine" },
+  { id: 19, name: "Sétif" },
+  { id: 6, name: "Béjaïa" },
+  { id: 13, name: "Tlemcen" },
+  { id: 23, name: "Annaba" },
+  { id: 30, name: "Ouargla" },
+  { id: 9, name: "Blida" },
+  { id: 15, name: "Tizi Ouzou" }
+];
 
 const PostOffer = () => {
   const navigate = useNavigate();
@@ -11,14 +32,20 @@ const PostOffer = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Comprehensive Form Data
   const [formData, setFormData] = useState({
     title: '',
-    offer_type: '',
-    duration: '',
-    location: '', // ADDED: Location is usually required
+    offer_type: '',       // e.g., 'stage', 'cdi'
+    employment_type: '',  // e.g., 'temps_plein'
+    duration: '',         // Number (months)
+    wilaya_id: '',        // Integer ID
+    commune: '',          // String detail
+    salary_min: '',       // Number
+    salary_max: '',       // Number
+    expiration_date: '',  // Date string
     description: '',
-    work_mode: '',
-    skills: ''
+    work_mode: '',        // 'presentiel', 'teletravail'
+    skills: ''            // Comma separated string
   });
 
   const handleChange = (e) => {
@@ -27,236 +54,333 @@ const PostOffer = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  try {
-    setLoading(true);
-    setError('');
+    e.preventDefault();
     
-    const token = localStorage.getItem('token');
-    
-    // Check if token exists
-    if (!token) {
-      setError("Erreur : Vous n'êtes pas connecté (Token manquant).");
-      setLoading(false);
-      return;
-    }
-
-    const skillsArray = formData.skills
-      .split(',')
-      .map(skill => skill.trim())
-      .filter(skill => skill.length > 0);
-
-    const payload = {
-      title: formData.title,
-      offer_type: formData.offer_type,
-      duration: formData.duration,
-      location: formData.location, 
-      description: formData.description,
-      work_mode: formData.work_mode,
-      is_active: true,
-      skills: skillsArray
-    };
-
-    console.log("1. Sending Payload:", payload); // Step 1: Check data sent
-
-    const response = await axios.post(`${API_URL}/api/v1/offers/`, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    console.log("2. Server Response:", response); // Step 2: Check server answer
-
-    // Check for any 2xx success code (200, 201, 202)
-    if (response.status >= 200 && response.status < 300) {
-      console.log("3. Success! Navigating...");
-      setSuccessMessage('Offre publiée avec succès!');
+    try {
+      setLoading(true);
+      setError('');
       
-      // Navigate immediately to test, then add timeout back later if you want
-      navigate('/company/offers'); 
-    } else {
-      console.log("3. Unexpected Status:", response.status);
-      setError(`Erreur inattendue: Code ${response.status}`);
-    }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError("Erreur : Vous n'êtes pas connecté (Token manquant).");
+        setLoading(false);
+        return;
+      }
 
-  } catch (err) {
-    console.error("4. ERROR CAUGHT:", err); // Step 3: Check specific error
-    
-    if (err.response) {
-      // The server responded with a status code outside the 2xx range
-      console.log("Error Data:", err.response.data);
-      console.log("Error Status:", err.response.status);
-      setError(JSON.stringify(err.response.data.detail || "Erreur serveur"));
-    } else if (err.request) {
-      // The request was made but no response was received
-      setError("Erreur de connexion : Le serveur ne répond pas.");
-    } else {
-      // Something happened in setting up the request
-      setError("Erreur : " + err.message);
+      // 1. Clean Data & Convert Types
+      // Ensure we send Integers for numeric fields, not strings
+      const durationInt = formData.duration ? parseInt(formData.duration) : null;
+      const salaryMinInt = formData.salary_min ? parseInt(formData.salary_min) : null;
+      const salaryMaxInt = formData.salary_max ? parseInt(formData.salary_max) : null;
+      const locationId = formData.wilaya_id ? parseInt(formData.wilaya_id) : null;
+
+      // Clean skills array
+      const skillsArray = formData.skills
+        ? formData.skills.split(',').map(skill => skill.trim()).filter(s => s)
+        : [];
+
+      // 2. Construct Payload
+      const payload = {
+        title: formData.title,
+        offer_type: formData.offer_type,
+        employment_type: formData.employment_type,
+        duration: durationInt,
+        location: locationId, // Sends the ID (e.g., 16), not "Alger"
+        description: formData.description + (formData.commune ? `\n\nLieu précis: ${formData.commune}` : ""), // Append detail to description if needed, or send as separate field if backend supports it
+        work_mode: formData.work_mode,
+        salary_min: salaryMinInt,
+        salary_max: salaryMaxInt,
+        expiration_date: formData.expiration_date,
+        is_active: true,
+        skills: skillsArray
+      };
+
+      console.log("Sending Payload:", payload);
+
+      // 3. Send Request
+      const response = await axios.post(`${API_URL}/api/v1/offers/`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status >= 200 && response.status < 300) {
+        setSuccessMessage('Offre publiée avec succès!');
+        setTimeout(() => {
+          navigate('/company/offers');
+        }, 1500);
+      } else {
+        setError(`Erreur inattendue: Code ${response.status}`);
+      }
+
+    } catch (err) {
+      console.error("Error:", err);
+      if (err.response) {
+        // Show detailed error from backend (e.g. "Validation Error")
+        const detail = err.response.data.detail;
+        setError(typeof detail === 'object' ? JSON.stringify(detail) : detail || "Erreur serveur");
+      } else {
+        setError("Erreur de connexion au serveur.");
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-12">
       <CompanyNavbar />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-slate-900">Publier une nouvelle offre</h1>
           <p className="text-slate-500 text-sm mt-1">
-            Remplissez les informations ci-dessous pour publier une offre.
+            Remplissez les détails complets de votre offre d'emploi ou de stage.
           </p>
         </div>
 
-        {/* Messages */}
+        {/* Alerts */}
         {successMessage && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-            {successMessage}
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 flex items-center">
+            <span className="mr-2">✓</span> {successMessage}
           </div>
         )}
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-            {error}
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 flex items-center">
+             <span className="mr-2">⚠</span> {error}
           </div>
         )}
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-          
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-8" onSubmit={handleSubmit}>
             
-            {/* Titre */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-900">
-                Titre de l'offre <span className="text-red-500">*</span>
-              </label>
-              <input 
-                type="text" 
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="ex. Ingénieur d'Études et de Développement"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
-                required
-              />
-            </div>
-
-            {/* Row: Type & Durée */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* SECTION 1: General Info */}
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold text-slate-800 border-b pb-2">Informations Générales</h2>
+              
+              {/* Title */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-slate-900">
-                  Type de l'offre <span className="text-red-500">*</span>
+                  Titre de l'offre <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <select 
-                    name="offer_type"
-                    value={formData.offer_type}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-slate-900 appearance-none bg-white focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none cursor-pointer"
-                    required
-                  >
-                    <option value="">Sélectionner un type</option>
-                    <option value="stage">Stage</option>
-                    <option value="pfe">PFE</option>
-                  </select>
-                  <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <input 
+                  type="text" 
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="ex. Développeur Full Stack Junior"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                  required
+                />
+              </div>
+
+              {/* Grid: Types & Duration */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                {/* Offer Type */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-900">Type d'offre <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <select 
+                      name="offer_type"
+                      value={formData.offer_type}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg appearance-none bg-white focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                      required
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="emploi">Premier Emploi</option>
+                      <option value="stage">Stage</option>
+                      <option value="pfe">PFE</option>
+                    </select>
+                    <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Employment Type */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-900">Temps de travail</label>
+                  <div className="relative">
+                    <select 
+                      name="employment_type"
+                      value={formData.employment_type}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg appearance-none bg-white focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="full-time">Temps plein</option>
+                      <option value="part-time">Temps partiel</option>
+                      <option value="contract">Contrat</option>
+                      <option value="internship">Stage</option>
+                    </select>
+                    <Briefcase size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Duration */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-900">Durée (Mois)</label>
+                  <div className="relative">
+                    <input 
+                      type="number" 
+                      name="duration"
+                      value={formData.duration}
+                      onChange={handleChange}
+                      placeholder="ex. 6"
+                      min="1"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                    />
+                    <Clock size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  </div>
                 </div>
               </div>
+            </div>
 
+            {/* SECTION 2: Location & Work Mode */}
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold text-slate-800 border-b pb-2">Lieu & Modalités</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                {/* Wilaya (Sends ID) */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-900">Wilaya <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <select 
+                      name="wilaya_id"
+                      value={formData.wilaya_id}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-4 py-2.5 border border-gray-300 rounded-lg appearance-none bg-white focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                      required
+                    >
+                      <option value="">Choisir la wilaya</option>
+                      {WILAYAS.map((w) => (
+                        <option key={w.id} value={w.id}>{w.id} - {w.name}</option>
+                      ))}
+                    </select>
+                    <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Commune / Details */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-900">Commune / Précision</label>
+                  <input 
+                    type="text" 
+                    name="commune"
+                    value={formData.commune}
+                    onChange={handleChange}
+                    placeholder="ex. Bab Ezzouar"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                  />
+                </div>
+
+                {/* Work Mode */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-900">Mode de travail <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <select 
+                      name="work_mode"
+                      value={formData.work_mode}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg appearance-none bg-white focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                      required
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="onsite">Présentiel</option>
+                      <option value="remote">Télétravail</option>
+                      <option value="hybrid">Hybride</option>
+                    </select>
+                    <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 3: Details */}
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold text-slate-800 border-b pb-2">Détails de l'offre</h2>
+
+              {/* Description */}
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-slate-900">
-                  Durée <span className="text-red-500">*</span>
+                  Description détaillée <span className="text-red-500">*</span>
                 </label>
-                <input 
-                  type="text" 
-                  name="duration"
-                  value={formData.duration}
+                <textarea 
+                  rows={6}
+                  name="description"
+                  value={formData.description}
                   onChange={handleChange}
-                  placeholder="ex. 6 mois"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                  placeholder="Décrivez les missions, responsabilités et profil recherché..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none resize-y"
                   required
                 />
               </div>
-            </div>
 
-            {/* NEW FIELD: Location */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-900">
-                Lieu (Wilaya / Commune) <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              {/* Skills */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-900">Compétences (séparées par des virgules)</label>
                 <input 
                   type="text" 
-                  name="location"
-                  value={formData.location}
+                  name="skills"
+                  value={formData.skills}
                   onChange={handleChange}
-                  placeholder="ex. Alger, Oran..."
-                  className="w-full pl-11 pr-4 py-2.5 border border-gray-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
-                  required
+                  placeholder="ex. Python, React, Communication, Gestion de projet"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
                 />
               </div>
-            </div>
 
-            {/* Description */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-900">
-                Description détaillée <span className="text-red-500">*</span>
-              </label>
-              <textarea 
-                rows={5}
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Décrivez les missions..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none resize-none"
-                required
-              />
-            </div>
+              {/* Salary & Dates */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-900">Salaire Min (DA)</label>
+                  <div className="relative">
+                    <input 
+                      type="number" 
+                      name="salary_min"
+                      value={formData.salary_min}
+                      onChange={handleChange}
+                      placeholder="ex. 30000"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                    />
+                    <DollarSign size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
 
-            {/* Mode de travail */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-900">
-                Mode de travail <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <select 
-                  name="work_mode"
-                  value={formData.work_mode}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-slate-900 appearance-none bg-white focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none cursor-pointer"
-                  required
-                >
-                  <option value="">Sélectionner</option>
-                  <option value="presentiel">Présentiel</option>
-                  <option value="teletravail">Télétravail</option>
-                  <option value="hybride">Hybride</option>
-                </select>
-                <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-900">Salaire Max (DA)</label>
+                  <div className="relative">
+                    <input 
+                      type="number" 
+                      name="salary_max"
+                      value={formData.salary_max}
+                      onChange={handleChange}
+                      placeholder="ex. 50000"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                    />
+                    <DollarSign size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-slate-900">Date d'expiration</label>
+                  <div className="relative">
+                    <input 
+                      type="date" 
+                      name="expiration_date"
+                      value={formData.expiration_date}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
+                    />
+                    <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Compétences */}
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-900">
-                Compétences requises
-              </label>
-              <input 
-                type="text" 
-                name="skills"
-                value={formData.skills}
-                onChange={handleChange}
-                placeholder="ex. Python, React..."
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-[#4AA59C]/20 focus:border-[#4AA59C] outline-none"
-              />
-            </div>
-
-            <hr className="border-gray-200 my-6" />
+            <hr className="border-gray-200" />
 
             {/* Buttons */}
             <div className="flex justify-end gap-4">
@@ -270,8 +394,9 @@ const PostOffer = () => {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="px-6 py-2.5 rounded-lg bg-[#56Bca0] hover:bg-[#4aa58b] disabled:opacity-50 text-white font-bold text-sm shadow-sm transition"
+                className="px-6 py-2.5 rounded-lg bg-[#56Bca0] hover:bg-[#4aa58b] disabled:opacity-50 text-white font-bold text-sm shadow-sm transition flex items-center gap-2"
               >
+                {loading && <span className="animate-spin">⌛</span>}
                 {loading ? 'Publication...' : 'Publier l\'offre'}
               </button>
             </div>
