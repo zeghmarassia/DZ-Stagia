@@ -1,28 +1,82 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth_router  # ← Fixed import
+from fastapi.openapi.utils import get_openapi
+from app.routes import auth_router, admin_router, establishment_router, student_router
+from app.routes import offerRoutes
 from app.database import engine, Base
+from typing import Optional
+from app.routes import applicationRoutes
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="DZ-Stagia API",
-    description="Backend API for DZ-Stagia internship platform",
+    description="Backend API for Stagia platform",
     version="1.0.0"
 )
+# Import existant
+from app.routes import authRoutes, adminRoutes, studentRoutes
+from app.routes import companyRoutes 
+from app.routes import notificationRoutes
+
+
+# Dans l'application FastAPI
+app.include_router(authRoutes.router, prefix="/auth")
+app.include_router(adminRoutes.router, prefix="/admin")
+app.include_router(studentRoutes.router, prefix="/student")
+app.include_router(companyRoutes.router)
+app.include_router(offerRoutes.router, prefix="/api/v1")  
+app.include_router(applicationRoutes.router, prefix="/api/v1")
+app.include_router(notificationRoutes.router, prefix="/api/v1")
+
+
+
+
+
+
+
+# Custom OpenAPI schema to add JWT authentication in docs
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    
+    openapi_schema = get_openapi(
+        title="DZ-Stagia API",
+        version="1.0.0",
+        description="Backend API for Stagia platform with JWT authentication",
+        routes=app.routes,
+    )
+    
+    # Add Bearer token security scheme
+    openapi_schema["components"]["securitySchemes"] = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+            "description": "Enter your JWT token (without 'Bearer' prefix)"
+        }
+    }
+    
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
 
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Change to specific origins in production
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Include routers
-app.include_router(auth_router)  # ← Clean!
+app.include_router(auth_router)
+app.include_router(admin_router)
+app.include_router(establishment_router)
+app.include_router(student_router)
 
 @app.get("/")
 def root():

@@ -17,8 +17,10 @@ from app.utils.security import (
     get_password_hash,
     create_access_token,
     decode_access_token,
-    get_user
-)
+    get_user,
+    get_current_student,    
+    get_current_company,    
+    get_current_admin       )
 
 __all__ = [
     "upload_student_document",
@@ -36,5 +38,8 @@ __all__ = [
     "get_password_hash",
     "create_access_token",
     "decode_access_token",
-    "get_user"
+    "get_user",
+    "get_current_student",   
+    "get_current_company",   
+    "get_current_admin"      
 ]

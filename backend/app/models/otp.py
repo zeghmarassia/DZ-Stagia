@@ -9,6 +9,7 @@ class OTP(Base):
     email = Column(String(255), nullable=False, index=True)
     otp_code = Column(String(6), nullable=False)
     user_type = Column(String(20), nullable=False, index=True)  # 'student', 'company', 'admin'
+    purpose = Column(String(20), nullable=False, index=True)
     expires_at = Column(TIMESTAMP, nullable=False, index=True)
     is_used = Column(Boolean, default=False, index=True)
     created_at = Column(TIMESTAMP, server_default=func.now())

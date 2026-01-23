@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, Text, TIMESTAMP
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
 
@@ -14,7 +15,7 @@ class Company(Base):
     status = Column(String(20), default='pending', index=True)
     is_email_verified = Column(Boolean, default=False)
     
-    document_url = Column(String(500), nullable=False)
+    document_url = Column(String(500), nullable=True)
     
     description = Column(Text, nullable=True)
     sector = Column(String(100), nullable=True)
@@ -26,3 +27,4 @@ class Company(Base):
     
     created_at = Column(TIMESTAMP, server_default=func.now())
     updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+    offers = relationship("Offer", back_populates="company", cascade="all, delete-orphan")
