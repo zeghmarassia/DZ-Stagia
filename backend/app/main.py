@@ -70,3 +70,12 @@ def root():
         "docs": "/docs",
         "health": "/health"
     }
+
+@app.get("/health")
+def health_check():
+    """Health check endpoint for Render and monitoring"""
+    return {
+        "status": "healthy",
+        "service": "DZ-Stagia API",
+        "version": "1.0.0"
+    }
