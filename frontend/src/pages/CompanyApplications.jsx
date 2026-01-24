@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Edit3, Search, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import axiosInstance from '../config/axios';
 import CompanyNavbar from '../components/CompanyNavbar';
 
 // Status Badge Component
@@ -52,13 +51,7 @@ const CompanyApplications = () => {
     const fetchApplications = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        
-        const response = await axios.get(`${API_URL}/applications/company/all?page=${currentPage}&page_size=10`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await axiosInstance.get(`/applications/company/all?page=${currentPage}&page_size=10`);
 
         setApplications(response.data.applications || []);
       } catch (err) {
@@ -85,7 +78,7 @@ const CompanyApplications = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      <CompanyNavbar />
+      {/* <CompanyNavbar /> */}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb & Header */}

@@ -4,8 +4,7 @@ import {
   Search, 
   Edit,
 } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import { getApplicationsForOffer } from '../services/companyService';
 import CompanyNavbar from '../components/CompanyNavbar';
 
 // Status Badge Component
@@ -39,13 +38,8 @@ const CompanyCandidatures = () => {
     const fetchCandidates = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        const headers = {
-          Authorization: `Bearer ${token}`
-        };
-
         // Fetch applications for this specific offer
-        const response = await axios.get(`${API_URL}/applications/offer/${id}`, { headers });
+        const response = await getApplicationsForOffer(id);
         
         const applications = response.data.applications || [];
         setCandidates(applications);
@@ -81,7 +75,7 @@ const CompanyCandidatures = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
-      <CompanyNavbar />
+      {/* <CompanyNavbar /> */}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         

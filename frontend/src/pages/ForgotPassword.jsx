@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Mail, ArrowLeft } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import { forgotPassword } from '../services/authService';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const ForgotPassword = () => {
@@ -24,9 +23,7 @@ const ForgotPassword = () => {
 
     try {
       setLoading(true);
-      await axios.post(`${API_URL}/auth/forgot-password`, {
-        email: email
-      });
+      await forgotPassword(email);
 
       navigate('/verify-otp', { state: { email: email } });
     } catch (err) {

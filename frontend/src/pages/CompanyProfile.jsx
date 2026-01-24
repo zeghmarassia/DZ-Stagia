@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Globe, Phone, Pen, ChevronDown } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import { getCompanyProfile, updateCompanyProfile } from '../services/companyService';
 import CompanyNavbar from '../components/CompanyNavbar';
 
 const CompanyProfile = () => {
@@ -11,8 +10,10 @@ const CompanyProfile = () => {
     location: '',
     website: '',
     phone: '',
-    description: ''
+    description: '',
+    logo: ''
   });
+  const [logoFile, setLogoFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -22,21 +23,17 @@ const CompanyProfile = () => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${API_URL}/company/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await getCompanyProfile();
 
         if (response.data) {
           setFormData({
-            name: response.data.name || '',
+            name: response.data.company_name || '',
             sector: response.data.sector || '',
-            location: response.data.location || '',
+            location: response.data.address || '',
             website: response.data.website || '',
-            phone: response.data.phone || '',
-            description: response.data.description || ''
+            phone: response.data.contact || '',
+            description: response.data.description || '',
+            logo: response.data.logo_url || ''
           });
         }
       } catch (err) {
@@ -54,17 +51,38 @@ const CompanyProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    if (e.target.files[0]) {
+      setLogoFile(e.target.files[0]);
+      // Optional: show a preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFormData(prev => ({...prev, logo: event.target.result}));
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
   const handleSave = async () => {
     try {
       setSuccessMessage('');
-      const token = localStorage.getItem('token');
-      
-      await axios.put(`${API_URL}/company/profile`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      setError('');
+
+      // 1. Update profile data
+      const profileData = new FormData();
+      profileData.append('company_name', formData.name);
+      profileData.append('sector', formData.sector);
+      profileData.append('address', formData.location);
+      profileData.append('website', formData.website);
+      profileData.append('contact', formData.phone);
+      profileData.append('description', formData.description);
+
+      await updateCompanyProfile(profileData);
+
+      // 2. Upload logo if a new one was selected
+      if (logoFile) {
+        await uploadCompanyLogo(logoFile);
+      }
 
       setSuccessMessage('Profil mis à jour avec succès!');
       setTimeout(() => setSuccessMessage(''), 3000);
@@ -76,7 +94,7 @@ const CompanyProfile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-12">
-      <CompanyNavbar />
+      {/* <CompanyNavbar /> */}
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
@@ -119,18 +137,19 @@ const CompanyProfile = () => {
               <div className="relative -mt-16">
                 <div className="w-32 h-32 rounded-full border-4 border-white bg-white overflow-hidden shadow-sm flex items-center justify-center">
                   <img 
-                    src={`https://ui-avatars.com/api/?name=${formData.name}&background=random&color=fff`}
+                    src={formData.logo || `https://ui-avatars.com/api/?name=${formData.name}&background=random&color=fff`}
                     alt="Logo" 
-                    className="w-full h-full object-contain p-2" 
+                    className="w-full h-full object-cover" 
                   />
                 </div>
               </div>
 
               {/* Edit Photo Button */}
-              <button className="mt-4 flex items-center gap-2 bg-blue-50 text-[#5B8C9D] px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-100 transition">
+              <label htmlFor="logo-upload" className="cursor-pointer mt-4 flex items-center gap-2 bg-blue-50 text-[#5B8C9D] px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-100 transition">
                 <Pen size={14} />
-                Modifier la photo de profile
-              </button>
+                Modifier la photo de profil
+              </label>
+              <input type="file" id="logo-upload" hidden onChange={handleFileChange} accept="image/*" />
             </div>
 
             {/* Form Fields */}

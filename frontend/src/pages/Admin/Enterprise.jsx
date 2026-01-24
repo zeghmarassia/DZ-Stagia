@@ -1,18 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getCompanies, deleteCompany } from '../../services/companyService';
 
 const Enterprise = () => {
-  // Enterprise data with direct public paths
-  const [companies, setCompanies] = useState([
-    { id: 1, name: "SONATRACH", sector: "Énergie & Hydrocarbures", location: "Hydra, Alger", date: "5 janvier 2026, 10:45", img: "/SONATRAC.png" },
-    { id: 2, name: "Cévital", sector: "Industrie", location: "Kouba, Alger", date: "31 décembre 2025, 09:33", img: "/Cévital.png" },
-    { id: 3, name: "DIGITAL Solutions", sector: "Technologie", location: "Sidi Abdellah, Alger", date: "21 octobre 2025, 18:21", img: null },
-    { id: 4, name: "Ooredoo Algérie", sector: "Télécommunications", location: "Chéraga, Alger", date: "23 septembre 2025, 13:05", img: "/ooredoo.png" },
-    { id: 5, name: "Algérie Telecom", sector: "Télécommunications", location: "Mohammadia, Alger", date: "12 septembre 2025, 21:10", img: null },
-    { id: 6, name: "BrainerX", sector: "Technologie", location: "Bab Ezzouar, Alger", date: "15 mai 2025, 11:11", img: null },
-    { id: 7, name: "HEETCH", sector: "Transport & Technologie", location: "Paris, France", date: "30 mars 2025, 12:35", img: "/Heech.png" },
-    { id: 8, name: "InnoVera", sector: "Éducation", location: "Amizour, Béjaïa", date: "21 octobre 2024, 13:55", img: null },
-  ]);
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        setLoading(true);
+        const response = await getCompanies();
+        setCompanies(response.data.companies || []);
+      } catch (err) {
+        setError('Failed to fetch companies.');
+        console.error('Fetch companies error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCompanies();
+  }, []);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -22,9 +31,16 @@ const Enterprise = () => {
     setShowModal(true);
   };
 
-  const confirmDelete = () => {
-    setCompanies(companies.filter((c) => c.id !== selectedId));
-    setShowModal(false);
+  const confirmDelete = async () => {
+    try {
+      await deleteCompany(selectedId);
+      setCompanies(companies.filter((c) => c.id !== selectedId));
+      setShowModal(false);
+    } catch (err) {
+      setError('Failed to delete company.');
+      console.error('Delete company error:', err);
+      setShowModal(false);
+    }
   };
 
   return (
@@ -111,7 +127,12 @@ const Enterprise = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F4F4F4]">
-              {companies.map((company) => (
+              {loading ? (
+                <tr><td colSpan="5" className="text-center py-10">Loading...</td></tr>
+              ) : error ? (
+                <tr><td colSpan="5" className="text-center py-10 text-red-500">{error}</td></tr>
+              ) : (
+                companies.map((company) => (
                 <tr key={company.id} className="hover:bg-[#F4F4F4]/20 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
@@ -132,14 +153,14 @@ const Enterprise = () => {
                       <span className="ml-1">{company.location}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-[13px] font-[600]">{company.date}</td>
+                  <td className="px-6 py-4 text-[13px] font-[600]">{new Date(company.date).toLocaleString('fr-FR')}</td>
                   <td className="px-6 py-4 text-right">
                     <button onClick={() => handleDeleteClick(company.id)} className="text-[#6F767E] hover:text-red-500 transition-colors">
                       <TrashIcon />
                     </button>
                   </td>
                 </tr>
-              ))}
+              )) )}
             </tbody>
           </table>
 

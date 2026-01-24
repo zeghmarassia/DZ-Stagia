@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { getAdminStats } from '../../services/AdminService';
+import { getAdminStats } from '../../services/authService';
 import { Link, useLocation } from 'react-router-dom';
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({
+    students_count: 0,
+    students_change: 0,
+    companies_count: 0,
+    companies_change: 0,
+    active_offers_count: 0,
+    active_offers_change: 0,
+    applications_count: 0,
+    applications_change: 0,
+  });
   const location = useLocation();
 
   const isCollapsed = location.pathname !== '/admin';
@@ -75,10 +84,10 @@ const AdminDashboard = () => {
             </div>
 
             <div className="grid grid-cols-4 gap-5 mb-8">
-              <StatCard label="Étudiants Inscrits" value="12,450" change="+12%" icon={<StudentIcon />} iconColor="text-[#2A85FF]" bgColor="bg-[#EAF2FF]" />
-              <StatCard label="Entreprises registrées" value="850" change="+5%" icon={<BuildingIcon />} iconColor="text-[#8E59FF]" bgColor="bg-[#F3EFFF]" />
-              <StatCard label="Offres actives" value="320" change="-2%" icon={<BriefcaseIcon />} iconColor="text-[#FFBC99]" bgColor="bg-[#FFF4EE]" isNegative />
-              <StatCard label="Total d'applications" value="5,200" change="+18%" icon={<ChartIcon />} iconColor="text-[#2A85FF]" bgColor="bg-[#EAF2FF]" />
+              <StatCard label="Étudiants Inscrits" value={stats.students_count.toLocaleString()} change={`${(stats.students_change * 100).toFixed(0)}%`} icon={<StudentIcon />} iconColor="text-[#2A85FF]" bgColor="bg-[#EAF2FF]" isNegative={stats.students_change < 0} />
+              <StatCard label="Entreprises registrées" value={stats.companies_count.toLocaleString()} change={`${(stats.companies_change * 100).toFixed(0)}%`} icon={<BuildingIcon />} iconColor="text-[#8E59FF]" bgColor="bg-[#F3EFFF]" isNegative={stats.companies_change < 0} />
+              <StatCard label="Offres actives" value={stats.active_offers_count.toLocaleString()} change={`${(stats.active_offers_change * 100).toFixed(0)}%`} icon={<BriefcaseIcon />} iconColor="text-[#FFBC99]" bgColor="bg-[#FFF4EE]" isNegative={stats.active_offers_change < 0} />
+              <StatCard label="Total d'applications" value={stats.applications_count.toLocaleString()} change={`${(stats.applications_change * 100).toFixed(0)}%`} icon={<ChartIcon />} iconColor="text-[#2A85FF]" bgColor="bg-[#EAF2FF]" isNegative={stats.applications_change < 0} />
             </div>
 
             <div className="grid grid-cols-3 gap-6">

@@ -10,10 +10,10 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import { getCompanyOfferStats, getCompanyApplicationStats, getCompanyApplications } from '../services/companyService';
 import '../i18n';
 import CompanyNavbar from '../components/CompanyNavbar';
+import Navbar from '../components/Navbar';
 
 // --- Sub-Components ---
 
@@ -71,7 +71,7 @@ const AvatarGroup = ({ count, images }) => (
 
 // --- Main Page ---
 
-const Dashboard = () => {
+const CompanyDashboard = () => {
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState('fr');
   const [statistics, setStatistics] = useState({
@@ -93,22 +93,14 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        const headers = {
-          Authorization: `Bearer ${token}`
-        };
-
         // Fetch offers statistics
-        const offersStatsResponse = await axios.get(`${API_URL}/offers/my-offers/statistics`, { headers });
+        const offersStatsResponse = await getCompanyOfferStats();
         
         // Fetch applications statistics
-        const appStatsResponse = await axios.get(`${API_URL}/applications/company/statistics`, { headers });
+        const appStatsResponse = await getCompanyApplicationStats();
         
         // Fetch all applications (recent ones)
-        const appResponse = await axios.get(`${API_URL}/applications/company/all`, {
-          headers,
-          params: { page: 1, page_size: 5 }
-        });
+        const appResponse = await getCompanyApplications({ page: 1, page_size: 5 });
 
         setStatistics({
           totalOffers: offersStatsResponse.data.total_offers || 0,
@@ -136,7 +128,8 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
       
-      <CompanyNavbar/>
+      {/* <CompanyNavbar/> */}
+      {/* <Navbar/> */}
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -261,4 +254,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default CompanyDashboard;

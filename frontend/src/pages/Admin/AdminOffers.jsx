@@ -1,18 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getOffers, deleteOffer } from '../../services/offerService';
 
 const Offers = () => {
-  // Mock data based on the design screenshot
-  const [offers, setOffers] = useState([
-    { id: 1, title: "Développeur Full Stack", company: "DIGITAL Solutions", type: "Stage", candidates: 45, date: "5 janvier 2026, 10:45" },
-    { id: 2, title: "Développeur Full Stack", company: "DIGITAL Solutions", type: "Premier Emploi", candidates: 45, date: "5 janvier 2026, 10:45" },
-    { id: 3, title: "Développeur Full Stack", company: "DIGITAL Solutions", type: "Projet de Fin d'Etudes", candidates: 45, date: "5 janvier 2026, 10:45" },
-    { id: 4, title: "Développeur Full Stack", company: "DIGITAL Solutions", type: "Stage", candidates: 45, date: "5 janvier 2026, 10:45" },
-    { id: 5, title: "Développeur Full Stack", company: "DIGITAL Solutions", type: "Stage", candidates: 45, date: "5 janvier 2026, 10:45" },
-    { id: 6, title: "Développeur Full Stack", company: "DIGITAL Solutions", type: "Premier Emploi", candidates: 45, date: "5 janvier 2026, 10:45" },
-    { id: 7, title: "Développeur Full Stack", company: "DIGITAL Solutions", type: "Projet de Fin d'Etudes", candidates: 45, date: "5 janvier 2026, 10:45" },
-    { id: 8, title: "Développeur Full Stack", company: "DIGITAL Solutions", type: "Stage", candidates: 45, date: "5 janvier 2026, 10:45" },
-  ]);
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        setLoading(true);
+        const response = await getOffers();
+        setOffers(response.data.offers || []);
+      } catch (err) {
+        setError('Failed to fetch offers.');
+        console.error('Fetch offers error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOffers();
+  }, []);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -22,9 +31,16 @@ const Offers = () => {
     setShowModal(true);
   };
 
-  const confirmDelete = () => {
-    setOffers(offers.filter((o) => o.id !== selectedId));
-    setShowModal(false);
+  const confirmDelete = async () => {
+    try {
+      await deleteOffer(selectedId);
+      setOffers(offers.filter((o) => o.id !== selectedId));
+      setShowModal(false);
+    } catch (err) {
+      setError('Failed to delete offer.');
+      console.error('Delete offer error:', err);
+      setShowModal(false);
+    }
   };
 
   // Helper to get badge styles based on offer type
@@ -123,33 +139,39 @@ const Offers = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F4F4F4]">
-              {offers.map((offer) => (
-                <tr key={offer.id} className="hover:bg-[#F4F4F4]/20 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="text-[13px] font-[700] text-[#1A1D1F]">{offer.title}</span>
-                      <span className="text-[11px] text-[#6F767E]">{offer.company}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-lg text-[11px] font-[700] ${getTypeStyles(offer.type)}`}>
-                      {offer.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center text-[12px] font-[600] text-[#1A1D1F]">
-                      <UsersIcon size={14} className="mr-2 text-[#6F767E]" />
-                      {offer.candidates} candidats
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-[12px] font-[600] text-[#1A1D1F]">{offer.date}</td>
-                  <td className="px-6 py-4 text-right">
-                    <button onClick={() => handleDeleteClick(offer.id)} className="text-[#6F767E] hover:text-red-500 transition-colors">
-                      <TrashIcon />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {loading ? (
+                <tr><td colSpan="5" className="text-center py-10">Loading...</td></tr>
+              ) : error ? (
+                <tr><td colSpan="5" className="text-center py-10 text-red-500">{error}</td></tr>
+              ) : (
+                offers.map((offer) => (
+                  <tr key={offer.id} className="hover:bg-[#F4F4F4]/20 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-[13px] font-[700] text-[#1A1D1F]">{offer.title}</span>
+                        <span className="text-[11px] text-[#6F767E]">{offer.company}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-lg text-[11px] font-[700] ${getTypeStyles(offer.type)}`}>
+                        {offer.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center text-[12px] font-[600] text-[#1A1D1F]">
+                        <UsersIcon size={14} className="mr-2 text-[#6F767E]" />
+                        {offer.candidates} candidats
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-[12px] font-[600] text-[#1A1D1F]">{new Date(offer.date).toLocaleString('fr-FR')}</td>
+                    <td className="px-6 py-4 text-right">
+                      <button onClick={() => handleDeleteClick(offer.id)} className="text-[#6F767E] hover:text-red-500 transition-colors">
+                        <TrashIcon />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
 

@@ -1,20 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getStudents, deleteStudent } from '../../services/studentService';
 
 // تم حذف أسطر الـ import لأن الصور في مجلد public
 
 const Etudiants = () => {
-  // Converted data to state to enable deletion
-  const [students, setStudents] = useState([
-    { id: 1, name: "Aicha Belaid", university: "ESTIN Béjaïa", specialty: "Informatique", date: "5 janvier 2026, 10:45", img: "/profile.png" },
-    { id: 2, name: "Abderrahim Benali", university: "Univ. Oran 1", specialty: "Electronique", date: "31 décembre 2025, 09:33", img: null },
-    { id: 3, name: "Nawel Ziane", university: "ESI Alger", specialty: "Informatique", date: "21 octobre 2025, 18:21", img: null },
-    { id: 4, name: "Achraf Brahimi", university: "USTHB", specialty: "Génie Civil", date: "23 septembre 2025, 13:05", img: null },
-    { id: 5, name: "Karim Mansouri", university: "Univ. Constantine 2", specialty: "Architecture", date: "12 septembre 2025, 21:10", img: "/Karim.png" },
-    { id: 6, name: "Lina Sellam", university: "ESI Alger", specialty: "Informatique", date: "15 mai 2025, 11:11", img: null },
-    { id: 7, name: "Sarah Mostefa", university: "Univ. Sétif 1", specialty: "Gestion & Marketing", date: "30 mars 2025, 12:35", img: "/Sarah.png" },
-    { id: 8, name: "Amine Benali", university: "USTHB", specialty: "Informatique", date: "21 octobre 2024, 13:55", img: "/Amine.png" },
-  ]);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        setLoading(true);
+        const response = await getStudents();
+        setStudents(response.data.students || []);
+      } catch (err) {
+        setError('Failed to fetch students.');
+        console.error('Fetch students error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStudents();
+  }, []);
 
   // State for Modal visibility and selected student
   const [showModal, setShowModal] = useState(false);
@@ -27,10 +36,17 @@ const Etudiants = () => {
   };
 
   // Function to confirm deletion
-  const confirmDelete = () => {
-    setStudents(students.filter((student) => student.id !== selectedId));
-    setShowModal(false);
-    setSelectedId(null);
+  const confirmDelete = async () => {
+    try {
+      await deleteStudent(selectedId);
+      setStudents(students.filter((student) => student.id !== selectedId));
+      setShowModal(false);
+      setSelectedId(null);
+    } catch (err) {
+      setError('Failed to delete student.');
+      console.error('Delete student error:', err);
+      setShowModal(false);
+    }
   };
 
   // Function to cancel deletion
@@ -146,7 +162,12 @@ const Etudiants = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F4F4F4]">
-              {students.map((student) => (
+              {loading ? (
+                <tr><td colSpan="5" className="text-center py-10">Loading...</td></tr>
+              ) : error ? (
+                <tr><td colSpan="5" className="text-center py-10 text-red-500">{error}</td></tr>
+              ) : (
+                students.map((student) => (
                 <tr key={student.id} className="hover:bg-[#F4F4F4]/20 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
@@ -162,7 +183,7 @@ const Etudiants = () => {
                   </td>
                   <td className="px-6 py-4 text-[13px] text-[#1A1D1F] font-[700]">{student.university}</td>
                   <td className="px-6 py-4 text-[13px] text-[#6F767E] font-medium">{student.specialty}</td>
-                  <td className="px-6 py-4 text-[13px] text-[#1A1D1F] font-[600]">{student.date}</td>
+                  <td className="px-6 py-4 text-[13px] font-[600]">{new Date(student.date).toLocaleString('fr-FR')}</td>
                   <td className="px-6 py-4 text-right">
                     <button 
                       onClick={() => handleDeleteClick(student.id)}
@@ -172,7 +193,7 @@ const Etudiants = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
+              )) )}
             </tbody>
           </table>
 

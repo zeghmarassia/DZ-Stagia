@@ -1,17 +1,78 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getPendingStudents, approveStudent, rejectStudent } from '../../services/studentService';
+import { getPendingCompanies, approveCompany, rejectCompany } from '../../services/companyService';
+
+const getDocColor = (docName) => {
+  if (!docName) return 'bg-gray-200 text-gray-800';
+  const extension = docName.split('.').pop().toLowerCase();
+  switch (extension) {
+    case 'pdf':
+      return 'bg-[#EAF2FF] text-[#2A85FF]';
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+      return 'bg-[#F3EFFF] text-[#8E59FF]';
+    default:
+      return 'bg-gray-200 text-gray-800';
+  }
+};
 
 const UserValidation = () => {
-  const users = [
-    { id: 1, name: "Amine Benali", date: "21 octobre 2024, 13:55", type: "Étudiant", doc: "certificat_de_scolarité.pdf", docColor: "bg-[#EAF2FF] text-[#2A85FF]" },
-    { id: 2, name: "SURVISION", date: "6 mai 2025, 10:05", type: "Entreprise", doc: "registre.pdf", docColor: "bg-[#EAF2FF] text-[#2A85FF]" },
-    { id: 3, name: "Selma Achour", date: "12 Juin 2025, 17:23", type: "Étudiant", doc: "carte_étudiant.jpg", docColor: "bg-[#F3EFFF] text-[#8E59FF]" },
-    { id: 4, name: "Amine Benali", date: "21 octobre 2024, 13:55", type: "Étudiant", doc: "certificat_de_scolarité.pdf", docColor: "bg-[#EAF2FF] text-[#2A85FF]" },
-    { id: 5, name: "SURVISION", date: "6 mai 2025, 10:05", type: "Entreprise", doc: "registre.pdf", docColor: "bg-[#EAF2FF] text-[#2A85FF]" },
-    { id: 6, name: "Selma Achour", date: "12 Juin 2025, 17:23", type: "Étudiant", doc: "carte_étudiant.jpg", docColor: "bg-[#F3EFFF] text-[#8E59FF]" },
-    { id: 7, name: "SURVISION", date: "6 mai 2025, 10:05", type: "Entreprise", doc: "registre.pdf", docColor: "bg-[#EAF2FF] text-[#2A85FF]" },
-    { id: 8, name: "Selma Achour", date: "12 Juin 2025, 17:23", type: "Étudiant", doc: "carte_étudiant.jpg", docColor: "bg-[#F3EFFF] text-[#8E59FF]" },
-  ];
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchPendingUsers = async () => {
+      try {
+        setLoading(true);
+        const [studentsRes, companiesRes] = await Promise.all([
+          getPendingStudents(),
+          getPendingCompanies(),
+        ]);
+
+        const pendingStudents = studentsRes.data.map(s => ({ ...s, id: s.student_id, name: `${s.first_name} ${s.last_name}`, type: 'student', date: s.created_at, doc: s.document_url }));
+        const pendingCompanies = companiesRes.data.map(c => ({ ...c, id: c.company_id, name: c.company_name, type: 'company', date: c.created_at, doc: c.document_url }));
+
+        setUsers([...pendingStudents, ...pendingCompanies]);
+      } catch (err) {
+        setError('Failed to fetch users.');
+        console.error('Fetch users error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPendingUsers();
+  }, []);
+
+  const handleApprove = async (id, type) => {
+    try {
+      if (type === 'student') {
+        await approveStudent(id);
+      } else if (type === 'company') {
+        await approveCompany(id);
+      }
+      setUsers(users.filter((user) => user.id !== id));
+    } catch (err) {
+      setError('Failed to approve user.');
+      console.error('Approve user error:', err);
+    }
+  };
+
+  const handleReject = async (id, type) => {
+    try {
+      if (type === 'student') {
+        await rejectStudent(id);
+      } else if (type === 'company') {
+        await rejectCompany(id);
+      }
+      setUsers(users.filter((user) => user.id !== id));
+    } catch (err) {
+      setError('Failed to reject user.');
+      console.error('Reject user error:', err);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-white font-sans text-[#1A1D1F]">
@@ -91,7 +152,12 @@ const UserValidation = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F4F4F4]">
-              {users.map((user, idx) => (
+              {loading ? (
+                <tr><td colSpan="5" className="text-center py-10">Loading...</td></tr>
+              ) : error ? (
+                <tr><td colSpan="5" className="text-center py-10 text-red-500">{error}</td></tr>
+              ) : (
+                users.map((user, idx) => (
                 <tr key={idx} className="hover:bg-[#F4F4F4]/20 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
@@ -101,31 +167,31 @@ const UserValidation = () => {
                       <span className="text-[13px] font-[700] text-[#1A1D1F]">{user.name}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-[13px] text-[#6F767E] font-medium">{user.date}</td>
+                  <td className="px-6 py-4 text-[13px] text-[#6F767E] font-medium">{new Date(user.date).toLocaleString('fr-FR')}</td>
                   <td className="px-6 py-4">
                     <span className="bg-[#F4F4F4] text-[#6F767E] px-3 py-1.5 rounded-lg text-[11px] font-[700]">
                       {user.type}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg w-fit cursor-pointer hover:opacity-80 transition-opacity ${user.docColor}`}>
+                    <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg w-fit cursor-pointer hover:opacity-80 transition-opacity ${getDocColor(user.doc)}`}>
                       <FileIcon />
                       <span className="text-[11px] font-[700] underline">{user.doc}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex justify-center items-center space-x-3">
-                      <button className="text-[#FF6A55] p-2 hover:bg-[#FFF2F0] rounded-lg transition-colors">
+                                            <button onClick={() => handleReject(user.id, user.type)} className="text-[#FF6A55] p-2 hover:bg-[#FFF2F0] rounded-lg transition-colors">
                         <CloseIcon />
                       </button>
-                      <button className="bg-[#27AE60] text-white px-4 py-2 rounded-xl flex items-center space-x-2 text-[12px] font-[700] hover:bg-[#219653] shadow-sm transition-all">
+                                            <button onClick={() => handleApprove(user.id, user.type)} className="bg-[#27AE60] text-white px-4 py-2 rounded-xl flex items-center space-x-2 text-[12px] font-[700] hover:bg-[#219653] shadow-sm transition-all">
                         <CheckIcon />
                         <span>Approuver</span>
                       </button>
                     </div>
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
 

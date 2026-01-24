@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { User, Clock, LogOut } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import { logout } from '../services/authService';
 
 const AccountPending = () => {
   const location = useLocation();
@@ -25,7 +24,7 @@ const AccountPending = () => {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await axios.post(`${API_URL}/auth/logout`);
+      await logout();
       // Clear any stored auth data if needed
       localStorage.clear();
       // Redirect to home or login page

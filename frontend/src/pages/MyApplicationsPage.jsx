@@ -1,50 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Added for navigation
+import axiosInstance from '../config/axios';
 
 const MyApplicationsPage = () => {
+  const [applications, setApplications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axiosInstance.get('/student/applications'); // Assuming this is the correct endpoint
+        setApplications(response.data.applications || []);
+        setError('');
+      } catch (err) {
+        setError('Impossible de charger vos candidatures.');
+        console.error('Error fetching applications:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchApplications();
+  }, []);
+
+  // Helper to get status colors, can be expanded
+  const getStatusStyles = (status) => {
+    switch (status.toLowerCase()) {
+      case 'entretien prévu':
+      case 'acceptée':
+        return { statusColor: 'text-green-600 bg-green-50', dotColor: 'bg-green-500' };
+      case 'en cours d\'étude':
+        return { statusColor: 'text-blue-600 bg-blue-50', dotColor: 'bg-blue-500' };
+      case 'refusée':
+        return { statusColor: 'text-red-600 bg-red-50', dotColor: 'bg-red-500' };
+      case 'reçue':
+      default:
+        return { statusColor: 'text-gray-500 bg-gray-100', dotColor: 'bg-gray-400' };
+    }
+  };
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col font-['Plus_Jakarta_Sans',sans-serif] text-[#111827]">
       <style>
         {`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');`}
       </style>
 
-      {/* Header - Navigation */}
-      <header className="w-full bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
-        <div className="flex items-center space-x-12">
-          <div className="text-[22px] font-[800] tracking-tighter text-[#111827]">LOGO</div>
-          <nav className="hidden md:flex space-x-8">
-            {/* Navigation links updated to use Link component */}
-            <Link to="/dashboard" className="text-gray-500 font-bold text-[14px] hover:text-[#111827]">Tableau de Bord</Link>
-            <Link to="/offres" className="text-gray-500 font-bold text-[14px] hover:text-[#111827]">Offres</Link>
-            <Link to="/applications" className="text-[#4fa797] font-bold text-[14px] border-b-2 border-[#4fa797] pb-1">Mes Candidatures</Link>
-          </nav>
-        </div>
-
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-4 border-r pr-6 border-gray-100">
-            <button className="text-gray-400 hover:text-[#4fa797] transition-colors">
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </button>
-            <button className="text-gray-400 hover:text-[#4fa797] relative transition-colors">
-              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <div className="text-right">
-              <p className="text-[13px] font-bold text-[#111827] leading-none">Aicha Belaid</p>
-              <p className="text-[11px] text-gray-400 font-bold mt-1">Étudiant</p>
-            </div>
-            <div className="w-10 h-10 rounded-full border border-gray-200 bg-white overflow-hidden shadow-sm flex items-center justify-center">
-              <img src="/profile.png" alt="Profile" className="w-full h-full object-cover" />
-            </div>
-            <button className="text-gray-400 hover:text-red-500 transition-colors">
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-            </button>
-          </div>
-        </div>
-      </header>
 
       <main className="flex-grow w-full max-w-[1200px] mx-auto px-8 py-12">
         <section className="mb-10">
@@ -85,42 +86,31 @@ const MyApplicationsPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                <ApplicationRow 
-                  logo="/SONATRAC.png" company="SONATRACH" 
-                  position="Ingénieur DevOps Junior" date="Publiée le 25 décembre 2025" 
-                  type="Premier Emploi" typeColor="text-orange-600 bg-orange-50"
-                  status="Entretien prévu" statusColor="text-green-600 bg-green-50" dotColor="bg-green-500"
-                />
-                <ApplicationRow 
-                  logo="/Cévital.png" company="Cévital" 
-                  position="Assistant Ressources Humaines" date="Publiée le 5 novembre 2025" 
-                  type="Projet de Fin d'Études" typeColor="text-blue-600 bg-blue-50"
-                  status="Reçue" statusColor="text-gray-500 bg-gray-100" dotColor="bg-gray-400"
-                />
-                <ApplicationRow 
-                  logo="/Djezzy.png" company="Djezzy" 
-                  position="Développeur Full Stack React/Node" date="Publiée le 10 octobre 2025" 
-                  type="Stage" typeColor="text-[#4fa797] bg-[#4fa797]/10"
-                  status="En cours d'étude" statusColor="text-blue-600 bg-blue-50" dotColor="bg-blue-500"
-                />
-                <ApplicationRow 
-                  logo="/Yassir.png" company="Yassir" 
-                  position="Designer UI/UX" date="Publiée le 4 avril 2025" 
-                  type="Stage" typeColor="text-[#4fa797] bg-[#4fa797]/10"
-                  status="Acceptée" statusColor="text-green-600 bg-green-50" dotColor="bg-green-500"
-                />
-                <ApplicationRow 
-                  logo="/mobilis.png" company="Mobilis" 
-                  position="Analyste Financier" date="Publiée le 09 janvier 2025" 
-                  type="Premier Emploi" typeColor="text-orange-600 bg-orange-50"
-                  status="Reçue" statusColor="text-gray-500 bg-gray-100" dotColor="bg-gray-400"
-                />
-                <ApplicationRow 
-                  logo="/AlgTele.png" company="Algérie Telecom" 
-                  position="Développeur Frontend" date="Publiée le 10 septembre 2024" 
-                  type="Stage" typeColor="text-[#4fa797] bg-[#4fa797]/10"
-                  status="Refusée" statusColor="text-red-600 bg-red-50" dotColor="bg-red-500"
-                />
+                {isLoading ? (
+                  <tr><td colSpan="5" className="text-center py-10 font-bold">Chargement...</td></tr>
+                ) : error ? (
+                  <tr><td colSpan="5" className="text-center py-10 font-bold text-red-500">{error}</td></tr>
+                ) : applications.length > 0 ? (
+                  applications.map(app => {
+                    const { statusColor, dotColor } = getStatusStyles(app.status);
+                    return (
+                      <ApplicationRow 
+                        key={app.id}
+                        logo={app.offer.company.logoUrl || '/placeholder-logo.png'}
+                        company={app.offer.company.name}
+                        position={app.offer.title}
+                        date={`Postulée le ${new Date(app.applicationDate).toLocaleDateString()}`}
+                        type={app.offer.type}
+                        typeColor="text-blue-600 bg-blue-50" // Placeholder color
+                        status={app.status}
+                        statusColor={statusColor}
+                        dotColor={dotColor}
+                      />
+                    );
+                  })
+                ) : (
+                  <tr><td colSpan="5" className="text-center py-10 font-bold text-gray-500">Vous n'avez aucune candidature pour le moment.</td></tr>
+                )}
               </tbody>
             </table>
           </div>

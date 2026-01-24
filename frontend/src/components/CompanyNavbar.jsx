@@ -1,52 +1,29 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../store';
 import { Search, Bell, LogOut } from 'lucide-react';
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import axiosInstance from '../config/axios';
 
 const CompanyNavbar = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const [companyName, setCompanyName] = useState('Chargement...');
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const companyName = user?.name || 'Mon Entreprise';
   
   // Check if on candidatures page
   const isCandidaturesPage = location.pathname.includes('/candidatures');
 
-  // Fetch company name on mount
-  useEffect(() => {
-    const fetchCompanyName = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${API_URL}/company/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setCompanyName(response.data.name || 'Mon Entreprise');
-      } catch (err) {
-        console.error('Failed to fetch company name:', err);
-        setCompanyName('Mon Entreprise');
-      }
-    };
-
-    fetchCompanyName();
-  }, []);
-
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(`${API_URL}/auth/logout`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await axiosInstance.post(`/auth/logout`, {});
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userType');
+      dispatch(logout());
       navigate('/');
     }
   };
@@ -115,11 +92,11 @@ const CompanyNavbar = () => {
             <Link to="/company/profile" className="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition group">
               <img 
                  src={`https://ui-avatars.com/api/?name=${companyName}&background=random&color=fff`}
-                 alt={companyName} 
+                 alt={user?.name} 
                  className="w-10 h-10 rounded-full object-contain bg-white border border-gray-200"
               />
               <div className="flex flex-col">
-                <span className="text-sm font-bold text-slate-900 group-hover:text-[#4AA59C] transition">{companyName}</span>
+                <span className="text-sm font-bold text-slate-900 group-hover:text-[#4AA59C] transition">{user?.name || 'Mon Entreprise'}</span>
                 <span className="text-xs text-slate-500">Entreprise</span>
               </div>
             </Link>

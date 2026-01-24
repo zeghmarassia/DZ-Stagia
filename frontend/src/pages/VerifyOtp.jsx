@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import axiosInstance from '../config/axios';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const VerifyOtp = () => {
@@ -68,7 +67,7 @@ const VerifyOtp = () => {
   const handleResend = async () => {
     if (isResendDisabled) return;
     try {
-      await axios.post(`${API_URL}/auth/forgot-password`, { email });
+      await axiosInstance.post(`/auth/forgot-password`, { email });
       setTimer(30);
       setIsResendDisabled(true);
     } catch (err) {

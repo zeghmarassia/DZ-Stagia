@@ -1,20 +1,21 @@
-import axios from 'axios';
-
-// The API URL will be taken from your .env file later
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/admin';
+import axiosInstance from '../config/axios';
 
 /**
  * Service to fetch admin dashboard statistics.
  * This function is ready to connect to the real backend once merged.
  */
-export const getAdminStats = async () => {
-    try {
-        // This is a real request that will work once the backend is ready
-        const response = await axios.get(`${API_URL}/stats`);
-        return response.data;
-    } catch (error) {
-        // We log the error in English for professional debugging
-        console.error("Backend not reached yet, using local logic:", error);
-        throw error;
-    }
-};
+export const getAdminStats = () => axiosInstance.get('/admin/stats');
+
+export const getPendingUsers = () => axiosInstance.get('/admin/pending-users');
+
+export const approveUser = (userId) => axiosInstance.post(`/admin/users/${userId}/approve`);
+
+export const rejectUser = (userId) => axiosInstance.post(`/admin/users/${userId}/reject`);
+
+export const getStudents = () => axiosInstance.get('/admin/students');
+
+export const deleteStudent = (studentId) => axiosInstance.delete(`/admin/students/${studentId}`);
+
+export const getCompanies = () => axiosInstance.get('/admin/companies');
+
+export const deleteCompany = (companyId) => axiosInstance.delete(`/admin/companies/${companyId}`);
