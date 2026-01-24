@@ -2,12 +2,6 @@
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
-  "env": {
-    "VITE_API_BASE_URL": {
-      "description": "Backend API base URL",
-      "default": "https://dz-stagia.onrender.com"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
