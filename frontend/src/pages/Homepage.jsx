@@ -32,7 +32,7 @@ const Homepage = () => {
       try {
         setLoading(true);
         // Fetch recent offers
-        const offersResponse = await getOffers({ limit: 4 });
+        const offersResponse = await getOffers({ page_size: 4 });
         setOffers(offersResponse.data.offers || []);
 
         // Fetch companies
