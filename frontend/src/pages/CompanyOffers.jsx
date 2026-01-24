@@ -50,7 +50,7 @@ const CompanyOffers = () => {
     const fetchOffers = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get(`/offers/my-offers`);
+        const response = await axiosInstance.get(`/api/v1/offers/my-offers`);
         
         // Map backend response to component state
         const offers = (response.data.offers || response.data || []).map(offer => ({

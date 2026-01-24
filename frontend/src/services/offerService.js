@@ -1,7 +1,7 @@
 import axiosInstance from '../config/axios';
 
 export const getOffers = (params) => {
-  return axiosInstance.get('/offers', { params });
+  return axiosInstance.get('/api/v1/offers', { params });
 };
 
 export const getOfferById = (id) => {
