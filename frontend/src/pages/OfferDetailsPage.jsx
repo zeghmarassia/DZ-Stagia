@@ -1,12 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react'; // Added useState
 import { Link } from 'react-router-dom';
 
 const OfferDetailsPage = () => {
+  // State to manage modal visibility
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col font-['Plus_Jakarta_Sans',sans-serif] text-[#111827]">
       <style>
         {`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');`}
       </style>
+
+      {/* Confirmation Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            onClick={() => setIsModalOpen(false)}
+          ></div>
+          
+          {/* Modal Content */}
+          <div className="bg-white rounded-[24px] p-10 max-w-[500px] w-full mx-4 relative z-10 shadow-2xl flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full border-4 border-[#111827] flex items-center justify-center mb-6">
+              <span className="text-[32px] font-bold text-[#111827]">!</span>
+            </div>
+            
+            <h3 className="text-[18px] font-[800] mb-8">
+              Êtes-vous sûr de vouloir postuler à cet offre ?
+            </h3>
+            
+            <div className="flex space-x-4 w-full">
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="flex-1 px-6 py-3 rounded-[12px] border border-gray-200 text-gray-500 font-[800] text-[14px] hover:bg-gray-50 transition-colors uppercase"
+              >
+                Annuler
+              </button>
+              <button 
+                onClick={() => {
+                  // Add your application logic here
+                  setIsModalOpen(false);
+                }}
+                className="flex-1 px-6 py-3 rounded-[12px] bg-[#4fa797] text-white font-[800] text-[14px] hover:bg-[#3d8b7d] transition-colors uppercase"
+              >
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <header className="w-full bg-white border-b border-gray-100 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
@@ -36,7 +79,7 @@ const OfferDetailsPage = () => {
               <p className="text-[11px] text-gray-400 font-bold">Étudiant</p>
             </div>
             <div className="w-10 h-10 rounded-full border border-gray-200 bg-white overflow-hidden shrink-0 shadow-sm">
-               <img src="/profile.png" alt="Profile" className="w-full h-full object-cover" />
+                <img src="/profile.png" alt="Profile" className="w-full h-full object-cover" />
             </div>
             <button className="text-gray-400 hover:text-red-500 transition-colors ml-2">
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -107,7 +150,7 @@ const OfferDetailsPage = () => {
               <section>
                 <h2 className="text-[18px] font-[800] mb-4">Description du poste</h2>
                 <p className="text-gray-500 leading-relaxed text-[15px] font-medium">
-                  Nous recherchons un(e) stagiaire Développeur Full Stack passionné(e) pour rejoindre notre équipe dynamique à Constantine. Vous participerez activement au développement de nouvelles fonctionnalités pour notre plateforme SaaS et travaillerez en étroite collaboration avec nos ingنيeurs seniors.
+                  Nous recherchons un(e) stagiaire Développeur Full Stack passionné(e) pour rejoindre notre équipe dynamique à Constantine. Vous participerez activement au développement de nouvelles fonctionnalités pour notre plateforme SaaS et travaillerez en étroite collaboration avec nos ingénieurs seniors.
                 </p>
               </section>
 
@@ -151,8 +194,11 @@ const OfferDetailsPage = () => {
             {/* Apply Card */}
             <div className="bg-white rounded-[24px] border border-gray-100 p-8 shadow-sm">
               <h3 className="text-[16px] font-[800] mb-2">Intéressé(e) par ce stage ?</h3>
-              <p className="text-gray-400 text-[13px] font-medium mb-6">Ne manquez pas cette opportunité de booster votre carrière. Postuleز dès maintenant !</p>
-              <button className="w-full bg-[#4fa797] text-white py-3.5 rounded-[12px] font-[800] text-[15px] hover:bg-[#3d8b7d] transition-colors flex items-center justify-center mb-3 group">
+              <p className="text-gray-400 text-[13px] font-medium mb-6">Ne manquez pas cette opportunité de booster votre carrière. Postulez dès maintenant !</p>
+              <button 
+                onClick={() => setIsModalOpen(true)} // Open modal on click
+                className="w-full bg-[#4fa797] text-white py-3.5 rounded-[12px] font-[800] text-[15px] hover:bg-[#3d8b7d] transition-colors flex items-center justify-center mb-3 group"
+              >
                 Postuler maintenant
                 <svg className="ml-2 group-hover:translate-x-1 transition-transform" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </button>
@@ -173,7 +219,7 @@ const OfferDetailsPage = () => {
                 </div>
               </div>
               <p className="text-gray-500 text-[13px] font-medium leading-relaxed mb-6">
-                Digital Solutions est une startup technologique basée à Constantine, spécialisée dans le تطوير de solutions SaaS innovantes.
+                Digital Solutions est une startup technologique basée à Constantine, spécialisée dans le développement de solutions SaaS innovantes.
               </p>
               <Link to="#" className="text-[#4fa797] text-[13px] font-[800] hover:underline flex items-center">
                 Voir le profil de l'entreprise
@@ -190,7 +236,6 @@ const OfferDetailsPage = () => {
                   company="Danone Algérie" 
                   location="Akbou" 
                   color="bg-[#F3FBF9]"
-                  /* UPDATED: Data Analyst Icon with a dashed arc within the circle */
                   icon={
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <circle cx="12" cy="12" r="9" stroke="#4fa797" strokeWidth="2"/>
