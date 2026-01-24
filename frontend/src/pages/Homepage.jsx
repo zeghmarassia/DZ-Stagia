@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 // Removed: LanguageSwitcher (now inside Navbar)
 import CompanyCard from '../components/CompanyCard';
 import JobCard from '../components/JobCard';
@@ -7,6 +8,7 @@ import FeatureCard from '../components/FeatureCard';
 import { getAllCompanies } from '../services/companyService';
 import { getOffers } from '../services/offerService';
 import HomeNavbar from '../components/HomeNavbar'; // Import the new component
+
 
 import { 
   Search, MapPin, Briefcase, GraduationCap, Building2, Handshake,
@@ -18,6 +20,7 @@ import {
 const Homepage = () => {
   const { t } = useTranslation();
   // Removed: isSearchOpen state (moved to Navbar)
+  const navigate = useNavigate();
   
   const [offers, setOffers] = useState([]);
   const [companies, setCompanies] = useState([]);
@@ -66,7 +69,7 @@ const Homepage = () => {
             <button className="px-8 py-3.5 bg-[#5B8C9D] text-white font-bold rounded-lg shadow-md hover:bg-[#4a7280] transition" onClick={() => navigate('/offers')}>
               {t('hero.btn_browse')}
             </button>
-            <button className="px-8 py-3.5 bg-white border border-gray-300 text-slate-700 font-bold rounded-lg hover:bg-gray-50 transition shadow-sm" onClick={() => navigate('/post-offer')}>
+            <button className="px-8 py-3.5 bg-white border border-gray-300 text-slate-700 font-bold rounded-lg hover:bg-gray-50 transition shadow-sm" onClick={() => navigate('/company/post-offer')}>
               {t('hero.btn_post')}
             </button>
           </div>
