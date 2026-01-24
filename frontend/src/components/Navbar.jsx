@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Search, Bell } from 'lucide-react';
+import HomeNavbar from './HomeNavbar';
 
 const Navbar = () => {
   const { isAuthenticated, userType } = useSelector((state) => state.auth);
@@ -9,43 +10,44 @@ const Navbar = () => {
   // Public Navbar (Not Authenticated)
   if (!isAuthenticated) {
     return (
-      <nav className="w-full bg-white border-b border-gray-200 px-8 py-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          {/* Logo */}
-          <Link to="/" className="text-2xl font-black text-slate-900">
-            STAGIA
-          </Link>
+      // <nav className="w-full bg-white border-b border-gray-200 px-8 py-4">
+      //   <div className="max-w-7xl mx-auto flex justify-between items-center">
+        
+      //     <Link to="/" className="text-2xl font-black text-slate-900">
+      //       STAGIA
+      //     </Link>
 
-          {/* Navigation Links */}
-          <div className="flex items-center space-x-8">
-            <Link to="/offers" className="text-slate-600 hover:text-slate-900 font-semibold">
-              Offres
-            </Link>
-            <Link to="/companies" className="text-slate-600 hover:text-slate-900 font-semibold">
-              Entreprises
-            </Link>
-            <Link to="/about" className="text-slate-600 hover:text-slate-900 font-semibold">
-              À Propos
-            </Link>
-          </div>
+         
+      //     <div className="flex items-center space-x-8">
+      //       <Link to="/offers" className="text-slate-600 hover:text-slate-900 font-semibold">
+      //         Offres
+      //       </Link>
+      //       <Link to="/companies" className="text-slate-600 hover:text-slate-900 font-semibold">
+      //         Entreprises
+      //       </Link>
+      //       <Link to="/about" className="text-slate-600 hover:text-slate-900 font-semibold">
+      //         À Propos
+      //       </Link>
+      //     </div>
 
-          {/* Auth Buttons */}
-          <div className="flex items-center space-x-4">
-            <Link 
-              to="/student/signup" 
-              className="px-6 py-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition"
-            >
-              S'Inscrire
-            </Link>
-            <Link 
-              to="/login" 
-              className="px-6 py-2 text-slate-700 font-semibold hover:text-slate-900 transition"
-            >
-              Connexion
-            </Link>
-          </div>
-        </div>
-      </nav>
+       
+      //     <div className="flex items-center space-x-4">
+      //       <Link 
+      //         to="/student/signup" 
+      //         className="px-6 py-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition"
+      //       >
+      //         S'Inscrire
+      //       </Link>
+      //       <Link 
+      //         to="/login" 
+      //         className="px-6 py-2 text-slate-700 font-semibold hover:text-slate-900 transition"
+      //       >
+      //         Connexion
+      //       </Link>
+      //     </div>
+      //   </div>
+      // </nav>
+      <HomeNavbar/>
     );
   }
 

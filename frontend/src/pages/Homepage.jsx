@@ -49,7 +49,7 @@ const Homepage = () => {
     <div className="min-h-screen bg-slate-50 font-sans">
       
       {/* 1. Navbar Component Call */}
-      <HomeNavbar />
+      {/* <HomeNavbar /> */}
 
       {/* --- HERO SECTION --- */}
       <header className="bg-gray-50/50 pt-20 pb-24 text-center px-4">
