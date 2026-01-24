@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Clock, Briefcase, Filter, ChevronDown, ChevronRight, ArrowRight, ArrowLeft } from 'lucide-react';
-import axios from 'axios';
+// import axios from 'axios';
+import axiosInstance from '../config/axios';
 import { API_URL } from '../config/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -19,7 +20,7 @@ const Offers = () => {
     const fetchOffers = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${API_URL}/offers/my-offers`, {
+        const response = await axiosInstance.get(`${API_URL}/offers/my-offers`, {
           params: {
             page: currentPage,
             page_size: pageSize,
