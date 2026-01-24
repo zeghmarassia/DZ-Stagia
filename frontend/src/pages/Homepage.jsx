@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import CompanyCard from '../components/CompanyCard';
 import JobCard from '../components/JobCard';
 import FeatureCard from '../components/FeatureCard';
-import { getAllCompanies } from '../services/companyService';
-import { getOffers } from '../services/offerService';
+import { getPublicCompanies } from '../services/mainService';
+import { getPublicOffers } from '../services/mainService';
 import HomeNavbar from '../components/HomeNavbar'; // Import the new component
 
 
@@ -26,17 +26,17 @@ const Homepage = () => {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch recent offers and companies on mount
+  // Fetch recent offers and companies on mount - Limited to 4 items for homepage
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch recent offers
-        const offersResponse = await getOffers({ page_size: 4 });
+        // Fetch recent offers (4 items only for homepage)
+        const offersResponse = await getPublicOffers({ page: 1, page_size: 4 });
         setOffers(offersResponse.data.offers || []);
 
-        // Fetch companies
-        const companiesResponse = await getAllCompanies({ page_size: 4 });
+        // Fetch companies (4 items only for homepage)
+        const companiesResponse = await getPublicCompanies({ page: 1, page_size: 4 });
         setCompanies(companiesResponse.data.companies || []);
       } catch (error) {
         console.error("Error fetching homepage data:", error);

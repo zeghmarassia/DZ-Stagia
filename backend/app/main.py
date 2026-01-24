@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from app.database import engine, Base
-from app.routes import authRoutes, adminRoutes, studentRoutes, companyRoutes
+from app.routes import authRoutes, adminRoutes, studentRoutes, companyRoutes, mainRoutes
 from app.routes import offerRoutes, applicationRoutes, notificationRoutes
 
 # Create database tables
@@ -28,6 +28,7 @@ app.include_router(authRoutes.router, prefix="/auth")
 app.include_router(adminRoutes.router, prefix="/admin")
 app.include_router(studentRoutes.router)  # Router already has /student prefix
 app.include_router(companyRoutes.router)
+app.include_router(mainRoutes.router)  # Main page public endpoints
 app.include_router(offerRoutes.router, prefix="/api/v1")  
 app.include_router(applicationRoutes.router, prefix="/api/v1")
 app.include_router(notificationRoutes.router, prefix="/api/v1")

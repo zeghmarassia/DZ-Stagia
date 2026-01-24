@@ -3,11 +3,13 @@ from app.services.adminService import AdminService
 from app.services.emailService import EmailService
 from app.services.studentService import StudentService
 from app.services.helperService import HelpersService
+from app.services.mainService import MainService
 
 __all__ = [
     "AuthService",
     "AdminService", 
     "EmailService",
     "StudentService",
-    "HelpersService"
+    "HelpersService",
+    "MainService"
 ]

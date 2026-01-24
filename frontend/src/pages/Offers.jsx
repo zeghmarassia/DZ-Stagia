@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Clock, Briefcase, Filter, ChevronDown, ChevronRight, ArrowRight, ArrowLeft } from 'lucide-react';
-import { getOffers } from '../services/offerService';
+import { getPublicOffers } from '../services/mainService';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -18,10 +18,10 @@ const Offers = () => {
     const fetchOffers = async () => {
       setLoading(true);
       try {
-        const response = await getOffers({
+        const response = await getPublicOffers({
           page: currentPage,
           page_size: pageSize,
-          sort: sortOption === 'Les plus récents' ? 'recent' : 'oldest',
+          keyword: null,
         });
         console.log('Offers response:', response.data);
         setOffers(response.data.offers || []);

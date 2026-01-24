@@ -1,0 +1,18 @@
+import axiosInstance from '../config/axios';
+
+/**
+ * Main Page Services - Public endpoints for fetching offers and companies
+ * These endpoints don't require authentication
+ */
+
+export const getPublicOffers = (params) => {
+  return axiosInstance.get('/main/public-offers', { params });
+};
+
+export const getPublicCompanies = (params) => {
+  return axiosInstance.get('/main/public-companies', { params });
+};
+
+export const getMainStats = () => {
+  return axiosInstance.get('/main/stats');
+};
