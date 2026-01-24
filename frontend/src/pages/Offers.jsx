@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Clock, Briefcase, Filter, ChevronDown, ChevronRight, ArrowRight, ArrowLeft } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import { getOffers } from '../services/offerService';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -19,13 +18,10 @@ const Offers = () => {
     const fetchOffers = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${API_URL}/offers/my-offers`, {
-          params: {
-            page: currentPage,
-            page_size: pageSize,
-            include_inactive: true,
-            include_expired: true
-          }
+        const response = await getOffers({
+          page: currentPage,
+          page_size: pageSize,
+          sort: sortOption === 'Les plus récents' ? 'recent' : 'oldest',
         });
         console.log('Offers response:', response.data);
         setOffers(response.data.offers || []);
@@ -51,7 +47,6 @@ const Offers = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
-      <Navbar />
 
       {/* --- HERO SECTION --- */}
       <div className="bg-gradient-to-r from-[#4AA59C] to-[#2D7A75] px-4 py-12 md:py-16 flex flex-col items-center justify-center text-center">

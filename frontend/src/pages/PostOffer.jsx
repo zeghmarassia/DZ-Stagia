@@ -7,9 +7,8 @@ import {
   Briefcase, 
   Clock 
 } from 'lucide-react';
-import axios from 'axios';
+import { postOffer } from '../services/offerService';
 import { useNavigate } from 'react-router-dom';
-import { API_URL } from '../config/api';
 import CompanyNavbar from '../components/CompanyNavbar';
 
 // Standard list of Wilayas (You can expand this to all 58)
@@ -60,13 +59,6 @@ const PostOffer = () => {
       setLoading(true);
       setError('');
       
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError("Erreur : Vous n'êtes pas connecté (Token manquant).");
-        setLoading(false);
-        return;
-      }
-
       // 1. Clean Data & Convert Types
       // Ensure we send Integers for numeric fields, not strings
       const durationInt = formData.duration ? parseInt(formData.duration) : null;
@@ -98,12 +90,7 @@ const PostOffer = () => {
       console.log("Sending Payload:", payload);
 
       // 3. Send Request
-      const response = await axios.post(`${API_URL}/api/v1/offers/`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+            const response = await postOffer(payload);
 
       if (response.status >= 200 && response.status < 300) {
         setSuccessMessage('Offre publiée avec succès!');

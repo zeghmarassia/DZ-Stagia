@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Lock, Eye, EyeOff } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import { resetPassword } from '../services/authService';
 
 const ResetPassword = () => {
   const { t } = useTranslation();
@@ -46,11 +45,7 @@ const ResetPassword = () => {
         return;
       }
 
-      const response = await axios.post(`${API_URL}/auth/reset-password`, {
-        email: email,
-        otp_code: otp,
-        new_password: formData.password
-      });
+      const response = await resetPassword({ otp_code: otp, new_password: formData.password, email: email });
 
       setSuccess(t('auth.reset_success') || "Mot de passe réinitialisé avec succès!");
       setTimeout(() => {

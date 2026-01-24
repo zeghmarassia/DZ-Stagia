@@ -1,8 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Mail } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import { verifyEmail } from '../services/authService';
 
 const VerifyEmail = () => {
     const location = useLocation();
@@ -85,11 +84,7 @@ const VerifyEmail = () => {
       formData.append('email', email);
       formData.append('otp_code', otpCode);
 
-      const response = await axios.post(`${API_URL}/auth/verify-email`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await verifyEmail(formData);
 
       // If successful, navigate to AccountPending
       navigate('/account-pending', { state: { email: email, userType: userType } });

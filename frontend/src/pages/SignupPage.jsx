@@ -2,8 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'; // 1. Import Hook
 import { Mail, Lock, Upload, User, Building, Briefcase, GraduationCap, X } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import { studentRegister, companyRegister } from '../services/authService';
 import LanguageSwitcher from '../components/LanguageSwitcher'; // 2. Import Switcher
 
 const SignupPage = ({ type }) => {
@@ -165,11 +164,7 @@ const StudentForm = () => {
       formDataBody.append('establishment_id', formData.university);
       formDataBody.append('document', formData.file);
 
-      const response = await axios.post(`${API_URL}/auth/student/register`, formDataBody, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await studentRegister(formDataBody);
 
       // Navigate to Email verification page
       navigate('/verify-email', { state: { email: formData.email, userType: 'student' } });
@@ -328,11 +323,7 @@ const CompanyForm = () => {
       formDataBody.append('address', formData.address);
       formDataBody.append('document', formData.file);
 
-      const response = await axios.post(`${API_URL}/auth/company/register`, formDataBody, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await companyRegister(formDataBody);
 
       // Navigate to Email verification page
       navigate('/verify-email', { state: { email: formData.email, userType: 'company' } });

@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next'; 
+import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Mail, Lock } from 'lucide-react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
+import { login } from '../services/authService';
+import { setCredentials } from '../store'; // Import Redux action
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,31 +30,29 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const formDataBody = new FormData();
-      formDataBody.append('email', formData.email);
-      formDataBody.append('password', formData.password);
-
-      const response = await axios.post(`${API_URL}/auth/login`, formDataBody, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true,
-      });
+      const response = await login({ email: formData.email, password: formData.password });
 
       console.log('Login response:', response.data);
 
-      // Check user_type and navigate accordingly
-      if (response.data.user_type === 'student') {
-        navigate('/student/dashboard');
-      } else if (response.data.user_type === 'company') {
-        navigate('/company/dashboard');
-      } else if (response.data.user_type === 'admin') {
-        navigate('/admin/dashboard');
-      }
-
-      // Store auth data including token
-      localStorage.setItem('user', JSON.stringify(response.data));
+      // Store token and user type in localStorage
       localStorage.setItem('token', response.data.access_token);
+      localStorage.setItem('userType', response.data.user_type);
+
+      // Update Redux state
+      dispatch(setCredentials({
+        user: response.data.user,
+        token: response.data.access_token,
+        userType: response.data.user_type
+      }));
+
+      // Navigate based on user type
+      if (response.data.user_type === 'student') {
+        navigate('/student/dashboard', { replace: true });
+      } else if (response.data.user_type === 'company') {
+        navigate('/company/dashboard', { replace: true });
+      } else if (response.data.user_type === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      }
     } catch (err) {
       console.error('Login error:', err);
       console.error('Error response:', err.response?.data);
@@ -142,17 +142,21 @@ const Login = () => {
             </div>
             <div className="text-right mt-2">
               <Link 
-     to="/forgot-password" 
-     className="text-xs font-semibold text-slate-500 hover:text-[#5B8C9D] underline decoration-slate-300"
-  >
-    {t('auth.forgot_password', 'Mot de passe oublié?')}
-  </Link>
+                to="/forgot-password" 
+                className="text-xs font-semibold text-slate-500 hover:text-[#5B8C9D] underline decoration-slate-300"
+              >
+                {t('auth.forgot_password', 'Mot de passe oublié?')}
+              </Link>
             </div>
           </div>
 
           {/* Submit Button */}
-          <button type="submit" className="w-full bg-[#5B8C9D] hover:bg-[#4a7280] text-white font-bold py-3.5 rounded-lg transition shadow-sm uppercase tracking-wide">
-            {t('auth.continue_btn', 'CONTINUER')}
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-[#5B8C9D] hover:bg-[#4a7280] text-white font-bold py-3.5 rounded-lg transition shadow-sm uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'CONNEXION...' : t('auth.continue_btn', 'CONTINUER')}
           </button>
         </form>
 

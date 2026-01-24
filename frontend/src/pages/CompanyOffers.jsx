@@ -10,7 +10,7 @@ import {
   ChevronDown 
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import axiosInstance from '../config/axios';
 import { API_URL } from '../config/api';
 import CompanyNavbar from '../components/CompanyNavbar';
 
@@ -50,13 +50,7 @@ const CompanyOffers = () => {
     const fetchOffers = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        
-        const response = await axios.get(`${API_URL}/api/v1/offers/my-offers`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await axiosInstance.get(`/offers/my-offers`);
         
         // Map backend response to component state
         const offers = (response.data.offers || response.data || []).map(offer => ({
@@ -98,7 +92,7 @@ const CompanyOffers = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
-      <CompanyNavbar />
+     
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         

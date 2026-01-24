@@ -1,7 +1,60 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // Added for navigation
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { getStudentProfile, getStudentDashboardStats, getStudentApplications } from '../services/studentService';
+import { useDispatch } from 'react-redux';
+import { logout } from '../store';
 
-const DashboardPage = () => {
+const StudentDashboard = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState({ name: 'Chargement...', profilePic: '/profile.png' });
+  const [stats, setStats] = useState({ active: 0, interviews: 0, saved: 0 });
+  const [recentApplications, setRecentApplications] = useState([]);
+  // const [savedOffers, setSavedOffers] = useState([]);
+
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    // Clear authentication token
+    localStorage.clear();
+    // Dispatch logout action
+    dispatch(logout());
+    // Redirect to login page
+    navigate('/login');
+  };
+
+  useEffect(() => {
+    // Fetch user profile
+    getStudentProfile()
+      .then(response => {
+        setUser({ 
+          name: response.data.fullName || 'Étudiant',
+          profilePic: response.data.profilePictureUrl || '/profile.png'
+        });
+      })
+      .catch(error => console.error('Error fetching user profile:', error));
+
+    // Fetch dashboard stats
+    getStudentDashboardStats()
+      .then(response => {
+        setStats(response.data);
+      })
+      .catch(error => console.error('Error fetching dashboard stats:', error));
+
+    // Fetch recent applications
+    getStudentApplications({ limit: 4, sort: 'recent' })
+      .then(response => {
+        setRecentApplications(response.data.applications || []);
+      })
+      .catch(error => console.error('Error fetching recent applications:', error));
+
+    // Fetch saved offers
+    // axiosInstance.get('/student/offers/saved?limit=2') // Assuming this endpoint exists
+    //   .then(response => {
+    //     setSavedOffers(response.data.offers || []);
+    //   })
+    //   .catch(error => console.error('Error fetching saved offers:', error));
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col font-['Plus_Jakarta_Sans',sans-serif] text-[#111827]">
       <style>
@@ -9,14 +62,13 @@ const DashboardPage = () => {
       </style>
 
       {/* Header */}
-      <header className="w-full bg-white border-b-2 border-gray-200 px-8 py-3 flex justify-between items-center sticky top-0 z-50">
+      {/* <header className="w-full bg-white border-b-2 border-gray-200 px-8 py-3 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center space-x-12">
           <div className="text-[20px] font-[800] tracking-tighter text-[#111827]">LOGO</div>
           <nav className="hidden md:flex space-x-8">
-            {/* Navigation links updated to use Link component */}
-            <Link to="/dashboard" className="text-[#4fa797] font-bold text-[14px] border-b-2 border-[#4fa797] pb-1">Tableau de Bord</Link>
-            <Link to="/offres" className="text-gray-500 font-bold text-[14px] hover:text-[#111827]">Offres</Link>
-            <Link to="/applications" className="text-gray-500 font-bold text-[14px] hover:text-[#111827]">Mes Candidatures</Link>
+            <Link to="/student/dashboard" className="text-[#4fa797] font-bold text-[14px] border-b-2 border-[#4fa797] pb-1">Tableau de Bord</Link>
+            <Link to="/offers" className="text-gray-500 font-bold text-[14px] hover:text-[#111827]">Offres</Link>
+            <Link to="/student/applications" className="text-gray-500 font-bold text-[14px] hover:text-[#111827]">Mes Candidatures</Link>
           </nav>
         </div>
 
@@ -32,31 +84,32 @@ const DashboardPage = () => {
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className="text-right">
-              <p className="text-[13px] font-bold text-[#111827] leading-none">Aicha Belaid</p>
+            <Link to="/student/profile" className="text-right cursor-pointer hover:opacity-80 transition-opacity">
+              <p className="text-[13px] font-bold text-[#111827] leading-none">{user.name}</p>
               <p className="text-[11px] text-gray-500 font-bold mt-1">Étudiant</p>
-            </div>
-            <div className="w-10 h-10 rounded-full border-2 border-gray-200 bg-[#E5E7EB] overflow-hidden">
-              <img src="/profile.png" alt="Profile" className="w-full h-full object-cover" />
-            </div>
-            <button className="text-gray-400 hover:text-gray-600">
+            </Link>
+            <Link to="/student/profile" className="w-10 h-10 rounded-full border-2 border-gray-200 bg-[#E5E7EB] overflow-hidden hover:border-[#4fa797] transition-colors">
+              <img src={user.profilePic} alt="Profile" className="w-full h-full object-cover" />
+            </Link>
+            <button onClick={handleLogout} className="text-gray-400 hover:text-gray-600 transition-colors" title="Se déconnecter">
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
             </button>
           </div>
         </div>
-      </header>
+      </header> */}
+      {/* <Navbar /> */}
 
       <main className="flex-grow w-full max-w-[1280px] mx-auto px-8 py-10">
         <section className="mb-8">
-          <h1 className="text-[30px] font-[800] text-[#111827] tracking-tight">Bonjour, Aicha !</h1>
+          <h1 className="text-[30px] font-[800] text-[#111827] tracking-tight">Bonjour, {user.name.split(' ')[0]} !</h1>
           <p className="text-gray-500 text-[15px] mt-1 font-bold">Trouvez des offres qui vous correspondent et gérez vos candidatures.</p>
         </section>
 
         {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <StatCard title="Candidatures actives" count="8" color="text-[#417482] bg-[#E8F1F3]" icon={<path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4z"/>} />
-          <StatCard title="Entretien prévu" count="3" color="text-[#6db096] bg-[#ECFDF5]" icon={<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>} btnText="EN SAVOIR PLUS" />
-          <StatCard title="Offres enregistrées" count="12" color="text-[#8FA7C7] bg-[#F0F4F8]" icon={<path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>} btnText="VOIR ENREGISTREMENTS" />
+          <StatCard title="Candidatures actives" count={stats.active} color="text-[#417482] bg-[#E8F1F3]" icon={<path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4z"/>} />
+          <StatCard title="Entretien prévu" count={stats.interviews} color="text-[#6db096] bg-[#ECFDF5]" icon={<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>} btnText="EN SAVOIR PLUS" />
+          <StatCard title="Offres enregistrées" count={stats.saved} color="text-[#8FA7C7] bg-[#F0F4F8]" icon={<path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>} btnText="VOIR ENREGISTREMENTS" />
         </div>
 
         {/* Recent Applications Table */}
@@ -78,10 +131,25 @@ const DashboardPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y-2 divide-gray-50">
-              <TableRow logo="/SONATRAC.png" company="SONATRACH" position="Ingénieur DevOps Junior" date="Publiée le 25 décembre 2025" type="Premier Emploi" typeColor="text-orange-600 bg-orange-50 border border-orange-100" status="Entretien prévu" statusColor="text-green-600 bg-green-50 border border-green-100" />
-              <TableRow logo="/Cévital.png" company="Cévital" position="Assistant Ressources Humaines" date="Publiée le 5 نوفمبر 2025" type="Projet de Fin d'Études" typeColor="text-blue-600 bg-blue-50 border border-blue-100" status="Reçue" statusColor="text-gray-500 bg-gray-50 border border-gray-200" />
-              <TableRow logo="/Djezzy.png" company="Djezzy" position="Développeur Full Stack React/Node" date="Publiée le 10 أكتوبر 2025" type="Stage" typeColor="text-[#4fa797] bg-emerald-50 border border-emerald-100" status="En cours d'étude" statusColor="text-blue-600 bg-blue-50 border border-blue-100" />
-              <TableRow logo="/Yassir.png" company="Yassir" position="Designer UI/UX" date="Publiée le 4 أفريل 2025" type="Stage" typeColor="text-[#4fa797] bg-emerald-50 border border-emerald-100" status="Acceptée" statusColor="text-green-600 bg-green-50 border border-green-100" />
+              {recentApplications.length > 0 ? (
+                recentApplications.map(app => (
+                  <TableRow 
+                    key={app.id}
+                    logo={app.offer?.company?.logoUrl || '/placeholder-logo.png'}
+                    company={app.offer?.company?.name}
+                    position={app.offer?.title}
+                    date={`Postulée le ${new Date(app.applicationDate).toLocaleDateString()}`}
+                    type={app.offer?.type} 
+                    typeColor="text-blue-600 bg-blue-50 border border-blue-100" // Example, you might need logic for this
+                    status={app.status}
+                    statusColor="text-gray-500 bg-gray-50 border border-gray-200" // Example, you might need logic for this
+                  />
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center py-10 text-gray-500 font-bold">Aucune candidature récente.</td>
+                </tr>
+              )}
             </tbody>
           </table>
           <div className="p-4 text-center">
@@ -93,30 +161,27 @@ const DashboardPage = () => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-[20px] font-[800] text-[#111827]">Offres enregistrées</h2>
           {/* Updated link to use Link component for Offers */}
-          <Link to="/offres" className="text-[#4fa797] text-[13px] font-[800] uppercase tracking-widest border-b-2 border-transparent hover:border-[#4fa797]">TOUT LES ENREGISTREMENTS &gt;</Link>
+          <Link to="/" className="text-[#4fa797] text-[13px] font-[800] uppercase tracking-widest border-b-2 border-transparent hover:border-[#4fa797]">TOUT LES ENREGISTREMENTS &gt;</Link>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <JobCard 
-            company="Cévital" 
-            logo="/logo.png" 
-            title="Analyste Financier Junior" 
-            type="Premier Emploi" 
-            typeColor="text-[#D97706] bg-[#FEF3C7] border border-[#FDE68A]" 
-            loc="Alger" 
-            contract="CDI" 
-            mode="Présentiel" 
-          />
-          <JobCard 
-            company="Mobilis" 
-            logo="/mobilis.png" 
-            title="Développeur Mobile (Flutter)" 
-            type="Stage" 
-            typeColor="text-[#065F46] bg-[#ECFDF5] border border-[#A7F3D0]" 
-            loc="Algérie" 
-            contract="3 mois" 
-            mode="Télétravail" 
-          />
+          {/* {savedOffers.length > 0 ? (
+            savedOffers.map(offer => (
+              <JobCard 
+                key={offer.id}
+                company={offer.company.name}
+                logo={offer.company.logoUrl || '/placeholder-logo.png'}
+                title={offer.title}
+                type={offer.type}
+                typeColor="text-[#D97706] bg-[#FEF3C7] border border-[#FDE68A]" // Example, you might need logic for this
+                loc={offer.location}
+                contract={offer.contractType}
+                mode={offer.workMode}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500 font-bold md:col-span-2">Aucune offre enregistrée.</p>
+          )} */}
         </div>
       </main>
     </div>
@@ -215,4 +280,4 @@ const JobCard = ({ company, logo, title, type, typeColor, loc, contract, mode })
   </div>
 );
 
-export default DashboardPage;
+export default StudentDashboard;
