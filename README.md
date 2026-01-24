@@ -2,20 +2,6 @@
 
 Welcome to **DZ-Stagia**, a comprehensive internship management platform that connects students with internship opportunities across Algeria. This platform addresses the critical gap between student job seekers and employers in Algeria's competitive academic and professional landscape. The platform streamlines recruitment by providing a centralized hub where students can showcase their skills and companies can efficiently identify promising young talent.
 
-## 🎯 Project Overview
-
-DZ-Stagia is a full-stack web application designed to streamline the internship process in Algeria. Students can:
-- Browse and search internship offers
-- Apply for positions
-- Track application status
-- Receive notifications
-
-Companies can:
-- Post internship offers
-- Manage applications
-- Track candidate progress
-- Communicate with candidates
-
 ## 🌟 Getting Started
 
 ### Prerequisites
@@ -47,18 +33,57 @@ Make sure you have the following installed on your system:
 3. Choose where to save it on your computer
 4. Click "Clone"
 
-### Installation
+## 📁 Project Structure Explained
 
-#### Option 1: Using Docker Compose (Recommended)
+### Backend (`/backend`)
+
+The backend is built with **FastAPI** following a modular architecture:
+
+- **`app/`** - Main application code
+  - **`models/`** - SQLAlchemy database models (Student, Company, Offer, Application, etc.)
+  - **`routes/`** - API route handlers (authRoutes, studentRoutes, companyRoutes, etc.)
+  - **`schemas/`** - Pydantic validation schemas
+  - **`services/`** - Business logic layer (authServices, emailService, notificationService, etc.)
+  - **`utils/`** - Utility functions (security, storage)
+  - `main.py`, `config.py`, `database.py` - Core setup files
+- **`alembic/`** - Database migrations and schema management
+- **`scripts/`** - Utility SQL scripts for initial data setup
+
+### Frontend (`/frontend`)
+
+The frontend is built with **React**, **Vite**, and **Tailwind CSS**:
+
+- **`src/components/`** - Reusable React components (Cards, Navbar, Footer, etc.)
+- **`src/pages/`** - Page-level components
+- **`src/services/`** - API service calls
+- **`src/config/`** - Configuration files
+- **`src/assets/`** - Images and static files
+- `i18n.js` - Internationalization setup
+- `store.js` - Redux state management
+- Configuration files: `vite.config.js`, `tailwind.config.js`, `postcss.config.js`, `eslint.config.js`
+
+## 🚀 How to Run the Project
+
+### Using Docker Compose (Recommended)
 
 ```bash
-# Build and start both frontend and backend services
+# Build and start all services
 docker-compose up --build
+
+# In another terminal, to stop the services:
+docker-compose down
+
+# To view logs from specific service:
+docker-compose logs backend
+docker-compose logs frontend
+
+# To rebuild only one service:
+docker-compose up --build backend
 ```
 
-#### Option 2: Running Locally
+### Running Locally
 
-**Backend Setup:**
+**Backend:**
 
 ```bash
 cd backend
@@ -77,10 +102,9 @@ alembic upgrade head
 
 # Start the backend server
 uvicorn app.main:app --reload
-# Backend will run on http://localhost:8000
 ```
 
-**Frontend Setup:**
+**Frontend:**
 
 ```bash
 cd frontend
@@ -90,8 +114,15 @@ npm install
 
 # Start the development server
 npm run dev
-# Frontend will run on http://localhost:3000
 ```
+
+### Access the Application
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Docs (Swagger)**: http://localhost:8000/docs
+- **API Docs (ReDoc)**: http://localhost:8000/redoc
+
 ## ⚙️ Environment Setup (.env Configuration)
 
 Before running the backend, you need to create a `.env` file in the `backend` folder. Here's the template:
@@ -151,78 +182,25 @@ CLOUDINARY_API_SECRET=your_api_secret
    - Generate a random secret key (at least 32 characters)
    - You can use: `python -c "import secrets; print(secrets.token_urlsafe(32))"`
   
-## 📁 Project Structure Explained
+## 🗄️ Database & Migrations
 
-### Backend (`/backend`)
-
-The backend is built with **FastAPI** following a modular architecture:
-
-- **`app/`** - Main application code
-  - **`models/`** - SQLAlchemy database models (Student, Company, Offer, Application, etc.)
-  - **`routes/`** - API route handlers (authRoutes, studentRoutes, companyRoutes, etc.)
-  - **`schemas/`** - Pydantic validation schemas
-  - **`services/`** - Business logic layer (authServices, emailService, notificationService, etc.)
-  - **`utils/`** - Utility functions (security, storage)
-  - `main.py`, `config.py`, `database.py` - Core setup files
-- **`alembic/`** - Database migrations and schema management
-- **`scripts/`** - Utility SQL scripts for initial data setup
-
-### Frontend (`/frontend`)
-
-The frontend is built with **React**, **Vite**, and **Tailwind CSS**:
-
-- **`src/components/`** - Reusable React components (Cards, Navbar, Footer, etc.)
-- **`src/pages/`** - Page-level components
-- **`src/services/`** - API service calls
-- **`src/config/`** - Configuration files
-- **`src/assets/`** - Images and static files
-- `i18n.js` - Internationalization setup
-- `store.js` - Redux state management
-- Configuration files: `vite.config.js`, `tailwind.config.js`, `postcss.config.js`, `eslint.config.js`
-
-
-## 🚀 How to Run the Project
-
-### Using Docker Compose (Recommended)
-
-```bash
-# Build and start all services
-docker-compose up --build
-
-# In another terminal, to stop the services:
-docker-compose down
-
-# To view logs from specific service:
-docker-compose logs backend
-docker-compose logs frontend
-
-# To rebuild only one service:
-docker-compose up --build backend
-```
-
-### Running Locally
-
-**Backend:**
+### Running Migrations
 
 ```bash
 cd backend
-source venv/bin/activate
-uvicorn app.main:app --reload
+
+# Create a new migration after modifying models
+alembic revision --autogenerate -m "Description of changes"
+
+# Apply pending migrations
+alembic upgrade head
+
+# Rollback to previous migration
+alembic downgrade -1
+
+# View migration history
+alembic history
 ```
-
-**Frontend:**
-
-```bash
-cd frontend
-npm run dev
-```
-
-### Access the Application
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Docs (Swagger)**: http://localhost:8000/docs
-- **API Docs (ReDoc)**: http://localhost:8000/redoc
 
 ## 🛠️ Technologies Used
 
@@ -250,27 +228,6 @@ npm run dev
 ### DevOps
 - **Docker** - Containerization
 - **Docker Compose** - Multi-container orchestration
-
-
-## 🗄️ Database & Migrations
-
-### Running Migrations
-
-```bash
-cd backend
-
-# Create a new migration after modifying models
-alembic revision --autogenerate -m "Description of changes"
-
-# Apply pending migrations
-alembic upgrade head
-
-# Rollback to previous migration
-alembic downgrade -1
-
-# View migration history
-alembic history
-```
 
 ## 🤝 Team Collaboration
 
