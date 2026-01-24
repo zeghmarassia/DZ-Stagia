@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import {useNavigate} from 'react-router-dom';
 import { Search, MapPin, Clock, Briefcase, Filter, ChevronDown, ChevronRight, ArrowRight, ArrowLeft } from 'lucide-react';
 import { getPublicOffers } from '../services/mainService';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const Offers = () => {
+  const navigate = useNavigate();
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortOption, setSortOption] = useState("Les plus récents");
   const [offers, setOffers] = useState([]);
@@ -12,6 +14,11 @@ const Offers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 8;
+
+  // Handler to navigate to offer details
+  const handleViewOffer = (offerId) => {
+    navigate(`/offers/${offerId}`);
+  };
 
   // Fetch offers from backend
   useEffect(() => {
@@ -162,7 +169,11 @@ const Offers = () => {
               <p className="col-span-2 text-center text-slate-500">Aucune offre disponible</p>
             ) : (
               offers.map((offer) => (
-                <JobCard key={offer.id} offer={offer} />
+                <JobCard 
+                  key={offer.offer_id} 
+                  offer={offer}
+                  onViewClick={handleViewOffer}
+                />
               ))
             )}
           </div>
@@ -210,7 +221,7 @@ const Offers = () => {
 };
 
 // Reusable Job Card Component matching the design
-const JobCard = ({ offer }) => {
+const JobCard = ({ offer, onViewClick }) => {
   // Format date
   const formatDate = (dateString) => {
     if (!dateString) return 'Date inconnue';
@@ -272,7 +283,10 @@ const JobCard = ({ offer }) => {
           </div>
         </div>
 
-        <button className="bg-[#56Bca0] hover:bg-[#4aa58b] text-white text-xs font-bold px-4 py-2 rounded-lg uppercase tracking-wide transition shadow-sm">
+        <button 
+          className="bg-[#56Bca0] hover:bg-[#4aa58b] text-white text-xs font-bold px-4 py-2 rounded-lg uppercase tracking-wide transition shadow-sm" 
+          onClick={() => onViewClick && onViewClick(offer.offer_id)}
+        >
           Voir Plus
         </button>
       </div>

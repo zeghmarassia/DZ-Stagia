@@ -41,6 +41,7 @@ function App() {
         {/* Public Routes with Navbar */}
         <Route path="/" element={<Layout><Homepage /></Layout>} />
         <Route path="/offers" element={<Layout><Offers /></Layout>} />
+        <Route path="/offers/:id" element={<Layout><OfferDetailsPage /></Layout>} />
         <Route path="/companies" element={<Layout><div>Companies Page</div></Layout>} />
         <Route path="/about" element={<Layout><div>About Page</div></Layout>} />
         
@@ -68,11 +69,6 @@ function App() {
         <Route path="/student/profile" element={
           <ProtectedRoute allowedRoles={['student']}>
             <Layout><StudentProfile /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/student/offers/:id" element={
-          <ProtectedRoute allowedRoles={['student']}>
-            <Layout><OfferDetailsPage /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/student/my-applications" element={

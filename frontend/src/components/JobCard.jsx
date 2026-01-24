@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 
-const JobCard = ({ title, company, location, duration, type, badgeColor, logo, logoBg }) => (
+const JobCard = ({ title, company, location, duration, type, badgeColor, logo, logoBg, onViewClick, offerId }) => (
   <div className="bg-white border border-gray-100 p-6 rounded-xl flex flex-col md:flex-row gap-6 hover:shadow-lg transition group relative">
     
     {/* Badge - Positioned Top Right */}
@@ -55,7 +55,10 @@ const JobCard = ({ title, company, location, duration, type, badgeColor, logo, l
 
     {/* Button - Aligned to bottom right */}
     <div className="flex flex-col justify-end mt-4 md:mt-0 items-stretch md:items-end">
-       <button className="px-8 py-2.5 bg-[#5B8C9D] text-white text-xs font-bold rounded hover:bg-[#4A7280] transition uppercase tracking-wide">
+       <button 
+         onClick={() => onViewClick && onViewClick(offerId)}
+         className="px-8 py-2.5 bg-[#5B8C9D] text-white text-xs font-bold rounded hover:bg-[#4A7280] transition uppercase tracking-wide"
+       >
          Voir Offre
        </button>
     </div>

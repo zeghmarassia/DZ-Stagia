@@ -16,3 +16,7 @@ export const getPublicCompanies = (params) => {
 export const getMainStats = () => {
   return axiosInstance.get('/main/stats');
 };
+
+export const getPublicOfferDetails = (offerId) => {
+  return axiosInstance.get(`/main/public-offers/${offerId}`);
+};

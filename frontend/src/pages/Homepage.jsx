@@ -26,6 +26,11 @@ const Homepage = () => {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Handler to navigate to offer details
+  const handleViewOffer = (offerId) => {
+    navigate(`/offers/${offerId}`);
+  };
+
   // Fetch recent offers and companies on mount - Limited to 4 items for homepage
   useEffect(() => {
     const fetchData = async () => {
@@ -112,7 +117,8 @@ const Homepage = () => {
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-end mb-10">
           <h2 className="text-2xl font-bold text-slate-900">Postulez pour les meilleures entreprises</h2>
-          <a href="#" className="text-blue-600 text-sm font-medium hover:underline flex items-center">
+
+          <a href="#" className="text-blue-600 text-sm font-medium hover:underline flex items-center" onClick={() => navigate('/companies')}>
             Voir tout <ArrowRight className="w-4 h-4 ml-1" />
           </a>
         </div>
@@ -149,7 +155,8 @@ const Homepage = () => {
             ) : offers.length > 0 ? (
               offers.map((offer) => (
                 <JobCard 
-                  key={offer.id}
+                  key={offer.offer_id}
+                  offerId={offer.offer_id}
                   title={offer.title}
                   company={offer.company?.company_name || 'Entreprise'}
                   location={offer.location}
@@ -158,6 +165,7 @@ const Homepage = () => {
                   badgeColor="bg-emerald-100 text-emerald-600"
                   logo={<Briefcase size={28} className="text-blue-600" />}
                   logoBg="bg-blue-100"
+                  onViewClick={handleViewOffer}
                 />
               ))
             ) : (
@@ -166,7 +174,7 @@ const Homepage = () => {
           </div>
 
           <div className="mt-10 text-center">
-            <button className="px-6 py-3 bg-slate-800 text-white font-medium rounded-lg hover:bg-slate-900 transition shadow-lg shadow-slate-300/50">
+            <button className="px-6 py-3 bg-slate-800 text-white font-medium rounded-lg hover:bg-slate-900 transition shadow-lg shadow-slate-300/50" onClick={() => navigate('/offers')}>
               Voir toutes les offres
             </button>
           </div>

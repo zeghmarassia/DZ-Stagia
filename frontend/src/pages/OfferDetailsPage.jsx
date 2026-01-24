@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'; // Added useState
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { getOfferById } from '../services/offerService';
+import { getPublicOfferDetails } from '../services/mainService';
+import axiosInstance from '../config/axios';
 
 const OfferDetailsPage = () => {
   const { id } = useParams();
@@ -14,7 +15,7 @@ const OfferDetailsPage = () => {
     const fetchOffer = async () => {
       try {
         setIsLoading(true);
-        const response = await getOfferById(id);
+        const response = await getPublicOfferDetails(id);
         setOffer(response.data);
         setError('');
       } catch (err) {
@@ -25,11 +26,21 @@ const OfferDetailsPage = () => {
       }
     };
 
-    fetchOffer();
+    if (id) {
+      fetchOffer();
+    }
   }, [id]);
 
   const handleApply = async () => {
     try {
+      // Check if user is authenticated (has token)
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Veuillez vous connecter pour postuler à cette offre.');
+        navigate('/login');
+        return;
+      }
+
       // Assuming the endpoint to apply is /offers/:id/apply
       const response = await axiosInstance.post(`/offers/${id}/apply`);
       alert('Candidature envoyée avec succès !');
@@ -37,7 +48,12 @@ const OfferDetailsPage = () => {
       // Optionally, redirect the user to their applications page
       navigate('/student/my-applications');
     } catch (err) {
-      alert(err.response?.data?.message || 'Une erreur est survenue lors de la candidature.');
+      if (err.response?.status === 401) {
+        alert('Votre session a expiré. Veuillez vous reconnecter.');
+        navigate('/login');
+      } else {
+        alert(err.response?.data?.message || 'Une erreur est survenue lors de la candidature.');
+      }
       console.error('Error applying for offer:', err);
       setIsModalOpen(false);
     }

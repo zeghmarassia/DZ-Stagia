@@ -65,3 +65,16 @@ def get_main_statistics(
         "public_offers_count": MainService.get_public_offers_count(db),
         "public_companies_count": MainService.get_public_companies_count(db)
     }
+
+
+@router.get("/public-offers/{offer_id}", response_model=dict)
+def get_public_offer_details(
+    offer_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Get details of a public offer
+    - Accessible to everyone (no authentication required)
+    - Returns offer details only if it's public and active
+    """
+    return MainService.get_public_offer_details(db, offer_id)

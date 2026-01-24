@@ -150,3 +150,55 @@ class MainService:
         return db.query(func.count(Company.company_id)).filter(
             Company.status == "approved"
         ).scalar()
+    
+    @staticmethod
+    def get_public_offer_details(db: Session, offer_id: int) -> dict:
+        """
+        Get details of a single public offer
+        Returns serialized offer data with company information
+        """
+        offer = db.query(Offer).filter(
+            and_(
+                Offer.offer_id == offer_id,
+                Offer.visibility == True,
+                Offer.is_active == True
+            )
+        ).first()
+        
+        if not offer:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Offer not found or not accessible"
+            )
+        
+        # Serialize offer to dictionary
+        return {
+            "offer_id": offer.offer_id,
+            "company_id": offer.company_id,
+            "title": offer.title,
+            "description": offer.description,
+            "offer_type": offer.offer_type,
+            "duration": offer.duration,
+            "salary_min": float(offer.salary_min) if offer.salary_min else None,
+            "salary_max": float(offer.salary_max) if offer.salary_max else None,
+            "location_mode": offer.location_mode,
+            "location": offer.location,
+            "employment_type": offer.employment_type,
+            "visibility": offer.visibility,
+            "is_active": offer.is_active,
+            "expiration_date": offer.expiration_date.isoformat() if offer.expiration_date else None,
+            "views_count": offer.views_count,
+            "applications_count": offer.applications_count,
+            "created_at": offer.created_at.isoformat(),
+            "updated_at": offer.updated_at.isoformat(),
+            "company": {
+                "company_id": offer.company.company_id,
+                "company_name": offer.company.company_name,
+                "logo_url": offer.company.logo_url,
+                "address": offer.company.address,
+                "sector": offer.company.sector,
+                "description": offer.company.description,
+                "website": offer.company.website,
+                "contact": offer.company.contact
+            } if offer.company else None
+        }
