@@ -6,7 +6,7 @@ import HomeNavbar from './HomeNavbar';
 import { logout } from '../store';
 
 const Navbar = () => {
-  const { isAuthenticated, userType } = useSelector((state) => state.auth);
+  const { isAuthenticated, userType, user } = useSelector((state) => state.auth);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -20,43 +20,6 @@ const Navbar = () => {
   // Public Navbar (Not Authenticated)
   if (!isAuthenticated) {
     return (
-      // <nav className="w-full bg-white border-b border-gray-200 px-8 py-4">
-      //   <div className="max-w-7xl mx-auto flex justify-between items-center">
-        
-      //     <Link to="/" className="text-2xl font-black text-slate-900">
-      //       STAGIA
-      //     </Link>
-
-         
-      //     <div className="flex items-center space-x-8">
-      //       <Link to="/offers" className="text-slate-600 hover:text-slate-900 font-semibold">
-      //         Offres
-      //       </Link>
-      //       <Link to="/companies" className="text-slate-600 hover:text-slate-900 font-semibold">
-      //         Entreprises
-      //       </Link>
-      //       <Link to="/about" className="text-slate-600 hover:text-slate-900 font-semibold">
-      //         À Propos
-      //       </Link>
-      //     </div>
-
-       
-      //     <div className="flex items-center space-x-4">
-      //       <Link 
-      //         to="/student/signup" 
-      //         className="px-6 py-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition"
-      //       >
-      //         S'Inscrire
-      //       </Link>
-      //       <Link 
-      //         to="/login" 
-      //         className="px-6 py-2 text-slate-700 font-semibold hover:text-slate-900 transition"
-      //       >
-      //         Connexion
-      //       </Link>
-      //     </div>
-      //   </div>
-      // </nav>
       <HomeNavbar/>
     );
   }
@@ -95,13 +58,27 @@ const Navbar = () => {
             </button>
             <Link to="/student/profile" className="flex items-center space-x-2">
               <div className="text-right">
-                <p className="text-sm font-bold text-slate-900">Aïcha Belaïd</p>
+                <p className="text-sm font-bold text-slate-900">
+                  {user ? `${user.first_name} ${user.last_name}` : 'Étudiant'}
+                </p>
                 <p className="text-xs text-slate-500">Étudiant</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center">
-                <img src="/profile.png" alt="Profile" className="w-full h-full rounded-full object-cover" />
+              <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center overflow-hidden">
+                {user?.profile_pic ? (
+                  <img src={user.profile_pic} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <img src="/profile.png" alt="Profile" className="w-full h-full object-cover" />
+                )}
               </div>
             </Link>
+            {/* Logout Button */}
+            <button 
+              onClick={handleLogout} 
+              className="ml-4 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+              title="Se déconnecter"
+            >
+              <LogOut size={20} strokeWidth={2.5} />
+            </button>
           </div>
         </div>
       </nav>
@@ -142,13 +119,27 @@ const Navbar = () => {
             </button>
             <Link to="/company/profile" className="flex items-center space-x-2">
               <div className="text-right">
-                <p className="text-sm font-bold text-slate-900">SONATRACH</p>
+                <p className="text-sm font-bold text-slate-900">
+                  {user?.company_name || 'Entreprise'}
+                </p>
                 <p className="text-xs text-slate-500">Entreprise</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                <img src="/company-logo.png" alt="Company" className="w-full h-full rounded-full object-cover" />
+              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center overflow-hidden">
+                {user?.logo_url ? (
+                  <img src={user.logo_url} alt="Company" className="w-full h-full object-cover" />
+                ) : (
+                  <img src="/company-logo.png" alt="Company" className="w-full h-full object-cover" />
+                )}
               </div>
             </Link>
+            {/* Logout Button */}
+            <button 
+              onClick={handleLogout} 
+              className="ml-4 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+              title="Se déconnecter"
+            >
+              <LogOut size={20} strokeWidth={2.5} />
+            </button>
           </div>
         </div>
       </nav>
@@ -191,7 +182,7 @@ const Navbar = () => {
               </div>
               <div className="ml-3 text-left">
                 <p className="text-sm font-bold text-slate-900 leading-tight">
-                  {user?.fullName || "Hiba Kara"}
+                  {user ? `${user.first_name} ${user.last_name}` : "Admin"}
                 </p>
                 <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
                   Admin
