@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setCredentials } from '../store'; // Importing from your store.js
-import axiosInstance from '../config/axios'; // Using your configured axios instance
+// import axiosInstance from '../config/axios'; // Using your configured axios instance
 import { loginAdmin } from '../services/AdminService';
 
 const AdminLoginPage = () => {
