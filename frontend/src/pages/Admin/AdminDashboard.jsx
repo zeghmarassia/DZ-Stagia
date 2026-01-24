@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAdminStats } from '../../services/authService';
 import { Link, useLocation } from 'react-router-dom';
+import Navbar from '../../components/Navbar';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -26,6 +27,7 @@ const AdminDashboard = () => {
   return (
     <div className="flex min-h-screen bg-white font-sans text-[#1A1D1F]">
       {/* Sidebar - Fixed to screen height with 100% height */}
+      {/* <Navbar/> */}
       <aside className={`${isCollapsed ? 'w-20' : 'w-64'} h-screen sticky top-0 border-r border-[#E8E8E8] flex flex-col transition-all duration-300 ease-in-out`}>
         
         {/* Logo Section */}
@@ -37,11 +39,11 @@ const AdminDashboard = () => {
         
         {/* 1. Upper Block (Navigation Icons) - Increased to ~60% height by adding spacing */}
         <nav className={`${isCollapsed ? 'px-2' : 'px-4'} space-y-8 flex-none`}>
-          <NavItem icon={<HomeIcon />} label="Tableau de Bord" to="/admin" active={location.pathname === '/admin'} collapsed={isCollapsed} />
-          <NavItem icon={<UsersIcon />} label="Utilisateurs" to="/admin/users" active={location.pathname === '/admin/users'} collapsed={isCollapsed} />
-          <NavItem icon={<StudentIcon />} label="Étudiants" to="/admin/students" active={location.pathname === '/admin/students'} collapsed={isCollapsed} />
-          <NavItem icon={<BuildingIcon />} label="Entreprises" to="/admin/companies" active={location.pathname === '/admin/companies'} collapsed={isCollapsed} />
-          <NavItem icon={<BriefcaseIcon />} label="Offres" to="/admin/offers" active={location.pathname === '/admin/offers'} collapsed={isCollapsed} />
+          <NavItem icon={<HomeIcon />} label="Tableau de Bord" to="/admin/admin/stats" active={location.pathname === '/admin'} collapsed={isCollapsed} />
+          <NavItem icon={<UsersIcon />} label="Admins" to="/admin/admin/admins" active={location.pathname === '/admin/users'} collapsed={isCollapsed} />
+          <NavItem icon={<StudentIcon />} label="Étudiants" to="/admin/admin/students" active={location.pathname === '/admin/students'} collapsed={isCollapsed} />
+          <NavItem icon={<BuildingIcon />} label="Entreprises" to="/admin/admin/companies" active={location.pathname === '/admin/companies'} collapsed={isCollapsed} />
+          <NavItem icon={<BriefcaseIcon />} label="Offres" to="/admin/admin/offers" active={location.pathname === '/admin/offers'} collapsed={isCollapsed} />
         </nav>
 
         {/* 2. Middle Section (Negative Space) - Remaining space */}

@@ -34,7 +34,7 @@ const AdminLoginPage = () => {
     }));
 
     // Redirect to the admin dashboard
-    navigate('/admin/dashboard');
+    navigate('/admin/admin/stats');
   } catch (err) {
     // Handle errors using the response from axiosInstance
     setError(err.response?.data?.message || "Identifiants administrateur invalides.");

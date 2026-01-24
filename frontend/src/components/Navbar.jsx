@@ -1,11 +1,21 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { Search, Bell } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { Search, Bell, LogOut } from 'lucide-react';
 import HomeNavbar from './HomeNavbar';
+import { logout } from '../store';
 
 const Navbar = () => {
   const { isAuthenticated, userType } = useSelector((state) => state.auth);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
+  const handleLogout = () => {
+    localStorage.clear();
+    dispatch(logout());
+    navigate('/login');
+  };
 
   // Public Navbar (Not Authenticated)
   if (!isAuthenticated) {
@@ -148,30 +158,56 @@ const Navbar = () => {
   // Admin Navbar
   if (userType === 'admin') {
     return (
-      <nav className="w-full bg-white border-b border-gray-200 px-8 py-4">
+      <nav className="w-full bg-white border-b border-gray-100 px-8 py-3 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link to="/admin/dashboard" className="text-2xl font-black text-slate-900">
+          
+          {/* Left Side: Logo */}
+          <Link to="/admin/dashboard" className="text-2xl font-black text-slate-900 tracking-tight">
             STAGIA
           </Link>
-          <div className="flex items-center space-x-8">
-            <Link to="/admin/dashboard" className="text-slate-600 hover:text-slate-900 font-semibold">
-              Dashboard
-            </Link>
-            <Link to="/admin/students" className="text-slate-600 hover:text-slate-900 font-semibold">
-              Étudiants
-            </Link>
-            <Link to="/admin/companies" className="text-slate-600 hover:text-slate-900 font-semibold">
-              Entreprises
-            </Link>
-            <Link to="/admin/offers" className="text-slate-600 hover:text-slate-900 font-semibold">
-              Offres
-            </Link>
-          </div>
-          <Link to="/admin/profile">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <span className="text-sm font-bold">AD</span>
+
+          {/* Right Side: Actions & Profile */}
+          <div className="flex items-center space-x-5">
+            
+            {/* Icons Group */}
+            <div className="flex items-center space-x-4 pr-4 border-r border-gray-200">
+              <button className="text-slate-400 hover:text-teal-500 transition-colors">
+                <Search size={22} strokeWidth={2} />
+              </button>
+              <button className="text-slate-400 hover:text-teal-500 transition-colors relative">
+                <Bell size={22} strokeWidth={2} />
+                <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+              </button>
             </div>
-          </Link>
+
+            {/* Profile Section */}
+            <Link to="/admin/profile" className="flex items-center group">
+              <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 transition-transform group-hover:scale-105">
+                {user?.profilePicture ? (
+                  <img src={user.profilePicture} alt="Admin" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-xs font-bold text-slate-500 uppercase">AD</span>
+                )}
+              </div>
+              <div className="ml-3 text-left">
+                <p className="text-sm font-bold text-slate-900 leading-tight">
+                  {user?.fullName || "Hiba Kara"}
+                </p>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                  Admin
+                </p>
+              </div>
+            </Link>
+
+            {/* Logout Button */}
+            <button 
+              onClick={handleLogout} 
+              className="ml-4 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+              title="Se déconnecter"
+            >
+              <LogOut size={20} strokeWidth={2.5} />
+            </button>
+          </div>
         </div>
       </nav>
     );

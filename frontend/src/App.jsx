@@ -119,34 +119,35 @@ function App() {
         } />
 
         {/* Admin Routes */}
-        <Route path="/admin/dashboard" element={
+        {/* <Route path="/admin/admin/stats" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Layout showNavbar={false}><AdminDashboard /></Layout>
+            <Layout><AdminDashboard /></Layout>
           </ProtectedRoute>
         } />
-        <Route path="/admin/offers" element={
+        <Route path="/admin/admin/offers" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Layout showNavbar={false}><AdminOffers /></Layout>
+            <Layout><AdminOffers /></Layout>
           </ProtectedRoute>
         } />
-        <Route path="/admin/entreprises" element={
+        <Route path="/admin/admin/companies" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Layout showNavbar={false}><Enterprise /></Layout>
+            <Layout><Enterprise /></Layout>
           </ProtectedRoute>
         } />
-        <Route path="/admin/etudiants" element={
+        <Route path="/admin/admin/students" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Layout showNavbar={false}><Etudiants /></Layout>
+            <Layout><Etudiants /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/admin/user-validation" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Layout showNavbar={false}><UserValidation /></Layout>
+            <Layout><UserValidation /></Layout>
           </ProtectedRoute>
-        } />
+        } /> */}
+
       </Routes>
     </Router>
   );
-}
+} 
 
 export default App;
