@@ -7,5 +7,11 @@
       "description": "Backend API base URL",
       "default": "https://dz-stagia.onrender.com"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
