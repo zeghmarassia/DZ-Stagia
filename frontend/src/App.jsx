@@ -25,6 +25,7 @@ import OfferDetailsPage from './pages/OfferDetailsPage';
 import MyApplicationsPage from './pages/MyApplicationsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
+import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminOffers from './pages/Admin/AdminOffers';
 import Enterprise from './pages/Admin/Enterprise';
@@ -45,6 +46,8 @@ function App() {
         
         {/* Auth Routes without Navbar */}
         <Route path="/login" element={<Layout showNavbar={false}><Login /></Layout>} />
+        <Route path="/auth/admin/login" element={<Layout showNavbar={false}><AdminLoginPage /></Layout>} />
+
         <Route path="/forgot-password" element={<Layout showNavbar={false}><ForgotPassword /></Layout>} />
         <Route path="/reset-password" element={<Layout showNavbar={false}><ResetPassword /></Layout>} />
         <Route path="/verify-otp" element={<Layout showNavbar={false}><VerifyOtp /></Layout>} />

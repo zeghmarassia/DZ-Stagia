@@ -4,6 +4,18 @@ import axiosInstance from '../config/axios';
  * Service to fetch admin dashboard statistics.
  * This function is ready to connect to the real backend once merged.
  */
+export const loginAdmin = (credentials) => {
+  const formData = new URLSearchParams();
+  formData.append('email', credentials.email);
+  formData.append('password', credentials.password);
+
+  return axiosInstance.post('/auth/admin/login', formData, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+};
+
 export const getAdminStats = () => axiosInstance.get('/admin/stats');
 
 export const getPendingUsers = () => axiosInstance.get('/admin/pending-users');
