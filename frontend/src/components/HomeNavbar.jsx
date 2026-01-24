@@ -19,9 +19,9 @@ const HomeNavbar = () => {
           {/* Left Side: Logo & Links */}
           <div className="flex items-center gap-8 md:gap-12">
             {/* Logo */}
-            <div className="text-2xl font-black text-slate-900 tracking-wide uppercase cursor-pointer">
-              LOGO
-            </div>
+            <Link to="/" className="text-2xl font-black text-slate-900">
+            STAGIA
+          </Link>
 
             {/* Nav Links (Desktop) */}
             <div className="hidden md:flex space-x-6 lg:space-x-8 text-sm font-bold text-slate-900">
