@@ -2,27 +2,6 @@
 
 Welcome to **DZ-Stagia**, a comprehensive internship management platform that connects students with internship opportunities across Algeria. This platform addresses the critical gap between student job seekers and employers in Algeria's competitive academic and professional landscape. The platform streamlines recruitment by providing a centralized hub where students can showcase their skills and companies can efficiently identify promising young talent.
 
----
-
-## 📋 Table of Contents
-
-- [Project Overview](#project-overview)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Clone the Repository](#clone-the-repository)
-  - [Installation](#installation)
-- [Project Structure](#project-structure)
-- [Running the Application](#running-the-application)
-  - [Using Docker Compose](#using-docker-compose)
-  - [Running Locally](#running-locally)
-- [Key Features](#key-features)
-- [Technologies Used](#technologies-used)
-- [Database & Migrations](#database--migrations)
-- [Common Issues](#common-issues)
-- [Support](#support)
-
----
-
 ## 🎯 Project Overview
 
 DZ-Stagia is a full-stack web application designed to streamline the internship process in Algeria. Students can:
@@ -37,9 +16,7 @@ Companies can:
 - Track candidate progress
 - Communicate with candidates
 
----
-
-## 🚀 Getting Started
+## 🌟 Getting Started
 
 ### Prerequisites
 
@@ -93,13 +70,7 @@ venv\Scripts\activate  # On Linux: source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Create a .env file with the following variables:
-# DATABASE_URL=postgresql://user:password@localhost:5432/dz_stagiaire_db
-# JWT_SECRET_KEY=your_secret_key_here
-# SMTP_HOST=smtp.gmail.com
-# SMTP_PORT=587
-# SMTP_USER=your_email@gmail.com
-# SMTP_PASSWORD=your_app_password
+# Create a .env file (see setup instructions below)
 
 # Run database migrations
 alembic upgrade head
@@ -121,10 +92,66 @@ npm install
 npm run dev
 # Frontend will run on http://localhost:3000
 ```
+## ⚙️ Environment Setup (.env Configuration)
 
----
+Before running the backend, you need to create a `.env` file in the `backend` folder. Here's the template:
 
-## 📁 Project Structure
+```env
+# Database Configuration (Neon PostgreSQL)
+DATABASE_URL=postgresql://user:password@endpoint.neon.tech/dz_stagiaire_db
+
+# Security
+JWT_SECRET_KEY=your_secret_key_here
+
+# Email Configuration (for notifications and OTP)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+
+# Cloud Storage (for images)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+### Important Notes:
+
+1. **Never commit the `.env` file to version control** - It contains sensitive credentials
+
+2. **For Database Configuration (Neon PostgreSQL):**
+   - Sign up at [Neon Console](https://console.neon.tech)
+   - Create a new project (free tier is sufficient)
+   - Go to the "Connection" section
+   - Copy the connection string that looks like: `postgresql://user:password@endpoint.neon.tech/dbname`
+   - Replace the `DATABASE_URL` value with your connection string
+   - Keep all three parts: username, password, and endpoint
+
+3. **For Email Configuration (Gmail):**
+   - Use a Gmail account
+   - Enable 2-Step Verification in your Google Account
+   - Generate an "App Password":
+     - Go to [Google Account Security](https://myaccount.google.com/security)
+     - Click "App passwords"
+     - Select "Mail" and "Windows Computer"
+     - Google will generate a 16-character password
+   - Use this password as `SMTP_PASSWORD` (without spaces)
+   - Use your Gmail address as `SMTP_USER`
+
+4. **For Cloudinary Configuration (Image Upload):**
+   - Sign up at [cloudinary.com](https://cloudinary.com)
+   - Go to your Dashboard
+   - Copy your credentials:
+     - `Cloud Name`
+     - `API Key`
+     - `API Secret`
+   - Paste them into the `.env` file
+
+5. **For JWT Secret Key:**
+   - Generate a random secret key (at least 32 characters)
+   - You can use: `python -c "import secrets; print(secrets.token_urlsafe(32))"`
+  
+## 📁 Project Structure Explained
 
 ### Backend (`/backend`)
 
@@ -153,9 +180,8 @@ The frontend is built with **React**, **Vite**, and **Tailwind CSS**:
 - `store.js` - Redux state management
 - Configuration files: `vite.config.js`, `tailwind.config.js`, `postcss.config.js`, `eslint.config.js`
 
----
 
-## 🏃 Running the Application
+## 🚀 How to Run the Project
 
 ### Using Docker Compose (Recommended)
 
@@ -198,33 +224,6 @@ npm run dev
 - **API Docs (Swagger)**: http://localhost:8000/docs
 - **API Docs (ReDoc)**: http://localhost:8000/redoc
 
----
-
-## ✨ Key Features
-
-### Student Features
-- 📝 Create and manage student profiles
-- 🔍 Search and filter internship offers
-- 📤 Submit applications to internships
-- 📢 Receive notifications about application status
-- ⭐ Save favorite offers
-- 📊 Track application history
-
-### Company Features
-- 🏢 Register and manage company profile
-- ➕ Post internship offers
-- 📋 Review and manage applications
-- 💬 Communicate with candidates
-- 📊 View candidate profiles and qualifications
-
-### Admin Features
-- 👥 Manage users and accounts
-- 🏛️ Manage establishments and domains
-- 🛡️ Moderate content
-- 📈 View platform statistics
-
----
-
 ## 🛠️ Technologies Used
 
 ### Backend
@@ -252,7 +251,6 @@ npm run dev
 - **Docker** - Containerization
 - **Docker Compose** - Multi-container orchestration
 
----
 
 ## 🗄️ Database & Migrations
 
@@ -274,7 +272,6 @@ alembic downgrade -1
 alembic history
 ```
 
----
 ## 🤝 Team Collaboration
 
 When multiple team members work on the project:
@@ -284,7 +281,7 @@ When multiple team members work on the project:
 4. Report any issues in the project's issue tracker
 
 
-## 🐛 Common Issues and Solutions
+## 🔍 Common Issues and Solutions
 
 ### Issue: "Connection refused" when starting Docker
 
@@ -336,8 +333,6 @@ cd frontend
 npm run dev
 ```
 
----
-
 ## 📧 Support
 
 If you encounter any issues:
@@ -346,7 +341,3 @@ If you encounter any issues:
 - Contact our team at [stagia.dz@gmail.com]
 
 Created with ❤️ by [Stagia Team]
-
----
-
-**Last Updated**: January 2026
