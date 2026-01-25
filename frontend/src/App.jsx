@@ -18,6 +18,7 @@ import CompanyProfile from './pages/CompanyProfile';
 import PostOffer from './pages/PostOffer';
 import CompanyCandidatures from './pages/CompanyCandidatures';  
 import CandidateDetails from './pages/CandidateDetails';
+import CompanyDetails from './pages/CompanyDetails';
 
 import StudentDashboard from './pages/StudentDashboard';
 import StudentProfile from './pages/StudentProfile';
@@ -33,6 +34,7 @@ import Etudiants from './pages/Admin/Etudiants';
 import UserValidation from './pages/Admin/UserValidation';
 
 import './i18n';
+import Companies from './pages/Companies';
 
 function App() {
   return (
@@ -42,7 +44,8 @@ function App() {
         <Route path="/" element={<Layout><Homepage /></Layout>} />
         <Route path="/offers" element={<Layout><Offers /></Layout>} />
         <Route path="/offers/:id" element={<Layout><OfferDetailsPage /></Layout>} />
-        <Route path="/companies" element={<Layout><div>Companies Page</div></Layout>} />
+        <Route path="/companies" element={<Layout><Companies/></Layout>} />
+        <Route path="/companies/:id" element={<Layout><CompanyDetails/></Layout>} />
         <Route path="/about" element={<Layout><div>About Page</div></Layout>} />
         
         {/* Auth Routes without Navbar */}
