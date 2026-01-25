@@ -47,5 +47,10 @@ export const resetPassword = (data) => {
   return axiosInstance.post('/auth/reset-password', data);
 };
 
+// Get establishments list
+export const getEstablishments = () => {
+  return axiosInstance.get('/establishments/list');
+};
+
 // Admin functions
 export const getAdminStats = () => axiosInstance.get('/admin/stats');

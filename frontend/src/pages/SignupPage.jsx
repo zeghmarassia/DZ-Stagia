@@ -1,13 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next'; // 1. Import Hook
+import { useTranslation } from 'react-i18next';
 import { Mail, Lock, Upload, User, Building, Briefcase, GraduationCap, X } from 'lucide-react';
-import { studentRegister, companyRegister } from '../services/authService';
-import axiosInstance from '../config/axios';
-import LanguageSwitcher from '../components/LanguageSwitcher'; // 2. Import Switcher
+import { studentRegister, companyRegister, getEstablishments } from '../services/authService';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const SignupPage = ({ type }) => {
-  const { t } = useTranslation(); // 3. Initialize Translation
+  const { t } = useTranslation();
   const isStudent = type === 'student';
 
   return (
@@ -23,10 +22,9 @@ const SignupPage = ({ type }) => {
             {/* Header: Logo & Switcher */}
             <div className="flex justify-between items-center mb-8">
                 <Link to="/" className="text-2xl font-black text-slate-900 tracking-wide uppercase hover:text-blue-600 transition">
-                  LOGO
+                  DZ-Stagia
                 </Link>
                 
-                {/* Replaced Static Flag with LanguageSwitcher */}
                 <div>
                    <LanguageSwitcher />
                 </div>
@@ -115,7 +113,7 @@ const SignupPage = ({ type }) => {
 
 /* --- STUDENT FORM SUB-COMPONENT --- */
 const StudentForm = () => {
-  const { t } = useTranslation(); // Initialize Hook
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     university: '', firstName: '', lastName: '', email: '', password: '', file: null
@@ -123,17 +121,22 @@ const StudentForm = () => {
   const [establishments, setEstablishments] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [establishmentsLoading, setEstablishmentsLoading] = useState(true);
 
   const fileInputRef = useRef(null);
 
-  // Fetch establishments on component mount
+  // Fetch establishments on component mount using authService
   React.useEffect(() => {
     const fetchEstablishments = async () => {
       try {
-        const response = await axiosInstance.get('/establishments/list');
+        setEstablishmentsLoading(true);
+        const response = await getEstablishments();
         setEstablishments(response.data);
       } catch (err) {
         console.error('Failed to fetch establishments:', err);
+        setError('Failed to load establishments. Please refresh the page.');
+      } finally {
+        setEstablishmentsLoading(false);
       }
     };
     fetchEstablishments();
@@ -181,6 +184,10 @@ const StudentForm = () => {
 
       const response = await studentRegister(formDataBody);
 
+      // Store email and userType in sessionStorage for page refresh handling
+      sessionStorage.setItem('verifyEmail', formData.email);
+      sessionStorage.setItem('verifyUserType', 'student');
+
       // Navigate to Email verification page
       navigate('/verify-email', { state: { email: formData.email, userType: 'student' } });
     } catch (err) {
@@ -207,9 +214,15 @@ const StudentForm = () => {
             name="university"
             value={formData.university}
             onChange={handleChange}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D] appearance-none bg-white text-gray-600"
+            disabled={establishmentsLoading}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D] appearance-none bg-white text-gray-600 disabled:bg-gray-100 disabled:cursor-not-allowed"
           >
-            <option value="">{t('auth.university_placeholder', 'Choisissez votre établissement')}</option>
+            <option value="">
+              {establishmentsLoading 
+                ? 'Chargement...' 
+                : t('auth.university_placeholder', 'Choisissez votre établissement')
+              }
+            </option>
             {establishments.map((est) => (
               <option key={est.establishment_id} value={est.establishment_id}>
                 {est.name}
@@ -281,7 +294,7 @@ const StudentForm = () => {
         </div>
       </div>
 
-      <button type="submit" disabled={loading} className="w-full bg-[#5B8C9D] text-white font-bold py-3.5 rounded-lg hover:bg-[#4a7280] transition mt-6 shadow-md uppercase disabled:opacity-50 disabled:cursor-not-allowed">
+      <button type="submit" disabled={loading || establishmentsLoading} className="w-full bg-[#5B8C9D] text-white font-bold py-3.5 rounded-lg hover:bg-[#4a7280] transition mt-6 shadow-md uppercase disabled:opacity-50 disabled:cursor-not-allowed">
         {loading ? t('auth.loading', 'Inscription en cours...') : t('auth.continue_btn', 'CONTINUER')}
       </button>
     </form>
@@ -342,6 +355,10 @@ const CompanyForm = () => {
 
       const response = await companyRegister(formDataBody);
 
+      // Store email and userType in sessionStorage for page refresh handling
+      sessionStorage.setItem('verifyEmail', formData.email);
+      sessionStorage.setItem('verifyUserType', 'company');
+
       // Navigate to Email verification page
       navigate('/verify-email', { state: { email: formData.email, userType: 'company' } });
     } catch (err) {
@@ -377,6 +394,18 @@ const CompanyForm = () => {
             <option value="">{t('auth.sector_placeholder', "Choisissez votre secteur d'activité")}</option>
             <option value="IT">Technologie / IT</option>
             <option value="Finance">Finance</option>
+            <option value="Education">Éducation</option>
+            <option value="Healthcare">Santé</option>
+            <option value="Energy">Énergie</option>
+            <option value="Construction">BTP / Construction</option>
+            <option value="Telecom">Télécommunications</option>
+            <option value="Industry">Industrie</option>
+            <option value="Agriculture">Agriculture</option>
+            <option value="Transport">Transport & Logistique</option>
+            <option value="Retail">Commerce / Vente</option>
+            <option value="Consulting">Conseil</option>
+            <option value="Public">Secteur public</option>
+            <option value="Other">Autre</option>
           </select>
           <Briefcase className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
         </div>
