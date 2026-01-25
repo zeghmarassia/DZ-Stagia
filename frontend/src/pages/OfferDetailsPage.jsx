@@ -12,24 +12,41 @@ const OfferDetailsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Mock Data
-  const MOCK_OFFER_DETAILS = {
-    offer_id: id,
-    title: "Développeur Full Stack",
-    description: "Nous recherchons un développeur Full Stack passionné pour rejoindre notre équipe dynamique. Vous travaillerez sur des projets innovants en utilisant les dernières technologies.",
-    company_name: "Tech Solutions",
-    location: "Alger, Hydra",
-    offer_type: "Emploi",
-    duration: "CDI",
-    created_at: "2024-01-25T10:00:00Z",
-    deadline: "2024-02-25",
-    requirements: "React, Node.js, SQL",
-    salary: "80000 - 120000 DZD",
-    status: "Active",
-    company: {
-        logo_url: "/company-logo.png",
-        website: "https://techsolutions.dz"
-    }
-  };
+ const MOCK_OFFER_DETAILS = {
+  offer_id: id,
+  title: "Développeur Full Stack",
+  description: "Nous recherchons un développeur Full Stack...",
+  location: "Alger, Hydra",
+  offer_type: "Emploi",
+  duration: "CDI",
+  created_at: "2024-01-25T10:00:00Z",
+
+  missions: [
+    "Développer des applications web modernes",
+    "Collaborer avec l'équipe produit",
+    "Maintenir et améliorer le code existant"
+  ],
+
+  requirements: [
+    "React",
+    "Node.js",
+    "SQL"
+  ],
+
+  whatWeOffer: [
+    "Environnement de travail dynamique",
+    "Opportunités d'évolution",
+    "Salaire compétitif"
+  ],
+
+  company: {
+    name: "Tech Solutions",
+    logoUrl: "/company-logo.png",
+    industry: "Technologie",
+    description: "Entreprise innovante spécialisée en solutions digitales"
+  }
+};
+
 
   useEffect(() => {
     const fetchOffer = async () => {
@@ -137,7 +154,7 @@ const OfferDetailsPage = () => {
       )}
 
       {/* Header */}
-      <header className="w-full bg-white border-b border-gray-100 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
+      {/* <header className="w-full bg-white border-b border-gray-100 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center space-x-12">
           <div className="text-[22px] font-[800] tracking-tighter text-[#111827]">LOGO</div>
           <nav className="hidden md:flex space-x-8 text-[14px] font-bold">
@@ -171,7 +188,7 @@ const OfferDetailsPage = () => {
             </button>
           </div>
         </div>
-      </header>
+      </header> */}
 
       <main className="max-w-[1200px] mx-auto w-full px-8 py-8">
         {isLoading && <p className="text-center font-bold">Chargement de l'offre...</p>}
@@ -179,7 +196,7 @@ const OfferDetailsPage = () => {
         {offer && !isLoading && !error && (
         <>
           {/* Back Button */}
-          <Link to="/offres" className="flex items-center text-[#4fa797] text-[14px] font-bold mb-8 hover:opacity-80 transition-opacity">
+          <Link to="/offers" className="flex items-center text-[#4fa797] text-[14px] font-bold mb-8 hover:opacity-80 transition-opacity">
             <svg className="mr-2" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
             Retour
           </Link>

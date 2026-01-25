@@ -21,48 +21,46 @@ import {
 } from 'lucide-react';
 
 
-const JobCard = ({ title, company, location, duration, type, badgeColor, logo, logoBg, onViewClick, offerId }) => (
-  <div className="bg-white border border-gray-100 p-6 rounded-xl flex flex-col md:flex-row gap-6 hover:shadow-lg transition group relative">
-    
-    {/* Badge - Positioned Top Right */}
-    <span className={`absolute top-6 right-6 px-3 py-1 rounded-md text-xs font-bold ${badgeColor}`}>
-      {type}
-    </span>
+const JobCard = ({ title, company, location, duration, type, badgeColor, logo, logoBg, onViewClick, offerId }) => {
+  if (!title || !offerId) return null;
 
-    {/* Logo Container */}
-    <div className={`w-16 h-16 min-w-[4rem] rounded-xl flex items-center justify-center ${logoBg}`}>
-      {/* We render the passed icon component here */}
-      {logo}
-    </div>
-
-    {/* Main Content */}
-    <div className="flex-1 flex flex-col justify-center pt-2 md:pt-0">
-      <h3 className="font-bold text-lg text-slate-900 mb-1">{title}</h3>
-      <p className="text-slate-500 font-medium text-sm mb-5">{company}</p>
+  return (
+    <div className="bg-white border border-gray-100 p-6 rounded-xl flex flex-col md:flex-row gap-6 hover:shadow-lg transition group relative">
       
-      {/* Meta Info (Location & Duration) */}
-      <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400">
-        <div className="flex items-center">
-          <MapPin className="w-4 h-4 mr-2 text-slate-400" />
-          {location}
-        </div>
-        <div className="flex items-center">
-          <Clock className="w-4 h-4 mr-2 text-slate-400" />
-          {duration}
+      <span className={`absolute top-6 right-6 px-3 py-1 rounded-md text-xs font-bold ${badgeColor || 'bg-blue-100 text-blue-600'}`}>
+        {type || 'Offre'}
+      </span>
+
+      <div className={`w-16 h-16 min-w-[4rem] rounded-xl flex items-center justify-center ${logoBg || 'bg-gray-100'}`}>
+        {logo}
+      </div>
+
+      <div className="flex-1 flex flex-col justify-center pt-2 md:pt-0">
+        <h3 className="font-bold text-lg text-slate-900 mb-1">{title}</h3>
+        <p className="text-slate-500 font-medium text-sm mb-5">{company}</p>
+
+        <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400">
+          <div className="flex items-center">
+            <MapPin className="w-4 h-4 mr-2" />
+            {location}
+          </div>
+          <div className="flex items-center">
+            <Clock className="w-4 h-4 mr-2" />
+            {duration}
+          </div>
         </div>
       </div>
-    </div>
 
-    {/* Button - Aligned to bottom right */}
-    <div className="flex flex-col justify-end mt-4 md:mt-0 items-stretch md:items-end">
-       <button 
-         onClick={() => onViewClick && onViewClick(offerId)}
-         className="px-8 py-2.5 bg-[#5B8C9D] text-white text-xs font-bold rounded hover:bg-[#4A7280] transition uppercase tracking-wide"
-       >
-         Voir Offre
-       </button>
+      <div className="flex flex-col justify-end mt-4 md:mt-0 items-stretch md:items-end">
+        <button
+          onClick={() => onViewClick && onViewClick(offerId)}
+          className="px-8 py-2.5 bg-[#5B8C9D] text-white text-xs font-bold rounded hover:bg-[#4A7280] transition uppercase tracking-wide"
+        >
+          Voir Offre
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
-export default JobCard
+export default JobCard;

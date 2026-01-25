@@ -4,6 +4,7 @@ import { Search, MapPin, Clock, Briefcase, Filter, ChevronDown, ChevronRight, Ar
 import { getPublicOffers } from '../services/mainService';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import JobCard from '../components/JobCard';
 
 const Offers = () => {
   const navigate = useNavigate();
@@ -89,24 +90,35 @@ const Offers = () => {
     const fetchOffers = async () => {
       setLoading(true);
       try {
-        // Commented out API call
-        /*
+        // Try API call first
         const response = await getPublicOffers({
           page: currentPage,
           page_size: pageSize,
-          keyword: null,
         });
-        console.log('Offers response:', response.data);
-        setOffers(response.data.offers || []);
-        setTotalPages(response.data.total_pages || 0);
-        */
-       
-        // Use Mock Data
-        setOffers(MOCK_OFFERS);
-        setTotalPages(1);
-
+        
+        // Ensure offers array exists and filter out any undefined entries
+        const offersData = (response?.data?.offers || []).filter(offer => offer && offer.offer_id);
+        
+        // Transform API response to match component structure
+        const transformedOffers = offersData.map(offer => ({
+          offer_id: offer.offer_id,
+          title: offer.title,
+          company_name: offer.company_name || 'Company',
+          location: offer.location || 'Location TBD',
+          duration: offer.duration || 'Duration TBD',
+          offer_type: offer.offer_type || 'Offre',
+          logo_bg: 'bg-blue-100',
+          badge_color: 'bg-blue-100 text-blue-600',
+        }));
+        
+        setOffers(transformedOffers.length > 0 ? transformedOffers : MOCK_OFFERS);
+        setTotalPages(response?.data?.total_pages || 1);
+        
       } catch (err) {
         console.error('Error fetching offers:', err);
+        // Fallback to mock data on error
+        setOffers(MOCK_OFFERS);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
@@ -301,77 +313,77 @@ const Offers = () => {
 };
 
 // Reusable Job Card Component matching the design
-const JobCard = ({ offer, onViewClick }) => {
-  // Format date
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Date inconnue';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+// const JobCard = ({ offer, onViewClick }) => {
+//   // Format date
+//   const formatDate = (dateString) => {
+//     if (!dateString) return 'Date inconnue';
+//     const date = new Date(dateString);
+//     const now = new Date();
+//     const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) return 'Aujourd\'hui';
-    if (diffDays === 1) return 'Il y a 1 jour';
-    if (diffDays < 7) return `Il y a ${diffDays} jours`;
-    return date.toLocaleDateString('fr-FR');
-  };
+//     if (diffDays === 0) return 'Aujourd\'hui';
+//     if (diffDays === 1) return 'Il y a 1 jour';
+//     if (diffDays < 7) return `Il y a ${diffDays} jours`;
+//     return date.toLocaleDateString('fr-FR');
+//   };
 
-  return (
-    <div className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md transition-shadow flex flex-col h-full relative group">
+//   return (
+//     <div className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md transition-shadow flex flex-col h-full relative group">
       
-      {/* Header: Badge & Date */}
-      <div className="flex justify-between items-start mb-4">
-        <span className="bg-[#FFF8C5] text-[#8B6E00] text-xs font-bold px-3 py-1 rounded-full">
-          {offer.offer_type || 'Offre'}
-        </span>
-        <span className="text-xs text-slate-400 font-medium">
-          {formatDate(offer.created_at)}
-        </span>
-      </div>
+//       {/* Header: Badge & Date */}
+//       <div className="flex justify-between items-start mb-4">
+//         <span className="bg-[#FFF8C5] text-[#8B6E00] text-xs font-bold px-3 py-1 rounded-full">
+//           {offer?.offer_type || 'Offre'}
+//         </span>
+//         <span className="text-xs text-slate-400 font-medium">
+//           {formatDate(offer.created_at)}
+//         </span>
+//       </div>
 
-      {/* Content */}
-      <div className="flex gap-4 mb-4">
-        {/* Logo Placeholder */}
-        <div className="w-12 h-12 bg-gradient-to-br from-[#4AA59C] to-[#2D7A75] rounded-md shrink-0 flex items-center justify-center text-white font-bold">
-          {offer.company?.company_name?.charAt(0) || 'E'}
-        </div>
+//       {/* Content */}
+//       <div className="flex gap-4 mb-4">
+//         {/* Logo Placeholder */}
+//         <div className="w-12 h-12 bg-gradient-to-br from-[#4AA59C] to-[#2D7A75] rounded-md shrink-0 flex items-center justify-center text-white font-bold">
+//           {offer.company?.company_name?.charAt(0) || 'E'}
+//         </div>
         
-        <div>
-          <h3 className="font-bold text-slate-900 text-lg leading-tight mb-1 group-hover:text-[#4AA59C] transition">
-            {offer.title}
-          </h3>
-          <p className="text-slate-500 text-sm font-medium">
-            {offer.company?.company_name || 'Entreprise'}
-          </p>
-        </div>
-      </div>
+//         <div>
+//           <h3 className="font-bold text-slate-900 text-lg leading-tight mb-1 group-hover:text-[#4AA59C] transition">
+//             {offer.title}
+//           </h3>
+//           <p className="text-slate-500 text-sm font-medium">
+//             {offer.company?.company_name || 'Entreprise'}
+//           </p>
+//         </div>
+//       </div>
 
-      <p className="text-slate-500 text-sm mb-6 line-clamp-2">
-        {offer.description || 'Pas de description disponible'}
-      </p>
+//       <p className="text-slate-500 text-sm mb-6 line-clamp-2">
+//         {offer.description || 'Pas de description disponible'}
+//       </p>
 
-      {/* Footer Icons & Button */}
-      <div className="mt-auto flex items-end justify-between">
-        <div className="space-y-2 text-xs text-slate-500 font-medium">
-          <div className="flex items-center gap-2">
-            <MapPin size={14} className="text-[#4AA59C]" /> {offer.location || 'Non spécifié'}
-          </div>
-          <div className="flex items-center gap-2">
-             <Clock size={14} className="text-[#4AA59C]" /> {offer.duration || 'Durée non spécifiée'}
-          </div>
-          <div className="flex items-center gap-2">
-             <Briefcase size={14} className="text-[#4AA59C]" /> {offer.location_mode || 'Mode non spécifié'}
-          </div>
-        </div>
+//       {/* Footer Icons & Button */}
+//       <div className="mt-auto flex items-end justify-between">
+//         <div className="space-y-2 text-xs text-slate-500 font-medium">
+//           <div className="flex items-center gap-2">
+//             <MapPin size={14} className="text-[#4AA59C]" /> {offer.location || 'Non spécifié'}
+//           </div>
+//           <div className="flex items-center gap-2">
+//              <Clock size={14} className="text-[#4AA59C]" /> {offer.duration || 'Durée non spécifiée'}
+//           </div>
+//           <div className="flex items-center gap-2">
+//              <Briefcase size={14} className="text-[#4AA59C]" /> {offer.location_mode || 'Mode non spécifié'}
+//           </div>
+//         </div>
 
-        <button 
-          className="bg-[#56Bca0] hover:bg-[#4aa58b] text-white text-xs font-bold px-4 py-2 rounded-lg uppercase tracking-wide transition shadow-sm" 
-          onClick={() => onViewClick && onViewClick(offer.offer_id)}
-        >
-          Voir Plus
-        </button>
-      </div>
-    </div>
-  );
-};
+//         <button 
+//           className="bg-[#56Bca0] hover:bg-[#4aa58b] text-white text-xs font-bold px-4 py-2 rounded-lg uppercase tracking-wide transition shadow-sm" 
+//           onClick={() => onViewClick && onViewClick(offer.offer_id)}
+//         >
+//           Voir Plus
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
 
 export default Offers;

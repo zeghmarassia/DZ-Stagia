@@ -66,54 +66,6 @@ def get_my_offer_statistics(
     return OfferService.get_offer_statistics(db, current_company.company_id)
 
 
-@router.get("/{offer_id}", response_model=OfferResponse)
-def get_offer_detail(
-    offer_id: int,
-    db: Session = Depends(get_db),
-    current_company = Depends(get_current_company)
-):
-    """Get detailed information about a specific offer (Company only)"""
-    offer = OfferService.get_offer_by_id(db, offer_id)
-    
-    if not offer:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Offer not found"
-        )
-    
-    # Verify ownership
-    if offer.company_id != current_company.company_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You don't have permission to view this offer"
-        )
-    
-    return offer
-
-
-@router.put("/{offer_id}", response_model=OfferResponse)
-def update_offer(
-    offer_id: int,
-    offer_data: OfferUpdate,
-    db: Session = Depends(get_db),
-    current_company = Depends(get_current_company)
-):
-    """Update an existing offer (Company only)"""
-    offer = OfferService.update_offer(db, offer_id, offer_data, current_company.company_id)
-    return offer
-
-
-@router.delete("/{offer_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_offer(
-    offer_id: int,
-    db: Session = Depends(get_db),
-    current_company = Depends(get_current_company)
-):
-    """Delete (archive) an offer (Company only)"""
-    OfferService.delete_offer(db, offer_id, current_company.company_id)
-    return None
-
-
 # ==================== Student Endpoints ====================
 
 @router.get("/search/student", response_model=dict)
@@ -201,7 +153,54 @@ def view_offer_as_student(
     return offer
 
 
-# ==================== Public Endpoints ====================
+# ==================== Company Endpoints (Dynamic) ====================
+
+@router.get("/{offer_id}", response_model=OfferResponse)
+def get_offer_detail(
+    offer_id: int,
+    db: Session = Depends(get_db),
+    current_company = Depends(get_current_company)
+):
+    """Get detailed information about a specific offer (Company only)"""
+    offer = OfferService.get_offer_by_id(db, offer_id)
+    
+    if not offer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Offer not found"
+        )
+    
+    # Verify ownership
+    if offer.company_id != current_company.company_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to view this offer"
+        )
+    
+    return offer
+
+
+@router.put("/{offer_id}", response_model=OfferResponse)
+def update_offer(
+    offer_id: int,
+    offer_data: OfferUpdate,
+    db: Session = Depends(get_db),
+    current_company = Depends(get_current_company)
+):
+    """Update an existing offer (Company only)"""
+    offer = OfferService.update_offer(db, offer_id, offer_data, current_company.company_id)
+    return offer
+
+
+@router.delete("/{offer_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_offer(
+    offer_id: int,
+    db: Session = Depends(get_db),
+    current_company = Depends(get_current_company)
+):
+    """Delete (archive) an offer (Company only)"""
+    OfferService.delete_offer(db, offer_id, current_company.company_id)
+    return None
 
 @router.get("/public/list", response_model=dict)
 def list_public_offers(
