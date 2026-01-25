@@ -56,7 +56,7 @@ const AdminDashboard = () => {
         
         {/* 1. Upper Block (Navigation Icons) - Increased to ~60% height by adding spacing */}
         <nav className={`${isCollapsed ? 'px-2' : 'px-4'} space-y-8 flex-none`}>
-          <NavItem icon={<HomeIcon />} label="Tableau de Bord" to="/admin/admin/stats" active={location.pathname === '/admin'} collapsed={isCollapsed} />
+          <NavItem icon={<HomeIcon />} label="Tableau de Bord" to="/admin/dahsboard" active={location.pathname === '/admin/dashboard'} collapsed={isCollapsed} />
           <NavItem icon={<UsersIcon />} label="Admins" to="/admin/admin/admins" active={location.pathname === '/admin/users'} collapsed={isCollapsed} />
           <NavItem icon={<StudentIcon />} label="Étudiants" to="/admin/admin/students" active={location.pathname === '/admin/students'} collapsed={isCollapsed} />
           <NavItem icon={<BuildingIcon />} label="Entreprises" to="/admin/admin/companies" active={location.pathname === '/admin/companies'} collapsed={isCollapsed} />
@@ -74,7 +74,7 @@ const AdminDashboard = () => {
 
       {/* Main Content - No changes here */}
       <main className="flex-1 bg-[#F4F4F4]/50 px-10 py-8">
-        <div className="flex justify-between items-center mb-8">
+        {/* <div className="flex justify-between items-center mb-8">
           <div className="flex-1"></div>
           <div className="flex items-center space-x-8">
             <button className="text-[#6F767E] hover:text-black scale-90"><SearchIcon /></button>
@@ -93,7 +93,7 @@ const AdminDashboard = () => {
               <button className="text-[#6F767E] hover:text-black scale-90"><LogoutIcon /></button>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {location.pathname === '/admin' && (
           <>
