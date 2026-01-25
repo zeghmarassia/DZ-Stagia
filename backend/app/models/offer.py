@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from datetime import date
 from app.database import Base
+from app.models.offer_speciality import offer_speciality
 
 class Offer(Base):
     __tablename__ = "offer"

@@ -13,6 +13,8 @@ from app.models.application import Application
 from app.models.education import Education
 from app.models.experience import Experience
 from app.models.notification import Notification
+from .speciality import Speciality
+from .offer_speciality import offer_speciality
 # Junction tables
 from app.models.student_skill import StudentSkill
 from app.models.offer_skill import OfferSkill

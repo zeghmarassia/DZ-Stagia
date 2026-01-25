@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
+from app.models.offer_speciality import offer_speciality
 
 class Speciality(Base):
     __tablename__ = "speciality"
