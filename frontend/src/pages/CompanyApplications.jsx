@@ -42,6 +42,55 @@ const CompanyApplications = () => {
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Mock Data
+  const MOCK_APPLICATIONS = [
+    {
+        id: 1,
+        status: "pending",
+        application_date: "2024-01-24T10:00:00Z",
+        student: {
+            first_name: "Yasmine",
+            last_name: "Amrani",
+            email: "yasmine.amrani@estin.dz",
+            profile_picture_url: "/profile.png"
+        },
+        offer: {
+            title: "Stage Développement Web",
+            type: "Stage"
+        }
+    },
+    {
+        id: 2,
+        status: "accepted",
+        application_date: "2024-01-22T14:30:00Z",
+        student: {
+            first_name: "Karim",
+            last_name: "Benzema",
+            email: "karim.benzema@estin.dz",
+            profile_picture_url: "/profile.png"
+        },
+        offer: {
+            title: "Designer UI/UX",
+            type: "PFE"
+        }
+    },
+    {
+        id: 3,
+        status: "rejected",
+        application_date: "2024-01-20T09:15:00Z",
+        student: {
+            first_name: "Sarah",
+            last_name: "Bouzid",
+            email: "sarah.bouzid@estin.dz",
+            profile_picture_url: "/profile.png"
+        },
+        offer: {
+            title: "Data Analyst",
+            type: "Emploi"
+        }
+    }
+  ];
+
   useEffect(() => {
     document.body.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   }, [i18n.language]);
@@ -51,9 +100,15 @@ const CompanyApplications = () => {
     const fetchApplications = async () => {
       try {
         setLoading(true);
+        // Commented out API call
+        /*
         const response = await axiosInstance.get(`/applications/company/all?page=${currentPage}&page_size=10`);
-
         setApplications(response.data.applications || []);
+        */
+       
+        // Use Mock Data
+        setApplications(MOCK_APPLICATIONS);
+
       } catch (err) {
         setError('Erreur lors du chargement des candidatures');
         console.error('Applications fetch error:', err);

@@ -9,12 +9,53 @@ const Etudiants = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Mock Data
+  const MOCK_STUDENTS = [
+    {
+      id: 1,
+      first_name: "Yasmine",
+      last_name: "Amrani",
+      email: "yasmine.amrani@estin.dz",
+      phone: "0555123456",
+      specialty: "Informatique",
+      level: "1CS",
+      profile_picture_url: "/profile.png"
+    },
+    {
+      id: 2,
+      first_name: "Karim",
+      last_name: "Benzema",
+      email: "karim.benzema@estin.dz",
+      phone: "0666987654",
+      specialty: "Informatique",
+      level: "2CS",
+      profile_picture_url: "/profile.png"
+    },
+    {
+      id: 3,
+      first_name: "Sarah",
+      last_name: "Bouzid",
+      email: "sarah.bouzid@estin.dz",
+      phone: "0777112233",
+      specialty: "Informatique",
+      level: "3CS",
+      profile_picture_url: "/profile.png"
+    }
+  ];
+
   useEffect(() => {
     const fetchStudents = async () => {
       try {
         setLoading(true);
+        // Commented out API call
+        /*
         const response = await getStudents();
         setStudents(response.data.students || []);
+        */
+        
+        // Use Mock Data
+        setStudents(MOCK_STUDENTS);
+        
       } catch (err) {
         setError('Failed to fetch students.');
         console.error('Fetch students error:', err);
@@ -38,7 +79,12 @@ const Etudiants = () => {
   // Function to confirm deletion
   const confirmDelete = async () => {
     try {
+      // Commented out API call
+      /*
       await deleteStudent(selectedId);
+      */
+      
+      // Update local state
       setStudents(students.filter((student) => student.id !== selectedId));
       setShowModal(false);
       setSelectedId(null);

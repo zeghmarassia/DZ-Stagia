@@ -13,6 +13,64 @@ const StudentDashboard = () => {
 
   const dispatch = useDispatch();
 
+  // Mock Data
+  const MOCK_USER = { name: 'Amina Mansouri', profilePic: '/profile.png' };
+  const MOCK_STATS = { active: 12, interviews: 3, saved: 8 };
+  const MOCK_APPLICATIONS = [
+    {
+      id: 1,
+      offer: {
+        title: "Stage Frontend React",
+        type: "Stage",
+        company: {
+            name: "TechCorp",
+            logoUrl: "/company-logo.png"
+        }
+      },
+      status: "Entretien",
+      applicationDate: "2024-01-20T10:00:00Z"
+    },
+    {
+      id: 2,
+      offer: {
+        title: "Designer UX/UI",
+        type: "PFE",
+        company: {
+            name: "Creative Agency",
+            logoUrl: "/company-logo.png"
+        }
+      },
+      status: "En attente",
+      applicationDate: "2024-01-18T14:30:00Z"
+    },
+    {
+      id: 3,
+      offer: {
+        title: "Data Analyst Junior",
+        type: "Emploi",
+        company: {
+            name: "DataSystems",
+            logoUrl: "/company-logo.png"
+        }
+      },
+      status: "Refusé",
+      applicationDate: "2024-01-15T09:00:00Z"
+    },
+     {
+      id: 4,
+      offer: {
+        title: "Développeur Mobile",
+        type: "Alternance",
+        company: {
+            name: "AppStudio",
+            logoUrl: "/company-logo.png"
+        }
+      },
+      status: "En attente",
+      applicationDate: "2024-01-10T11:20:00Z"
+    }
+  ];
+
   const handleLogout = () => {
     // Clear authentication token
     localStorage.clear();
@@ -24,6 +82,8 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     // Fetch user profile
+    // Commented out API call
+    /*
     getStudentProfile()
       .then(response => {
         setUser({ 
@@ -32,20 +92,30 @@ const StudentDashboard = () => {
         });
       })
       .catch(error => console.error('Error fetching user profile:', error));
+    */
+    setUser(MOCK_USER);
 
     // Fetch dashboard stats
+    // Commented out API call
+    /*
     getStudentDashboardStats()
       .then(response => {
         setStats(response.data);
       })
       .catch(error => console.error('Error fetching dashboard stats:', error));
+    */
+    setStats(MOCK_STATS);
 
     // Fetch recent applications
+    // Commented out API call
+    /*
     getStudentApplications({ limit: 4, sort: 'recent' })
       .then(response => {
         setRecentApplications(response.data.applications || []);
       })
       .catch(error => console.error('Error fetching recent applications:', error));
+    */
+    setRecentApplications(MOCK_APPLICATIONS);
 
     // Fetch saved offers
     // axiosInstance.get('/student/offers/saved?limit=2') // Assuming this endpoint exists

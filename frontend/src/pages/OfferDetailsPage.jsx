@@ -11,12 +11,39 @@ const OfferDetailsPage = () => {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Mock Data
+  const MOCK_OFFER_DETAILS = {
+    offer_id: id,
+    title: "Développeur Full Stack",
+    description: "Nous recherchons un développeur Full Stack passionné pour rejoindre notre équipe dynamique. Vous travaillerez sur des projets innovants en utilisant les dernières technologies.",
+    company_name: "Tech Solutions",
+    location: "Alger, Hydra",
+    offer_type: "Emploi",
+    duration: "CDI",
+    created_at: "2024-01-25T10:00:00Z",
+    deadline: "2024-02-25",
+    requirements: "React, Node.js, SQL",
+    salary: "80000 - 120000 DZD",
+    status: "Active",
+    company: {
+        logo_url: "/company-logo.png",
+        website: "https://techsolutions.dz"
+    }
+  };
+
   useEffect(() => {
     const fetchOffer = async () => {
       try {
         setIsLoading(true);
+        // Commented out API call
+        /*
         const response = await getPublicOfferDetails(id);
         setOffer(response.data);
+        */
+        
+        // Use Mock Data
+        setOffer(MOCK_OFFER_DETAILS);
+        
         setError('');
       } catch (err) {
         setError('Impossible de charger les détails de l\'offre.');
@@ -41,8 +68,15 @@ const OfferDetailsPage = () => {
         return;
       }
 
+      // Commented out API call
+      /*
       // Assuming the endpoint to apply is /offers/:id/apply
       const response = await axiosInstance.post(`/offers/${id}/apply`);
+      */
+     
+      // Simulate success
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate delay
+      
       alert('Candidature envoyée avec succès !');
       setIsModalOpen(false);
       // Optionally, redirect the user to their applications page

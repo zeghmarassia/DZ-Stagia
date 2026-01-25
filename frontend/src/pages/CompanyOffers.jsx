@@ -40,6 +40,43 @@ const CompanyOffers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Mock Data
+  const MOCK_OFFERS = [
+    {
+        id: 1,
+        title: "Stage Développement Web",
+        date: "24/01/2024",
+        typeColor: "green",
+        typeText: "Stage",
+        visibility: "public",
+        status: "active",
+        candidates: 12,
+        is_active: true
+    },
+    {
+        id: 2,
+        title: "Designer UI/UX",
+        date: "22/01/2024",
+        typeColor: "blue",
+        typeText: "PFE",
+        visibility: "targeted",
+        status: "active",
+        candidates: 5,
+        is_active: true
+    },
+    {
+        id: 3,
+        title: "Data Analyst",
+        date: "20/01/2024",
+        typeColor: "yellow",
+        typeText: "Emploi",
+        visibility: "public",
+        status: "archived",
+        candidates: 8,
+        is_active: false
+    }
+  ];
+
   // Handle RTL for Arabic
   useEffect(() => {
     document.body.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
@@ -50,6 +87,8 @@ const CompanyOffers = () => {
     const fetchOffers = async () => {
       try {
         setLoading(true);
+        // Commented out API call
+        /*
         const response = await axiosInstance.get(`/api/v1/offers/my-offers`);
         
         // Map backend response to component state
@@ -66,6 +105,11 @@ const CompanyOffers = () => {
         }));
         
         setOffersData(offers);
+        */
+
+        // Use Mock Data
+        setOffersData(MOCK_OFFERS);
+        
       } catch (err) {
         setError('Erreur lors du chargement des offres');
         console.error('Offers fetch error:', err);

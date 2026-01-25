@@ -83,6 +83,61 @@ const CompanyDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Mock Data
+  const MOCK_STATS = {
+    totalOffers: 15,
+    totalApplications: 45,
+    totalCandidates: 38
+  };
+  
+  const MOCK_APPLICATIONS = [
+    {
+        id: 1,
+        student: {
+            first_name: "Yasmine",
+            last_name: "Amrani",
+            email: "yasmine.amrani@estin.dz",
+            profile_picture_url: "/profile.png"
+        },
+        offer: {
+            title: "Stage Développement Web",
+            type: "Stage"
+        },
+        status: "pending",
+        created_at: "2024-01-24T10:00:00Z"
+    },
+    {
+        id: 2,
+        student: {
+            first_name: "Karim",
+            last_name: "Benzema",
+            email: "karim.benzema@estin.dz",
+            profile_picture_url: "/profile.png"
+        },
+        offer: {
+            title: "Designer UI/UX",
+            type: "PFE"
+        },
+        status: "accepted",
+        created_at: "2024-01-22T14:30:00Z"
+    },
+    {
+        id: 3,
+        student: {
+            first_name: "Sarah",
+            last_name: "Bouzid",
+            email: "sarah.bouzid@estin.dz",
+            profile_picture_url: "/profile.png"
+        },
+        offer: {
+            title: "Data Analyst",
+            type: "Emploi"
+        },
+        status: "rejected",
+        created_at: "2024-01-20T09:15:00Z"
+    }
+  ];
+
   // Handle RTL for Arabic
   useEffect(() => {
     document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
@@ -93,6 +148,8 @@ const CompanyDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        // Commented out API calls
+        /*
         // Fetch offers statistics
         const offersStatsResponse = await getCompanyOfferStats();
         
@@ -109,6 +166,12 @@ const CompanyDashboard = () => {
         });
 
         setRecentApplications(appResponse.data.applications || []);
+        */
+       
+        // Use Mock Data
+        setStatistics(MOCK_STATS);
+        setRecentApplications(MOCK_APPLICATIONS);
+
       } catch (err) {
         setError('Failed to load dashboard data');
         console.error('Dashboard fetch error:', err);

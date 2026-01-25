@@ -14,14 +14,31 @@ const AdminDashboard = () => {
     applications_count: 0,
     applications_change: 0,
   });
+
+  // Mock Data
+  const MOCK_STATS = {
+    students_count: 1250,
+    students_change: 0.12,
+    companies_count: 45,
+    companies_change: 0.05,
+    active_offers_count: 89,
+    active_offers_change: -0.02,
+    applications_count: 340,
+    applications_change: 0.25,
+  };
+
   const location = useLocation();
 
   const isCollapsed = location.pathname !== '/admin';
 
   useEffect(() => {
+    // Commented out API call
+    /*
     getAdminStats()
       .then(data => setStats(data))
       .catch(err => console.error("Syncing with backend...", err));
+    */
+    setStats(MOCK_STATS);
   }, []);
 
   return (

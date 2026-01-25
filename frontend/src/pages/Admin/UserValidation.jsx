@@ -23,10 +23,40 @@ const UserValidation = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Mock Data
+  const MOCK_USERS = [
+    {
+      id: 1,
+      name: "Yasmine Amrani",
+      type: "student",
+      date: "2024-01-24T10:00:00Z",
+      doc: "certificat_scolarite.pdf",
+      email: "yasmine.amrani@estin.dz"
+    },
+    {
+      id: 2,
+      name: "Tech Solutions",
+      type: "company",
+      date: "2024-01-23T15:30:00Z",
+      doc: "registre_commerce.pdf",
+      email: "contact@techsolutions.com"
+    },
+    {
+      id: 3,
+      name: "Karim Benzema",
+      type: "student",
+      date: "2024-01-22T09:15:00Z",
+      doc: "releve_notes.png",
+      email: "karim.benzema@estin.dz"
+    }
+  ];
+
   useEffect(() => {
     const fetchPendingUsers = async () => {
       try {
         setLoading(true);
+        // Commented out API call
+        /*
         const [studentsRes, companiesRes] = await Promise.all([
           getPendingStudents(),
           getPendingCompanies(),
@@ -36,6 +66,11 @@ const UserValidation = () => {
         const pendingCompanies = companiesRes.data.map(c => ({ ...c, id: c.company_id, name: c.company_name, type: 'company', date: c.created_at, doc: c.document_url }));
 
         setUsers([...pendingStudents, ...pendingCompanies]);
+        */
+        
+        // Use Mock Data
+        setUsers(MOCK_USERS);
+
       } catch (err) {
         setError('Failed to fetch users.');
         console.error('Fetch users error:', err);
@@ -48,11 +83,16 @@ const UserValidation = () => {
 
   const handleApprove = async (id, type) => {
     try {
+      // Commented out API call
+      /*
       if (type === 'student') {
         await approveStudent(id);
       } else if (type === 'company') {
         await approveCompany(id);
       }
+      */
+      
+      // Update local state
       setUsers(users.filter((user) => user.id !== id));
     } catch (err) {
       setError('Failed to approve user.');
@@ -62,11 +102,16 @@ const UserValidation = () => {
 
   const handleReject = async (id, type) => {
     try {
+      // Commented out API call
+      /*
       if (type === 'student') {
         await rejectStudent(id);
       } else if (type === 'company') {
         await rejectCompany(id);
       }
+      */
+      
+      // Update local state
       setUsers(users.filter((user) => user.id !== id));
     } catch (err) {
       setError('Failed to reject user.');

@@ -90,7 +90,9 @@ const PostOffer = () => {
       console.log("Sending Payload:", payload);
 
       // 3. Send Request
-            const response = await postOffer(payload);
+      // Commented out API call
+      /*
+      const response = await postOffer(payload);
 
       if (response.status >= 200 && response.status < 300) {
         setSuccessMessage('Offre publiée avec succès!');
@@ -100,6 +102,14 @@ const PostOffer = () => {
       } else {
         setError(`Erreur inattendue: Code ${response.status}`);
       }
+      */
+
+      // Simulate successful response
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSuccessMessage('Offre publiée avec succès!');
+      setTimeout(() => {
+        navigate('/company/offers');
+      }, 1500);
 
     } catch (err) {
       console.error("Error:", err);

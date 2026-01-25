@@ -7,12 +7,47 @@ const Offers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Mock Data
+  const MOCK_OFFERS = [
+    {
+      id: 1,
+      title: "Développeur React Native",
+      company_name: "TechInnovate",
+      created_at: "2024-01-24T10:00:00Z",
+      offer_type: "Stage",
+      applications_count: 15
+    },
+    {
+      id: 2,
+      title: "Designer UI/UX",
+      company_name: "Creative Studio",
+      created_at: "2024-01-22T14:30:00Z",
+      offer_type: "PFE",
+      applications_count: 8
+    },
+    {
+      id: 3,
+      title: "Data Analyst",
+      company_name: "Data Corp",
+      created_at: "2024-01-20T09:15:00Z",
+      offer_type: "Emploi",
+      applications_count: 22
+    }
+  ];
+
   useEffect(() => {
     const fetchOffers = async () => {
       try {
         setLoading(true);
+        // Commented out API call
+        /*
         const response = await getOffers();
         setOffers(response.data.offers || []);
+        */
+        
+        // Use Mock Data
+        setOffers(MOCK_OFFERS);
+
       } catch (err) {
         setError('Failed to fetch offers.');
         console.error('Fetch offers error:', err);
@@ -33,7 +68,12 @@ const Offers = () => {
 
   const confirmDelete = async () => {
     try {
+      // Commented out API call
+      /*
       await deleteOffer(selectedId);
+      */
+      
+      // Update local state
       setOffers(offers.filter((o) => o.id !== selectedId));
       setShowModal(false);
     } catch (err) {

@@ -24,15 +24,44 @@ const StudentProfile = () => {
     github: '',
     portfolio: ''
   });
-    const [profilePicture, setProfilePicture] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(null);
+
+  // Mock Data
+  const MOCK_PROFILE = {
+    firstName: 'Yasmine',
+    lastName: 'Amrani',
+    professionalTitle: 'Développeuse Web Full Stack',
+    wilaya: 'Alger',
+    phoneNumber: '0555123456',
+    about: 'Étudiante passionnée par le développement web et les nouvelles technologies.',
+    education: [{
+      university: 'ESTIN',
+      degree: 'Ingénieur',
+      fieldOfStudy: 'Informatique',
+      startDate: '2021-09-01',
+      endDate: '2026-06-30'
+    }],
+    experiences: [],
+    skills: ['React', 'Node.js', 'Python'],
+    linkedIn: 'https://linkedin.com/in/yasmine-amrani',
+    github: 'https://github.com/yasmine-amrani',
+    portfolio: 'https://yasmine-amrani.com'
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        // Commented out API call
+        /*
         const response = await getStudentProfile();
         if (response.data) {
           setProfile(prev => ({ ...prev, ...response.data }));
         }
+        */
+       
+        // Use Mock Data
+        setProfile(prev => ({ ...prev, ...MOCK_PROFILE }));
+
       } catch (error) {
         console.error('Failed to fetch profile:', error);
       }
@@ -63,6 +92,8 @@ const StudentProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Commented out API call
+      /*
       // 1. Update textual profile data
       const profileData = {
         first_name: profile.firstName,
@@ -79,9 +110,12 @@ const StudentProfile = () => {
       if (profilePicture) {
         await uploadProfilePicture(profilePicture);
       }
+      */
 
       // TODO: Add separate calls for education, experience, and skills when those services are ready.
 
+      // Simulate successful response
+      await new Promise(resolve => setTimeout(resolve, 1000));
       alert('Profil mis à jour avec succès !');
       navigate('/student/dashboard');
     } catch (error) {

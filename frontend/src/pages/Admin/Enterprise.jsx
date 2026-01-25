@@ -7,12 +7,53 @@ const Enterprise = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Mock Data
+  const MOCK_COMPANIES = [
+    {
+      id: 1,
+      company_name: "TechInnovate",
+      industry: "Technologie",
+      email: "contact@techinnovate.com",
+      phone: "021234567",
+      address: "Alger Centre",
+      website_url: "https://techinnovate.com",
+      logo_url: "/company-logo.png"
+    },
+    {
+      id: 2,
+      company_name: "Creative Studio",
+      industry: "Design & Marketing",
+      email: "hello@creative.com",
+      phone: "021987654",
+      address: "Oran",
+      website_url: "https://creativestudio.com",
+      logo_url: "/company-logo.png"
+    },
+    {
+      id: 3,
+      company_name: "Data Corp",
+      industry: "Big Data",
+      email: "info@datacorp.com",
+      phone: "021112233",
+      address: "Constantine",
+      website_url: "https://datacorp.com",
+      logo_url: "/company-logo.png"
+    }
+  ];
+
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
         setLoading(true);
+        // Commented out API call
+        /*
         const response = await getCompanies();
         setCompanies(response.data.companies || []);
+        */
+        
+        // Use Mock Data
+        setCompanies(MOCK_COMPANIES);
+
       } catch (err) {
         setError('Failed to fetch companies.');
         console.error('Fetch companies error:', err);
@@ -33,7 +74,12 @@ const Enterprise = () => {
 
   const confirmDelete = async () => {
     try {
+      // Commented out API call
+      /*
       await deleteCompany(selectedId);
+      */
+      
+      // Update local state
       setCompanies(companies.filter((c) => c.id !== selectedId));
       setShowModal(false);
     } catch (err) {

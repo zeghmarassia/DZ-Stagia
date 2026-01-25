@@ -33,11 +33,47 @@ const CompanyCandidatures = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Mock Data
+  const MOCK_CANDIDATES = [
+    {
+        id: 1,
+        status: "pending",
+        student: {
+            first_name: "Yasmine",
+            last_name: "Amrani",
+            email: "yasmine.amrani@estin.dz",
+            profile_picture_url: "/profile.png"
+        },
+        offer: {
+            title: "Stage Développement Web",
+            created_at: "2024-01-15T09:00:00Z"
+        },
+        created_at: "2024-01-24T10:00:00Z"
+    },
+    {
+        id: 2,
+        status: "accepted",
+        student: {
+            first_name: "Karim",
+            last_name: "Benzema",
+            email: "karim.benzema@estin.dz",
+            profile_picture_url: "/profile.png"
+        },
+        offer: {
+            title: "Stage Développement Web",
+            created_at: "2024-01-15T09:00:00Z"
+        },
+        created_at: "2024-01-22T14:30:00Z"
+    }
+  ];
+
   // Fetch candidates for the offer
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
         setLoading(true);
+        // Commented out API call
+        /*
         // Fetch applications for this specific offer
         const response = await getApplicationsForOffer(id);
         
@@ -56,6 +92,17 @@ const CompanyCandidatures = () => {
             date: new Date().toLocaleDateString('fr-FR')
           });
         }
+        */
+
+        // Use Mock Data
+        setCandidates(MOCK_CANDIDATES);
+        if (MOCK_CANDIDATES.length > 0) {
+          setOfferDetails({
+            title: MOCK_CANDIDATES[0].offer?.title || 'Offre',
+            date: new Date(MOCK_CANDIDATES[0].offer?.created_at).toLocaleDateString('fr-FR')
+          });
+        }
+
       } catch (err) {
         setError('Erreur lors du chargement des candidatures');
         console.error('Candidates fetch error:', err);

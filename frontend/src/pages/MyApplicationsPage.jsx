@@ -7,12 +7,62 @@ const MyApplicationsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Mock Data
+  const MOCK_APPLICATIONS = [
+    {
+        id: 1,
+        status: "En cours d'étude",
+        applicationDate: "2024-01-24T10:00:00Z",
+        offer: {
+            title: "Développeur Full Stack",
+            type: "Stage",
+            company: {
+                name: "Tech Solutions",
+                logoUrl: "/company-logo.png"
+            }
+        }
+    },
+    {
+        id: 2,
+        status: "Acceptée",
+        applicationDate: "2024-01-22T14:30:00Z",
+        offer: {
+            title: "Designer UI/UX",
+            type: "PFE",
+            company: {
+                name: "Creative Agency",
+                logoUrl: "/company-logo.png"
+            }
+        }
+    },
+    {
+        id: 3,
+        status: "Refusée",
+        applicationDate: "2024-01-20T09:15:00Z",
+        offer: {
+            title: "Data Scientist",
+            type: "Emploi",
+            company: {
+                name: "Data Corp",
+                logoUrl: "/company-logo.png"
+            }
+        }
+    }
+  ];
+
   useEffect(() => {
     const fetchApplications = async () => {
       try {
         setIsLoading(true);
+        // Commented out API call
+        /*
         const response = await axiosInstance.get('/student/applications'); // Assuming this is the correct endpoint
         setApplications(response.data.applications || []);
+        */
+       
+        // Use Mock Data
+        setApplications(MOCK_APPLICATIONS);
+
         setError('');
       } catch (err) {
         setError('Impossible de charger vos candidatures.');

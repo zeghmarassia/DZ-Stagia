@@ -20,11 +20,77 @@ const Offers = () => {
     navigate(`/offers/${offerId}`);
   };
 
+  // Mock Data
+  const MOCK_OFFERS = [
+    {
+      offer_id: 1,
+      title: "Développeur React Native",
+      company_name: "TechInnovate",
+      location: "Alger",
+      duration: "6 mois",
+      offer_type: "PFE",
+      logo_bg: "bg-blue-100",
+      badge_color: "bg-blue-100 text-blue-600",
+    },
+    {
+      offer_id: 2,
+      title: "Designer UI/UX",
+      company_name: "Creative Studio",
+      location: "Oran",
+      duration: "3 mois",
+      offer_type: "Stage",
+      logo_bg: "bg-purple-100",
+      badge_color: "bg-purple-100 text-purple-600",
+    },
+    {
+      offer_id: 3,
+      title: "Data Analyst",
+      company_name: "DataCorp",
+      location: "Sétif",
+      duration: "CDD",
+      offer_type: "Emploi",
+      logo_bg: "bg-green-100",
+      badge_color: "bg-green-100 text-green-600",
+    },
+    {
+      offer_id: 4,
+      title: "Chef de Projet Junior",
+      company_name: "StartUp Valley",
+      location: "Constantine",
+      duration: "12 mois",
+      offer_type: "Alternance",
+      logo_bg: "bg-orange-100",
+      badge_color: "bg-orange-100 text-orange-600",
+    },
+    {
+      offer_id: 5,
+      title: "Ingénieur DevOps",
+      company_name: "Cloud Systems",
+      location: "Télétravail",
+      duration: "CDI",
+      offer_type: "Emploi",
+      logo_bg: "bg-red-100",
+      badge_color: "bg-red-100 text-red-600",
+    },
+    {
+      offer_id: 6,
+      title: "Community Manager",
+      company_name: "Social Buzz",
+      location: "Annaba",
+      duration: "3 mois",
+      offer_type: "Stage",
+      logo_bg: "bg-pink-100",
+      badge_color: "bg-pink-100 text-pink-600",
+    }
+  ];
+
   // Fetch offers from backend
   useEffect(() => {
     const fetchOffers = async () => {
       setLoading(true);
       try {
+        // Commented out API call
+        /*
         const response = await getPublicOffers({
           page: currentPage,
           page_size: pageSize,
@@ -33,6 +99,12 @@ const Offers = () => {
         console.log('Offers response:', response.data);
         setOffers(response.data.offers || []);
         setTotalPages(response.data.total_pages || 0);
+        */
+       
+        // Use Mock Data
+        setOffers(MOCK_OFFERS);
+        setTotalPages(1);
+
       } catch (err) {
         console.error('Error fetching offers:', err);
       } finally {
@@ -171,7 +243,15 @@ const Offers = () => {
               offers.map((offer) => (
                 <JobCard 
                   key={offer.offer_id} 
-                  offer={offer}
+                  title={offer.title}
+                  company={offer.company_name}
+                  location={offer.location}
+                  duration={offer.duration}
+                  type={offer.offer_type}
+                  badgeColor={offer.badge_color || "bg-blue-100 text-blue-600"}
+                  logo={<Briefcase className="w-8 h-8 text-slate-600" />}
+                  logoBg={offer.logo_bg || "bg-blue-100"}
+                  offerId={offer.offer_id}
                   onViewClick={handleViewOffer}
                 />
               ))
