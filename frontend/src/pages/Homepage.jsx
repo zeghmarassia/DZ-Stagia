@@ -131,7 +131,7 @@ const Homepage = () => {
       {/* <HomeNavbar /> */}
 
       {/* --- HERO SECTION --- */}
-      <header className="bg-gray-50/50 pt-20 pb-24 text-center px-4">
+      <header id='hero' className="bg-gray-50/50 pt-20 pb-24 text-center px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-8">
             {t('hero.title')}
@@ -153,7 +153,7 @@ const Homepage = () => {
       </header>
 
       {/* --- FEATURES SECTION --- */}
-      <section className="relative py-24 bg-gradient-to-r from-teal-600 to-slate-400">
+      <section id='features' className="relative py-24 bg-gradient-to-r from-teal-600 to-slate-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-3xl font-bold text-white drop-shadow-md">
@@ -185,7 +185,7 @@ const Homepage = () => {
       </section>
 
       {/* --- TOP COMPANIES --- */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id='companies' className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-end mb-10">
           <h2 className="text-2xl font-bold text-slate-900">Postulez pour les meilleures entreprises</h2>
 
@@ -213,7 +213,7 @@ const Homepage = () => {
       </section>
 
       {/* --- RECENT OFFERS --- */}
-      <section className="py-16 bg-white">
+      <section id='offers' className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Offres Récentes</h2>
@@ -253,12 +253,12 @@ const Homepage = () => {
       </section>
 
       {/* --- CTA SECTION 1 --- */}
-      <section className="bg-gradient-to-r from-slate-800 to-slate-900 text-white overflow-hidden">
+      <section id='forstudent' className="bg-gradient-to-r from-slate-800 to-slate-900 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
           <div className="md:w-1/2 py-16 md:pr-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">Prêt à commencer votre parcours ?</h2>
             <p className="text-slate-300 text-lg mb-8 max-w-lg">Rejoignez des milliers d'étudiants qui ont trouvé leur opportunité idéale.</p>
-            <button className="px-8 py-3 bg-white text-slate-900 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg">Commencer</button>
+            <button onClick={() => navigate('/login')} className="px-8 py-3 bg-white text-slate-900 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg">Commencer</button>
           </div>
           <div className="md:w-1/2 flex justify-center md:justify-end relative mt-8 md:mt-0">
             <img src="/students1 1.png" alt="Étudiants" className="w-full max-w-md object-contain drop-shadow-2xl" />
@@ -267,7 +267,7 @@ const Homepage = () => {
       </section>
 
       {/* --- CTA SECTION 2 --- */}
-      <section className="bg-gradient-to-r from-teal-700 to-emerald-600 text-white overflow-hidden">
+      <section id='forcompany' className="bg-gradient-to-r from-teal-700 to-emerald-600 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col-reverse md:flex-row items-center justify-between">
           <div className="md:w-1/2 flex justify-center md:justify-start relative mt-8 md:mt-0 pt-10">
             <img src="/company 1.png" alt="Entreprise" className="w-full max-w-lg object-contain drop-shadow-xl" />
@@ -275,13 +275,13 @@ const Homepage = () => {
           <div className="md:w-1/2 py-16 md:pl-12 text-left">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">Vous voulez recruter les meilleurs talents ?</h2>
             <p className="text-emerald-50 text-lg mb-8 max-w-lg">Rejoignez des entreprises qui publient des offres captivantes.</p>
-            <button className="px-8 py-3 bg-white text-teal-800 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg">Commencer</button>
+            <button onClick={() => navigate('/login')} className="px-8 py-3 bg-white text-teal-800 font-bold rounded-lg hover:bg-gray-100 transition shadow-lg">Commencer</button>
           </div>
         </div>
       </section>
 
       {/* --- FOOTER --- */}
-      <footer className="bg-slate-950 text-slate-400 py-12 text-sm">
+      <footer id='footer' className="bg-slate-950 text-slate-400 py-12 text-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="text-xl font-black text-white mb-4">STAGIA.</div>

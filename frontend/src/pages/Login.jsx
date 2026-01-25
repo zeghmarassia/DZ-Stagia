@@ -86,7 +86,7 @@ const Login = () => {
       {/* Top Navigation */}
       <div className="p-6 flex justify-between items-center">
         <Link to="/" className="text-2xl font-black text-slate-900 tracking-wide uppercase hover:text-blue-600 transition">
-          LOGO
+          DZ-Stagia
         </Link>
         <div><LanguageSwitcher /></div>
       </div>

@@ -91,7 +91,7 @@ const Navbar = () => {
       <nav className="w-full bg-white border-b border-gray-200 px-8 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           {/* Logo */}
-          <Link to="/company/dashboard" className="text-2xl font-black text-slate-900">
+          <Link to="/" className="text-2xl font-black text-slate-900">
             STAGIA
           </Link>
 
@@ -128,7 +128,7 @@ const Navbar = () => {
                 {user?.logo_url ? (
                   <img src={user.logo_url} alt="Company" className="w-full h-full object-cover" />
                 ) : (
-                  <img src="/company-logo.png" alt="Company" className="w-full h-full object-cover" />
+                  <img src="/yassir-logo.png" alt="Company" className="w-full h-full object-cover" />
                 )}
               </div>
             </Link>

@@ -25,9 +25,9 @@ const HomeNavbar = () => {
 
             {/* Nav Links (Desktop) */}
             <div className="hidden md:flex space-x-6 lg:space-x-8 text-sm font-bold text-slate-900">
-              <Link to="/offers" className="hover:text-blue-600 transition">{t('nav.offers')}</Link>
-              <a href="#" className="hover:text-blue-600 transition">{t('nav.companies')}</a>
-              <a href="#" className="hover:text-blue-600 transition">{t('nav.about')}</a>
+              <a href="#offers" className="hover:text-blue-600 transition">{t('nav.offers')}</a>
+              <a href="#companies" className="hover:text-blue-600 transition">{t('nav.companies')}</a>
+              <a href="#footer" className="hover:text-blue-600 transition">{t('nav.about')}</a>
             </div>
           </div>
 
