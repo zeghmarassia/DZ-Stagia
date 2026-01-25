@@ -74,26 +74,6 @@ const AdminDashboard = () => {
 
       {/* Main Content - No changes here */}
       <main className="flex-1 bg-[#F4F4F4]/50 px-10 py-8">
-        {/* <div className="flex justify-between items-center mb-8">
-          <div className="flex-1"></div>
-          <div className="flex items-center space-x-8">
-            <button className="text-[#6F767E] hover:text-black scale-90"><SearchIcon /></button>
-            <button className="text-[#6F767E] relative scale-90">
-              <BellIcon />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-[#FF6A55] rounded-full border-2 border-white"></span>
-            </button>
-            <div className="flex items-center space-x-3">
-              <div className="text-right">
-                <p className="text-[13px] font-[700] text-[#1A1D1F]">Hiba Kara</p>
-                <p className="text-[11px] text-[#6F767E] font-[500]">Admin</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-[#FFBC99] flex items-center justify-center border border-white shadow-sm">
-                <span className="text-white font-[700] text-[12px]">HK</span>
-              </div>
-              <button className="text-[#6F767E] hover:text-black scale-90"><LogoutIcon /></button>
-            </div>
-          </div>
-        </div> */}
 
         {location.pathname === '/admin' && (
           <>
