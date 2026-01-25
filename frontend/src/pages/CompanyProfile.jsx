@@ -18,7 +18,8 @@ const CompanyProfile = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Mock Data
+  // COMMENTED OUT MOCK DATA - Now fetching from API
+  /*
   const MOCK_PROFILE = {
     name: "Tech Solutions",
     sector: "Technologie",
@@ -28,14 +29,14 @@ const CompanyProfile = () => {
     description: "Une entreprise leader dans le domaine des solutions technologiques innovantes.",
     logo: "/company-logo.png"
   };
+  */
 
   // Fetch company profile on component mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        // Commented out API call
-        /*
+        // Fetch profile from API using service
         const response = await getCompanyProfile();
 
         if (response.data) {
@@ -49,19 +50,6 @@ const CompanyProfile = () => {
             logo: response.data.logo_url || ''
           });
         }
-        */
-
-        // Use Mock Data
-        setFormData({
-            name: MOCK_PROFILE.name,
-            sector: MOCK_PROFILE.sector,
-            location: MOCK_PROFILE.location,
-            website: MOCK_PROFILE.website,
-            phone: MOCK_PROFILE.phone,
-            description: MOCK_PROFILE.description,
-            logo: MOCK_PROFILE.logo
-        });
-
       } catch (err) {
         setError('Erreur lors du chargement du profil');
         console.error('Profile fetch error:', err);

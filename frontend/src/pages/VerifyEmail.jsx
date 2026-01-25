@@ -80,11 +80,8 @@ const VerifyEmail = () => {
     setError('');
 
     try {
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('otp_code', otpCode);
-
-      const response = await verifyEmail(formData);
+      // Pass object directly, not FormData - verifyEmail will handle FormData conversion
+      const response = await verifyEmail({ email, otp_code: otpCode });
 
       // If successful, navigate to AccountPending
       navigate('/account-pending', { state: { email: email, userType: userType } });

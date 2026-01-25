@@ -21,7 +21,8 @@ const Offers = () => {
     navigate(`/offers/${offerId}`);
   };
 
-  // Mock Data
+  // Mock Data - COMMENTED OUT (Now fetching from API via getPublicOffers)
+  /*
   const MOCK_OFFERS = [
     {
       offer_id: 1,
@@ -84,6 +85,7 @@ const Offers = () => {
       badge_color: "bg-pink-100 text-pink-600",
     }
   ];
+  */
 
   // Fetch offers from backend
   useEffect(() => {
@@ -111,13 +113,13 @@ const Offers = () => {
           badge_color: 'bg-blue-100 text-blue-600',
         }));
         
-        setOffers(transformedOffers.length > 0 ? transformedOffers : MOCK_OFFERS);
+        setOffers(transformedOffers.length > 0 ? transformedOffers : []);
         setTotalPages(response?.data?.total_pages || 1);
         
       } catch (err) {
         console.error('Error fetching offers:', err);
-        // Fallback to mock data on error
-        setOffers(MOCK_OFFERS);
+        // Fallback to empty array on error
+        setOffers([]);
         setTotalPages(1);
       } finally {
         setLoading(false);

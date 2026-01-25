@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next'; // 1. Import Hook
 import { Mail, Lock, Upload, User, Building, Briefcase, GraduationCap, X } from 'lucide-react';
 import { studentRegister, companyRegister } from '../services/authService';
+import axiosInstance from '../config/axios';
 import LanguageSwitcher from '../components/LanguageSwitcher'; // 2. Import Switcher
 
 const SignupPage = ({ type }) => {
@@ -119,10 +120,24 @@ const StudentForm = () => {
   const [formData, setFormData] = useState({
     university: '', firstName: '', lastName: '', email: '', password: '', file: null
   });
+  const [establishments, setEstablishments] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef(null);
+
+  // Fetch establishments on component mount
+  React.useEffect(() => {
+    const fetchEstablishments = async () => {
+      try {
+        const response = await axiosInstance.get('/establishments/list');
+        setEstablishments(response.data);
+      } catch (err) {
+        console.error('Failed to fetch establishments:', err);
+      }
+    };
+    fetchEstablishments();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -195,9 +210,11 @@ const StudentForm = () => {
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5B8C9D] appearance-none bg-white text-gray-600"
           >
             <option value="">{t('auth.university_placeholder', 'Choisissez votre établissement')}</option>
-            <option value="1">USTHB</option>
-            <option value="2">ESI</option>
-            <option value="3">MDI</option>
+            {establishments.map((est) => (
+              <option key={est.establishment_id} value={est.establishment_id}>
+                {est.name}
+              </option>
+            ))}
           </select>
           <GraduationCap className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
         </div>

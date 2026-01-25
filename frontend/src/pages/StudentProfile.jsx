@@ -26,7 +26,8 @@ const StudentProfile = () => {
   });
   const [profilePicture, setProfilePicture] = useState(null);
 
-  // Mock Data
+  // COMMENTED OUT MOCK DATA - Now fetching from API
+  /*
   const MOCK_PROFILE = {
     firstName: 'Yasmine',
     lastName: 'Amrani',
@@ -47,21 +48,16 @@ const StudentProfile = () => {
     github: 'https://github.com/yasmine-amrani',
     portfolio: 'https://yasmine-amrani.com'
   };
+  */
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Commented out API call
-        /*
+        // Fetch profile from API using service
         const response = await getStudentProfile();
         if (response.data) {
           setProfile(prev => ({ ...prev, ...response.data }));
         }
-        */
-       
-        // Use Mock Data
-        setProfile(prev => ({ ...prev, ...MOCK_PROFILE }));
-
       } catch (error) {
         console.error('Failed to fetch profile:', error);
       }

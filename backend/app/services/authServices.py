@@ -209,8 +209,19 @@ class AuthService:
         
         try:
             db.add(new_student)
+            db.flush()  # Flush to get the student_id
             db.commit()
-            db.refresh(new_student)
+            
+            # Verify student was saved
+            saved_student = db.query(Student).filter(Student.email == email).first()
+            if not saved_student:
+                print(f"ERROR: Student {email} not found after commit!")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Student registration failed - user not persisted"
+                )
+            
+            print(f"SUCCESS: Student {email} registered with ID {saved_student.student_id}")
 
             # Generate OTP
             otp = AuthService.generate_otp()
@@ -226,7 +237,9 @@ class AuthService:
             except Exception as email_error:
                 print(f"Email service failed: {email_error}")
                 
-            return new_student
+            return saved_student
+        except HTTPException:
+            raise
         except IntegrityError as e:
             db.rollback()
             # Document is already uploaded but student failed
@@ -237,6 +250,7 @@ class AuthService:
             )
         except Exception as e:
             db.rollback()
+            print(f"Unexpected error during registration: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Registration failed: {str(e)}"
@@ -288,8 +302,19 @@ class AuthService:
         
         try:
             db.add(new_company)
+            db.flush()  # Flush to get the company_id
             db.commit()
-            db.refresh(new_company)
+            
+            # Verify company was saved
+            saved_company = db.query(Company).filter(Company.email == email).first()
+            if not saved_company:
+                print(f"ERROR: Company {email} not found after commit!")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Company registration failed - user not persisted"
+                )
+            
+            print(f"SUCCESS: Company {email} registered with ID {saved_company.company_id}")
             
             # Generate OTP
             otp = AuthService.generate_otp()
@@ -324,24 +349,39 @@ class AuthService:
         
     @staticmethod
     def verify_email(db: Session, email: str, otp: str) -> dict:
+        """Verify email with OTP - user must exist in database"""
         
-        user_type, user = AuthService.detect_user_type(db, email)
+        # First, try to find the user by email
+        student = db.query(Student).filter(Student.email == email).first()
+        company = db.query(Company).filter(Company.email == email).first()
         
-        if not user:
+        if not student and not company:
+            print(f"DEBUG: User not found for email: {email}")
+            print(f"DEBUG: Checking students table...")
+            all_students = db.query(Student).all()
+            print(f"DEBUG: Total students in DB: {len(all_students)}")
+            for s in all_students:
+                print(f"  - {s.email}")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
+                detail="User not found. Please register first."
             )
+        
+        user = student if student else company
+        user_type = "student" if student else "company"
+        
         if user.is_email_verified:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already verified"
             )
+        
         if not AuthService.verify_otp(db, email, otp, user_type, "verification"):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid or expired OTP"
             )
+        
         user.is_email_verified = True
         db.commit()
         

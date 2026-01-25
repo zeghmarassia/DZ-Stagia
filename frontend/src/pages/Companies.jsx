@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Filter } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import CompanyCard2 from '../components/CompanyCard2'; // CHANGED: Imported CompanyCard2
+import { getAllCompanies } from '../services/companyService';
 
 const Companies = () => {
   const [companies, setCompanies] = useState([]);
@@ -9,6 +10,8 @@ const Companies = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSector, setSelectedSector] = useState("Tous");
 
+  // COMMENTED OUT MOCK DATA - Now fetching from API
+  /*
   const MOCK_COMPANIES = [
     {
       company_id: 1,
@@ -95,17 +98,18 @@ const Companies = () => {
       created_at: "2023-12-01T16:20:00Z"
     }
   ];
+  */
 
   useEffect(() => {
     const fetchCompanies = async () => {
       setLoading(true);
       try {
-        setTimeout(() => {
-          setCompanies(MOCK_COMPANIES);
-          setLoading(false);
-        }, 800);
+        const response = await getAllCompanies();
+        setCompanies(response.data || []);
       } catch (error) {
         console.error("Error fetching companies:", error);
+        setCompanies([]);
+      } finally {
         setLoading(false);
       }
     };
