@@ -1,13 +1,22 @@
-from app.routes.authRoutes import router as auth_router
-from app.routes.adminRoutes import router as admin_router
-from app.routes.establishment import router as establishment_router
-from app.routes.studentRoutes import router as student_router
-from app.routes.mainRoutes import router as main_router
+# This exports the modules themselves, not the routers
+from app.routes import authRoutes
+from app.routes import adminRoutes
+from app.routes import establishment
+from app.routes import studentRoutes
+from app.routes import companyRoutes
+from app.routes import mainRoutes
+from app.routes import offerRoutes
+from app.routes import applicationRoutes
+from app.routes import notificationRoutes
 
 __all__ = [
-    "auth_router",
-    "admin_router",
-    "establishment_router",
-    "student_router",
-    "main_router"
+    "authRoutes",
+    "adminRoutes",
+    "establishment",
+    "studentRoutes",
+    "companyRoutes",
+    "mainRoutes",
+    "offerRoutes",
+    "applicationRoutes",
+    "notificationRoutes"
 ]
