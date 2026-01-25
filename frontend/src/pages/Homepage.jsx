@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-// Removed: LanguageSwitcher (now inside Navbar)
 import CompanyCard from '../components/CompanyCard';
 import JobCard from '../components/JobCard';
 import FeatureCard from '../components/FeatureCard';
