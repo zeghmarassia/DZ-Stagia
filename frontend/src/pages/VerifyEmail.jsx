@@ -98,7 +98,7 @@ const VerifyEmail = () => {
     <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center items-center px-8 relative">
        {/* Logo Absolute Top Left (Mobile friendly adjustment needed for real app) */}
        <div className="absolute top-8 left-8">
-        <span className="text-2xl font-black uppercase tracking-widest">LOGO</span>
+        <span className="text-2xl font-black uppercase tracking-widest" onClick={() => navigate('/')}>DZ-Stagia</span>
       </div>
 
       {/* Language Flag Absolute Top Right */}
