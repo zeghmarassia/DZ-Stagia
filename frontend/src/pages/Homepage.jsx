@@ -311,7 +311,7 @@ const Homepage = () => {
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-slate-900 text-center text-xs">
-          &copy; 2025 STAGIA. Tous Droits Réservés.
+          &copy; <span onClick={()=>navigate('/auth/admin/login')}>2025</span> STAGIA. Tous Droits Réservés.
         </div>
     </footer>
     </div>
