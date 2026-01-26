@@ -81,3 +81,31 @@ def health_check():
         "service": "DZ-Stagia API",
         "version": "1.0.0"
     }
+
+@app.get("/test-smtp-port")
+async def test_smtp():
+    import socket
+    
+    results = {}
+    
+    # Test port 587
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5)
+        result = sock.connect_ex(('smtp.gmail.com', 587))
+        sock.close()
+        results['port_587'] = " OPEN" if result == 0 else f" BLOCKED (code: {result})"
+    except Exception as e:
+        results['port_587'] = f" ERROR: {str(e)}"
+    
+    # Test port 465
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5)
+        result = sock.connect_ex(('smtp.gmail.com', 465))
+        sock.close()
+        results['port_465'] = "OPEN" if result == 0 else f" BLOCKED (code: {result})"
+    except Exception as e:
+        results['port_465'] = f"ERROR: {str(e)}"
+    
+    return results
