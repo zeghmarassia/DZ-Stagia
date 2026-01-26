@@ -22,16 +22,20 @@ const AdminLoginPage = () => {
   try {
     // Call the centralized service function
     const response = await loginAdmin({ email, password });
+    console.log('Login response:', response.data);
 
+    // Store token and user type in localStorage
+    localStorage.setItem('token', response.data.access_token);
+    localStorage.setItem('userType', response.data.user_type);
     // Destructure the data returned by your backend
-    const { token, user } = response.data;
-
+    const { access_token, user } = response.data;
     // Update Redux and LocalStorage using your store's action
     dispatch(setCredentials({
       user: user,
-      token: token,
+      token: access_token,
       userType: 'admin' // Ensures Navbar renders Admin links
     }));
+
 
     // Redirect to the admin dashboard
     navigate('/admin/dashboard');
