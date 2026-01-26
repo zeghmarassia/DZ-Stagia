@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Search, Bell, LogOut } from 'lucide-react';
 import HomeNavbar from './HomeNavbar';
@@ -7,14 +7,20 @@ import { logout } from '../store';
 
 const Navbar = () => {
   const { isAuthenticated, userType, user } = useSelector((state) => state.auth);
-
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   
   const handleLogout = () => {
     localStorage.clear();
     dispatch(logout());
-    navigate('/login');
+    // navigate('/login');
+    window.location.href = '/login';
+  };
+  const handleAdminLogout = () => {
+    console.log('Admin logout called');
+    localStorage.clear();
+    // navigate('/auth/admin/login');
+    dispatch(logout());
+    window.location.href = '/auth/admin/login'; // Hard redirect
   };
 
   // Public Navbar (Not Authenticated)
@@ -192,7 +198,7 @@ const Navbar = () => {
 
             {/* Logout Button */}
             <button 
-              onClick={handleLogout} 
+              onClick={handleAdminLogout} 
               className="ml-4 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
               title="Se déconnecter"
             >
