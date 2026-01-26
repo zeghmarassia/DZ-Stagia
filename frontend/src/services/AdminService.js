@@ -16,6 +16,8 @@ export const loginAdmin = (credentials) => {
   });
 };
 
+export const getAdmins = () => axiosInstance.get('/admin/admin/admins');
+
 export const getAdminStats = () => axiosInstance.get('/admin/stats');
 
 export const getPendingUsers = () => axiosInstance.get('/admin/pending-users');

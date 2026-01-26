@@ -53,4 +53,4 @@ export const getEstablishments = () => {
 };
 
 // Admin functions
-export const getAdminStats = () => axiosInstance.get('/admin/stats');
+export const getAdminStats = () => axiosInstance.get('/admin/admin/stats');
