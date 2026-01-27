@@ -1,30 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus } from 'lucide-react';
 import { getAdmins } from '../../services/AdminService.js';
+import Sidebar from '../../components/Sidebar.jsx';
 
 const Admins = () => {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAdmins = async () => {
-      setLoading(true);
-      try {
-        const response = await getAdmins();
-        setAdmins(response.data);
-      } catch (error) {
-        console.error("Error fetching admins:", error);
-        setLoading(false);
-      }
-    };
-
     fetchAdmins();
   }, []);
 
+  const fetchAdmins = async () => {
+    setLoading(true);
+    try {
+      const response = await getAdmins({
+        skip: 0,      // Optional: start from first record
+        limit: 100    // Optional: get 100 records
+      });
+      
+      console.log('Admins:', response.data);
+      setAdmins(response.data);
+    } catch (error) {
+      console.error('Error fetching admins:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // const formatDate = (dateString) => {
+  //   if (!dateString) return 'N/A';
+  //   return new Date(dateString).toLocaleDateString('fr-FR', {
+  //     year: 'numeric',
+  //     month: 'short',
+  //     day: 'numeric',
+  //     hour: '2-digit',
+  //     minute: '2-digit'
+  //   });
+  // };
+
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans">
-  
 
+      <Sidebar/>
       {/* Main Content */}
       <main className="flex-1 ml-64 p-8">
         
@@ -34,11 +52,6 @@ const Admins = () => {
             <h1 className="text-2xl font-bold text-slate-900">Gestion des Administrateurs</h1>
             <p className="text-slate-500 mt-1">Liste des administrateurs enregistrés.</p>
           </div>
-          
-          <button className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2 shadow-lg shadow-slate-900/20">
-            <UserPlus size={18} />
-            Ajouter un admin
-          </button>
         </div>
 
         {/* Content Container */}
@@ -52,6 +65,8 @@ const Admins = () => {
                   <th className="px-6 py-4">Prénom</th>
                   <th className="px-6 py-4">Nom</th>
                   <th className="px-6 py-4">Email</th>
+                  <th className='px-6 py-4'>Photo</th>
+                  {/* <th className='px-6 py-4'>A rejoint le</th> */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -76,6 +91,17 @@ const Admins = () => {
                       <td className="px-6 py-4 text-slate-600">
                         {admin.email}
                       </td>
+                      <td className="px-6 py-4 text-slate-600">
+                        <img 
+                          src={admin.picture}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      </td>
+                      {/* <td className="px-6 py-4 text-slate-600">
+                        <span className="text-sm text-slate-600">
+                        {formatDate(admin.created_at)}
+                        </span>
+                      </td> */}
                     </tr>
                   ))
                 ) : (

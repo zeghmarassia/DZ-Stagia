@@ -123,18 +123,18 @@ function App() {
         <Route path="/admin/dashboard" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <Layout>
-              <Sidebar>
+              {/* <Sidebar> */}
               <AdminDashboard/>
-              </Sidebar>
+              {/* </Sidebar> */}
               </Layout>
           </ProtectedRoute>
         } />
             <Route path="/admin/admins" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <Layout>
-                  <Sidebar>
+                  {/* <Sidebar> */}
                     <Admins/>
-                  </Sidebar>
+                  {/* </Sidebar> */}
                   </Layout>
               </ProtectedRoute>
             } />
@@ -142,35 +142,31 @@ function App() {
         <Route path="/admin/companies" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <Layout>
-              <Sidebar>
+              {/* <Sidebar> */}
               <Enterprise />
-              </Sidebar>
+              {/* </Sidebar> */}
               </Layout>
           </ProtectedRoute>
         } />
         <Route path="/admin/students" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <Layout>
-              <Sidebar>
+              {/* <Sidebar> */}
                 <Etudiants />
-              </Sidebar>
+              {/* </Sidebar> */}
             </Layout>
           </ProtectedRoute>
         } />
         <Route path="/admin/offers" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <Layout>
-              <Sidebar>
+              {/* <Sidebar> */}
                 <AdminOffers />
-              </Sidebar >
+              {/* </Sidebar > */}
             </Layout>
           </ProtectedRoute>
         } />
-        {/* <Route path="/admin/user-validation" element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <Layout><UserValidation /></Layout>
-          </ProtectedRoute>
-        } /> */}
+
 
       </Routes>
     </Router>

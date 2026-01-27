@@ -51,6 +51,3 @@ export const resetPassword = (data) => {
 export const getEstablishments = () => {
   return axiosInstance.get('/establishments/list');
 };
-
-// Admin functions
-export const getAdminStats = () => axiosInstance.get('/admin/admin/stats');

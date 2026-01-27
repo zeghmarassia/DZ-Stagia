@@ -53,7 +53,7 @@ const AdminLoginPage = () => {
       <div className="max-w-md w-full bg-white p-8 rounded-[2rem] border border-slate-200 shadow-xl">
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-teal-50 rounded-2xl mb-4">
-            <span className="text-2xl font-black text-teal-600">STAGIA</span>
+            <span className="text-2xl font-black text-teal-600 cursor-pointer" onClick={()=> navigate('/')}>STAGIA</span>
           </div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Portail Administrateur</h1>
           <p className="text-slate-500 text-sm font-medium mt-1">Connectez-vous pour gérer la plateforme</p>
