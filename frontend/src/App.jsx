@@ -32,6 +32,7 @@ import Admins from './pages/Admin/Admins';
 import AdminOffers from './pages/Admin/AdminOffers';
 import Enterprise from './pages/Admin/Enterprise';
 import Etudiants from './pages/Admin/Etudiants';
+import AdminProfile from './pages/Admin/AdminProfile.jsx';
 // import UserValidation from './pages/Admin/UserValidation';
 
 import './i18n';
@@ -162,6 +163,15 @@ function App() {
             <Layout>
               {/* <Sidebar> */}
                 <AdminOffers />
+              {/* </Sidebar > */}
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/profile" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Layout>
+              {/* <Sidebar> */}
+                <AdminProfile />
               {/* </Sidebar > */}
             </Layout>
           </ProtectedRoute>

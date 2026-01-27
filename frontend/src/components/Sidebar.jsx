@@ -6,12 +6,14 @@ import {
   GraduationCap, 
   Building2, 
   ShieldCheck, 
-  LogOut 
+  LogOut, 
+  CircleUser
 } from 'lucide-react';
 
 const Sidebar = () => {
 
   const navItems = [
+    { icon: CircleUser, label: "Profil", path: "/admin/profile" },
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin/dashboard" },
     { icon: ShieldCheck, label: "Admins", path: "/admin/admins" },
     { icon: GraduationCap, label: "Étudiants", path: "/admin/students" },
