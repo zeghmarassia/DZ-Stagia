@@ -22,16 +22,20 @@ const AdminLoginPage = () => {
   try {
     // Call the centralized service function
     const response = await loginAdmin({ email, password });
+    console.log('Login response:', response.data);
 
+    // Store token and user type in localStorage
+    localStorage.setItem('token', response.data.access_token);
+    localStorage.setItem('userType', response.data.user_type);
     // Destructure the data returned by your backend
-    const { token, user } = response.data;
-
+    const { access_token, user } = response.data;
     // Update Redux and LocalStorage using your store's action
     dispatch(setCredentials({
       user: user,
-      token: token,
+      token: access_token,
       userType: 'admin' // Ensures Navbar renders Admin links
     }));
+
 
     // Redirect to the admin dashboard
     navigate('/admin/dashboard');
@@ -49,7 +53,7 @@ const AdminLoginPage = () => {
       <div className="max-w-md w-full bg-white p-8 rounded-[2rem] border border-slate-200 shadow-xl">
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-teal-50 rounded-2xl mb-4">
-            <span className="text-2xl font-black text-teal-600">STAGIA</span>
+            <span className="text-2xl font-black text-teal-600 cursor-pointer" onClick={()=> navigate('/')}>STAGIA</span>
           </div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Portail Administrateur</h1>
           <p className="text-slate-500 text-sm font-medium mt-1">Connectez-vous pour gérer la plateforme</p>

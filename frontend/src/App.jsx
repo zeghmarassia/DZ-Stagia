@@ -28,13 +28,15 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
+import Admins from './pages/Admin/Admins';
 import AdminOffers from './pages/Admin/AdminOffers';
 import Enterprise from './pages/Admin/Enterprise';
 import Etudiants from './pages/Admin/Etudiants';
-import UserValidation from './pages/Admin/UserValidation';
+// import UserValidation from './pages/Admin/UserValidation';
 
 import './i18n';
 import Companies from './pages/Companies';
+import Sidebar from './components/Sidebar.jsx';
 
 function App() {
   return (
@@ -120,29 +122,51 @@ function App() {
         {/* Admin Routes */}
         <Route path="/admin/dashboard" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Layout><AdminDashboard /></Layout>
+            <Layout>
+              {/* <Sidebar> */}
+              <AdminDashboard/>
+              {/* </Sidebar> */}
+              </Layout>
           </ProtectedRoute>
         } />
-        <Route path="/admin/admin/offers" element={
+            <Route path="/admin/admins" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <Layout>
+                  {/* <Sidebar> */}
+                    <Admins/>
+                  {/* </Sidebar> */}
+                  </Layout>
+              </ProtectedRoute>
+            } />
+        
+        <Route path="/admin/companies" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Layout><AdminOffers /></Layout>
+            <Layout>
+              {/* <Sidebar> */}
+              <Enterprise />
+              {/* </Sidebar> */}
+              </Layout>
           </ProtectedRoute>
         } />
-        <Route path="/admin/admin/companies" element={
+        <Route path="/admin/students" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Layout><Enterprise /></Layout>
+            <Layout>
+              {/* <Sidebar> */}
+                <Etudiants />
+              {/* </Sidebar> */}
+            </Layout>
           </ProtectedRoute>
         } />
-        <Route path="/admin/admin/students" element={
+        <Route path="/admin/offers" element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Layout><Etudiants /></Layout>
+            <Layout>
+              {/* <Sidebar> */}
+                <AdminOffers />
+              {/* </Sidebar > */}
+            </Layout>
           </ProtectedRoute>
         } />
-        <Route path="/admin/user-validation" element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <Layout><UserValidation /></Layout>
-          </ProtectedRoute>
-        } />
+
 
       </Routes>
     </Router>

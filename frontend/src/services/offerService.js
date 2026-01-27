@@ -5,11 +5,11 @@ export const getOffers = (params) => {
 };
 
 export const getOfferById = (id) => {
-  return axiosInstance.get(`/offers/${id}`);
+  return axiosInstance.get(`/api/v1/offers/${id}`);
 };
 
 export const postOffer = (data) => {
-  return axiosInstance.post('/offers', data);
+  return axiosInstance.post('/api/v1/offers/', data);
 };
 
 export const deleteOffer = (id) => {
