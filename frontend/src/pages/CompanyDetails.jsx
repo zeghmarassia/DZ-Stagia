@@ -5,46 +5,24 @@ import {
   ArrowLeft, Building2, CheckCircle2, Briefcase 
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
-// import { getCompanyById } from '../services/companyService'; // Uncomment later
+import { getCompanyPublicProfile } from '../services/companyService';
+// import { useSelector } from 'react-redux';
 
 const CompanyDetails = () => {
   const { id } = useParams(); // Get ID from URL
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
+  // const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchCompanyDetails = async () => {
       setLoading(true);
       try {
         // --- REAL API CALL (COMMENTED OUT) ---
-        // const response = await axios.get(`/api/v1/company/${id}/public`);
-        // setCompany(response.data);
-
-        // --- MOCK DATA ---
-        setTimeout(() => {
-          setCompany({
-            company_id: id,
-            company_name: "Sonatrach",
-            email: "contact@sonatrach.dz",
-            status: "active",
-            is_email_verified: true,
-            description: `Sonatrach est la compagnie nationale algérienne de recherche, production, transport, transformation et commercialisation des hydrocarbures. Elle joue un rôle majeur dans l'économie nationale et africaine.
-            
-            Nos valeurs reposent sur l'intégrité, le professionnalisme et l'innovation. Nous offrons régulièrement des stages aux étudiants des filières techniques et commerciales pour préparer la relève de demain.`,
-            sector: "Énergie & Pétrole",
-            logo_url: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Sonatrach_Logo.svg",
-            address: "Hydra, Alger, Algérie",
-            contact: "+213 21 54 70 00",
-            website: "https://sonatrach.com",
-            created_at: "2020-01-15T10:00:00Z",
-            // Mock offers for this company
-            offers: [
-              { id: 101, title: "Ingénieur Process Junior", type: "Stage PFE", location: "Hassi Messaoud" },
-              { id: 102, title: "Assistant RH", type: "Stage Immersion", location: "Alger" }
-            ]
-          });
-          setLoading(false);
-        }, 600);
+        const response = await getCompanyPublicProfile(id);
+        setCompany(response.data);
+        console.log("Company Details:", response.data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching company details:", error);
         setLoading(false);
@@ -63,7 +41,7 @@ const CompanyDetails = () => {
   if (!company) return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4">
       <h2 className="text-2xl font-bold text-slate-800">Entreprise introuvable</h2>
-      <Link to="/companies" className="text-emerald-600 hover:underline">Retourner à la liste</Link>
+      <Link to="/" className="text-emerald-600 hover:underline">Retourner à la liste</Link>
     </div>
   );
 
@@ -74,8 +52,8 @@ const CompanyDetails = () => {
       {/* Header Banner */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <Link to="/companies" className="inline-flex items-center text-slate-500 hover:text-emerald-600 mb-6 transition-colors font-medium">
-            <ArrowLeft size={18} className="mr-2" /> Retour aux entreprises
+          <Link to="/" className="inline-flex items-center text-slate-500 hover:text-emerald-600 mb-6 transition-colors font-medium">
+            <ArrowLeft size={18} className="mr-2" /> Retour au Acceuil
           </Link>
           
           <div className="flex flex-col md:flex-row gap-8 items-start">

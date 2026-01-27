@@ -30,88 +30,25 @@ const Homepage = () => {
     navigate(`/offers/${offerId}`);
   };
 
-  // Mock Data
-  const MOCK_RECENT_OFFERS = [
-    {
-      offer_id: 1,
-      title: "Stage Développement Web",
-      company: { company_name: "WebSolutions" },
-      location: "Alger",
-      duration: "3 mois",
-      offer_type: "Stage",
-    },
-    {
-      offer_id: 2,
-      title: "Assistant Marketing",
-      company: { company_name: "DigitalPro" },
-      location: "Oran",
-      duration: "6 mois",
-      offer_type: "PFE",
-    },
-    {
-      offer_id: 3,
-      title: "Community Manager",
-      company: { company_name: "SocialMedia Agency" },
-      location: "Constantine",
-      duration: "3 mois",
-      offer_type: "Stage",
-    },
-    {
-      offer_id: 4,
-      title: "Développeur Mobile",
-      company: { company_name: "AppTech" },
-      location: "Sétif",
-      duration: "CDD",
-      offer_type: "Emploi",
-    }
-  ];
-
-  const MOCK_COMPANIES = [
-    {
-      id: 1,
-      company_name: "Tech Solutions",
-      address: "Alger, Hydra",
-      logo_url: "/company-logo.png",
-    },
-    {
-      id: 2,
-      company_name: "Digital Agency",
-      address: "Alger, Dar El Beida",
-      logo_url: "/company-logo.png",
-    },
-    {
-      id: 3,
-      company_name: "Innovate Corp",
-      address: "Oran",
-      logo_url: "/company-logo.png",
-    },
-    {
-      id: 4,
-      company_name: "StartUp Lab",
-      address: "Constantine",
-      logo_url: "/company-logo.png",
-    }
-  ];
-
   // Fetch recent offers and companies on mount - Limited to 4 items for homepage
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         // Commented out API calls
-        /*
+        
         // Fetch recent offers (4 items only for homepage)
         const offersResponse = await getPublicOffers({ page: 1, page_size: 4 });
         setOffers(offersResponse.data.offers || []);
 
         // Fetch companies (4 items only for homepage)
-        const companiesResponse = await getPublicCompanies({ page: 1, page_size: 4 });
+        const companiesResponse = await getPublicCompanies({ page: 1, page_size: 6 });
         setCompanies(companiesResponse.data.companies || []);
-        */
+        
        
         // Use Mock Data
-        setOffers(MOCK_RECENT_OFFERS);
-        setCompanies(MOCK_COMPANIES);
+        // setOffers(MOCK_RECENT_OFFERS);
+        // setCompanies(MOCK_COMPANIES);
 
       } catch (error) {
         console.error("Error fetching homepage data:", error);
@@ -199,7 +136,8 @@ const Homepage = () => {
           ) : companies.length > 0 ? (
             companies.map((company) => (
               <CompanyCard 
-                key={company.id}
+                key={company.company_id}
+                id={company.company_id}
                 name={company.company_name} 
                 location={company.address} 
                 logo={company.logo_url || 'https://via.placeholder.com/150'}

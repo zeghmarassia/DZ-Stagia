@@ -5,7 +5,7 @@ import {
   // ... other icons
 } from 'lucide-react';
 
-const CompanyCard = ({ name, location, logo, isFeatured = false }) => {
+const CompanyCard = ({ id, name, location, logo, isFeatured = false }) => {
   // 1. Hook must be inside the component
   const navigate = useNavigate();
 
@@ -46,7 +46,7 @@ const CompanyCard = ({ name, location, logo, isFeatured = false }) => {
         className="w-full py-3 rounded-lg font-bold text-sm transition-all duration-300 
                    bg-blue-50 text-blue-600 
                    group-hover:bg-cyan-700 group-hover:text-white" 
-        onClick={() => navigate(`/companies/1`)}
+        onClick={() => navigate(`/company/public-profile/${id}`)}
       >
         VOIR PROFIL
       </button>

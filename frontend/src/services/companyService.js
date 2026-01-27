@@ -4,6 +4,14 @@ export const getCompanyProfile = () => {
   return axiosInstance.get('/company/profile');
 };
 
+export const getCompanyPublicProfile = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/public`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
 export const uploadCompanyLogo = (logoFile) => {
   const formData = new FormData();
   formData.append('logo', logoFile);

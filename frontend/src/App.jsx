@@ -48,7 +48,7 @@ function App() {
         <Route path="/offers" element={<Layout><Offers /></Layout>} />
         <Route path="/offers/:id" element={<Layout><OfferDetailsPage /></Layout>} />
         <Route path="/companies" element={<Layout><Companies/></Layout>} />
-        <Route path="/companies/:id" element={<Layout><CompanyDetails/></Layout>} />
+        <Route path="/company/public-profile/:id" element={<Layout><CompanyDetails/></Layout>} />
         <Route path="/about" element={<Layout><div>About Page</div></Layout>} />
         
         {/* Auth Routes without Navbar */}

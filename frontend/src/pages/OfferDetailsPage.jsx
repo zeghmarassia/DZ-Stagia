@@ -12,40 +12,40 @@ const OfferDetailsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Mock Data
- const MOCK_OFFER_DETAILS = {
-  offer_id: id,
-  title: "Développeur Full Stack",
-  description: "Nous recherchons un développeur Full Stack...",
-  location: "Alger, Hydra",
-  offer_type: "Emploi",
-  duration: "CDI",
-  created_at: "2024-01-25T10:00:00Z",
+//  const MOCK_OFFER_DETAILS = {
+//   offer_id: id,
+//   title: "Développeur Full Stack",
+//   description: "Nous recherchons un développeur Full Stack...",
+//   location: "Alger, Hydra",
+//   offer_type: "Emploi",
+//   duration: "CDI",
+//   created_at: "2024-01-25T10:00:00Z",
 
-  missions: [
-    "Développer des applications web modernes",
-    "Collaborer avec l'équipe produit",
-    "Maintenir et améliorer le code existant"
-  ],
+//   missions: [
+//     "Développer des applications web modernes",
+//     "Collaborer avec l'équipe produit",
+//     "Maintenir et améliorer le code existant"
+//   ],
 
-  requirements: [
-    "React",
-    "Node.js",
-    "SQL"
-  ],
+//   requirements: [
+//     "React",
+//     "Node.js",
+//     "SQL"
+//   ],
 
-  whatWeOffer: [
-    "Environnement de travail dynamique",
-    "Opportunités d'évolution",
-    "Salaire compétitif"
-  ],
+//   whatWeOffer: [
+//     "Environnement de travail dynamique",
+//     "Opportunités d'évolution",
+//     "Salaire compétitif"
+//   ],
 
-  company: {
-    name: "Tech Solutions",
-    logoUrl: "/company-logo.png",
-    industry: "Technologie",
-    description: "Entreprise innovante spécialisée en solutions digitales"
-  }
-};
+//   company: {
+//     name: "Tech Solutions",
+//     logoUrl: "/company-logo.png",
+//     industry: "Technologie",
+//     description: "Entreprise innovante spécialisée en solutions digitales"
+//   }
+// };
 
 
   useEffect(() => {
@@ -53,13 +53,14 @@ const OfferDetailsPage = () => {
       try {
         setIsLoading(true);
         // Commented out API call
-        /*
+        
         const response = await getPublicOfferDetails(id);
         setOffer(response.data);
-        */
+        console.log('Offer Details:', response.data);
+        
         
         // Use Mock Data
-        setOffer(MOCK_OFFER_DETAILS);
+        // setOffer(MOCK_OFFER_DETAILS);
         
         setError('');
       } catch (err) {
@@ -86,10 +87,10 @@ const OfferDetailsPage = () => {
       }
 
       // Commented out API call
-      /*
+      
       // Assuming the endpoint to apply is /offers/:id/apply
-      const response = await axiosInstance.post(`/offers/${id}/apply`);
-      */
+      const response = await axiosInstance.post(`/student/offers/${id}/apply`);
+      
      
       // Simulate success
       await new Promise(resolve => setTimeout(resolve, 500)); // Simulate delay
@@ -260,25 +261,25 @@ const OfferDetailsPage = () => {
                   </p>
                 </section>
 
-                <section>
+                {/* <section>
                   <h2 className="text-[18px] font-[800] mb-4">Vos missions</h2>
                   <ul className="space-y-3 text-gray-500 text-[15px] font-medium">
                     {offer.missions.map((mission, index) => <ListItem key={index} text={mission} />)}
                   </ul>
-                </section>
+                </section> */}
 
                 <section>
                   <h2 className="text-[18px] font-[800] mb-4">Prérequis</h2>
-                  <ul className="space-y-3 text-gray-500 text-[15px] font-medium">
+                  {/* <ul className="space-y-3 text-gray-500 text-[15px] font-medium">
                     {offer.requirements.map((req, index) => <ListItem key={index} text={req} />)}
-                  </ul>
+                  </ul> */}
                 </section>
 
                 <section>
                   <h2 className="text-[18px] font-[800] mb-4">Ce que nous offrons</h2>
-                  <ul className="space-y-3 text-gray-500 text-[15px] font-medium">
+                  {/* <ul className="space-y-3 text-gray-500 text-[15px] font-medium">
                     {offer.whatWeOffer.map((item, index) => <ListItem key={index} text={item} />)}
-                  </ul>
+                  </ul> */}
                 </section>
               </div>
             </div>
